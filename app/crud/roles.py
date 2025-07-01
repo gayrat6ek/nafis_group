@@ -78,7 +78,7 @@ def update_role(db:Session, data: UpdateRole):
     if data.is_active is not None:
         role.is_active = data.is_active
     if data.permissions is not None:
-        data.permissions = data.permissions if data.permissions else []
+        role.permissions = data.permissions if data.permissions else []
 
     db.commit()
     db.refresh(role)
