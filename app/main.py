@@ -16,6 +16,8 @@ from app.routes.v1.brands import brands_router
 from app.routes.v1.categories import categories_router
 from app.routes.v1.regions import regions_router
 from app.routes.v1.districts import districts_router
+from app.routes.v1.colors import colors_router
+from app.routes.v1.loan_months import loan_months_router
 
 from app.utils.utils import get_current_user_for_docs
 
@@ -38,6 +40,8 @@ app.include_router(brands_router, prefix="/api/v1", tags=["Brands"])
 app.include_router(categories_router, prefix="/api/v1", tags=["Categories"])
 app.include_router(regions_router, prefix="/api/v1", tags=["Regions"])
 app.include_router(districts_router, prefix="/api/v1", tags=["Districts"])
+app.include_router(colors_router, prefix="/api/v1", tags=["Colors"])
+app.include_router(loan_months_router, prefix="/api/v1", tags=["Loan Months"])
 
 
 

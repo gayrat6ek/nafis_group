@@ -56,8 +56,8 @@ def get_categories(db: Session, page: int = 1, size: int = 10,filter:Optional[Fi
                 )
             if  filter.is_active is not None:
                 query = query.filter(Categories.is_active == filter.is_active)
-            if filter.parent_id:
-                query = query.filter(Categories.parent_id == filter.parent_id)
+            # if filter.parent_id:
+            query = query.filter(Categories.parent_id == filter.parent_id)
 
             
         query = query.order_by(Categories.created_at.desc())

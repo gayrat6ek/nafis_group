@@ -11,8 +11,9 @@ from app.crud.pages_and_permissions import (
     get_permission,
     get_permission_link
 )
-from app.crud.roles import create_role,  get_role_by_name
+from app.crud.roles import create_role,  get_role_by_name,update_role
 from app.crud.users import create_user, get_user_by_username
+from app.schemas.roles import UpdateRole
 from app.routes.depth import get_db
 from app.utils.permissions import pages_and_permissions
 
@@ -49,6 +50,12 @@ async def create_role_lifespan():
     role = get_role_by_name(db=db, name=settings.admin_role)
     if not role:
         role = create_role(db=db, name=settings.admin_role, description='Admin',permissions=role_permissions)
+    else:
+        role = update_role(db=db, id=role.id,data=UpdateRole(**{
+    'name': settings.admin_role,
+    'description': 'Admin',
+    'permissions': role_permissions
+}))
 
     user = get_user_by_username(db=db, username=settings.admin_role)
     if not user:

@@ -11,7 +11,7 @@ from fastapi_pagination import Page
 from sqlalchemy.orm import Session
 from app.crud import categories as crud_categories
 from app.routes.depth import get_db, PermissionChecker
-from app.schemas.categories import CategoryGet, CategoryList, CreateCategory, UpdateCategory,FilterCategory
+from app.schemas.categories import CategoryGet, CategoryList, CreateCategory, UpdateCategory,FilterCategory,GetCategoriesTree
 from app.models.Categories import Categories
 from app.utils.permissions import pages_and_permissions
 
@@ -32,7 +32,7 @@ async def get_category_list(
     return crud_categories.get_categories(db=db, page=page, size=size, filter=filter)
 
 
-@categories_router.get('/categories/{id}', response_model=CategoryGet)
+@categories_router.get('/category/{id}', response_model=CategoryGet)
 async def get_category(
         id: UUID,
         db: Session = Depends(get_db),
@@ -65,6 +65,18 @@ async def update_category(
     
     updated_category = crud_categories.update_category(db=db, category_id=id, data=body)
     return updated_category
+
+
+@categories_router.get('/categories/tree', response_model=Page[GetCategoriesTree])
+async def get_category_tree(
+        page: int = 1,
+        size: int = 10,
+        filter: FilterCategory = Depends(),
+        db: Session = Depends(get_db),
+        current_user: dict = Depends(PermissionChecker(required_permissions=pages_and_permissions['Categories']['view']))
+):
+    categories = crud_categories.get_categories(db=db, page=page, size=size, filter=filter)
+    return categories
 
 
 

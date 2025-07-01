@@ -33,6 +33,16 @@ pages_and_permissions = {
         "update": "B2",
         "create": "B4"
     },
+    "LoanMonths":{
+        "view": "LM1",
+        "update": "LM2",
+        "create": "LM4"
+    },
+    "Colors": {
+        "view": "CL1",
+        "update": "CL2",
+        "create": "CL4"
+    }
 
 
 }
