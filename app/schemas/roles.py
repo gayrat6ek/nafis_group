@@ -58,7 +58,6 @@ class CreateRole(BaseConfig):
 
 
 class UpdateRole(BaseConfig):
-    id: UUID
     name: Optional[str] = None
     description: Optional[str] = None
     is_active: Optional[bool] = True

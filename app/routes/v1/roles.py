@@ -42,8 +42,9 @@ async def create_roles(
     return created_role
 
 
-@roles_router.put('/roles', response_model=RolesGet)
+@roles_router.put('/roles/{id}', response_model=RolesGet)
 async def update_roles(
+        id: UUID,
         body: UpdateRole,
         db: Session = Depends(get_db),
         current_user: dict = Depends(PermissionChecker(required_permissions=pages_and_permissions['Roles']['update']))

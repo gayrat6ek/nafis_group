@@ -69,8 +69,8 @@ def add_role(db:Session, data: CreateRole):
         return None
 
 
-def update_role(db:Session, data: UpdateRole):
-    role = db.query(Roles).get(ident=data.id)
+def update_role(db:Session, data: UpdateRole,id: Optional[UUID] = None):
+    role = db.query(Roles).get(ident=id)
     if data.name is not None:
         role.name = data.name
     if data.description is not None:
