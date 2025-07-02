@@ -32,9 +32,11 @@ def create_region(db: Session, data: CreateRegion) -> Regions:
         db.rollback()
         raise e
 
-def get_regions(db: Session, page: int = 1, size: int = 10) -> list[Regions]:
+def get_regions(db: Session, page: int = 1, size: int = 10,is_active:Optional[bool]=None) -> list[Regions]:
     try:
         query = db.query(Regions)
+        if is_active is not None:
+            query = query.filter(Regions.is_active == is_active)
         total_count = query.count()
         regions = query.offset((page - 1) * size).limit(size).all()
         

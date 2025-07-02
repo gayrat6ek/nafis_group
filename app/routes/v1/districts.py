@@ -24,11 +24,12 @@ districts_router = APIRouter()
 async def get_district_list(
         page: int = 1,
         size: int = 10,
+        is_active: bool = None,
         region_id: UUID = None,
         db: Session = Depends(get_db),
         current_user: dict = Depends(PermissionChecker(required_permissions=pages_and_permissions['Districts']['view']))
 ):
-    return crud_districts.get_districts(db=db, page=page, size=size, region_id=region_id)
+    return crud_districts.get_districts(db=db, page=page, size=size, region_id=region_id, is_active=is_active)
 
 
 @districts_router.get('/districts/{id}', response_model=DistrictGet)

@@ -18,6 +18,8 @@ from app.routes.v1.regions import regions_router
 from app.routes.v1.districts import districts_router
 from app.routes.v1.colors import colors_router
 from app.routes.v1.loan_months import loan_months_router
+from app.routes.v1.products import products_router
+from app.routes.v1.productDetails   import product_details_router
 
 from app.utils.utils import get_current_user_for_docs
 
@@ -42,6 +44,8 @@ app.include_router(regions_router, prefix="/api/v1", tags=["Regions"])
 app.include_router(districts_router, prefix="/api/v1", tags=["Districts"])
 app.include_router(colors_router, prefix="/api/v1", tags=["Colors"])
 app.include_router(loan_months_router, prefix="/api/v1", tags=["Loan Months"])
+app.include_router(products_router, prefix="/api/v1", tags=["Products"])
+app.include_router(product_details_router, prefix="/api/v1", tags=["Product Details"])
 
 
 

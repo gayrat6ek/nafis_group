@@ -42,6 +42,16 @@ pages_and_permissions = {
         "view": "CL1",
         "update": "CL2",
         "create": "CL4"
+    },
+    "Products": {
+        "view": "P1",
+        "update": "P2",
+        "create": "P4"
+    },
+    "ProductDetails": {
+        "view": "PD1",
+        "update": "PD2",
+        "create": "PD4"
     }
 
 

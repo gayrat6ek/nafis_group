@@ -31,11 +31,13 @@ def create_district(db: Session, data: CreateDistrict) -> Districts:
         raise e
     
 
-def get_districts(db: Session,region_id:Optional[UUID]=None, page: int = 1, size: int = 10) -> list[Districts]:
+def get_districts(db: Session,region_id:Optional[UUID]=None, page: int = 1, size: int = 10, is_active:Optional[bool]=None) -> list[Districts]:
     try:
         query = db.query(Districts)
         if region_id:
             query = query.filter(Districts.region_id == region_id)
+        if is_active is not None:
+            query = query.filter(Districts.is_active == is_active)
         
         total_count = query.count()
         districts = query.offset((page - 1) * size).limit(size).all()

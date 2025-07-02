@@ -21,7 +21,7 @@ class ProductDetails(Base):
     id = Column(UUID(as_uuid=True), primary_key=True, index=True, default=uuid.uuid4)
     product_id = Column(UUID(as_uuid=True), ForeignKey('products.id'), nullable=False)
     size = Column(JSONB, nullable=True)  # Assuming size is stored as a JSON object (e.g., {"size": "M", "dimensions": {"length": 10, "width": 5}})
-
+    is_active = Column(Boolean, default=True)  # Indicates if the product detail is active
 
     
     characteristics = Column(JSONB, nullable=True)  # Assuming characteristics are stored as a JSON object
