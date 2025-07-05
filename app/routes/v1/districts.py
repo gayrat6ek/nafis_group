@@ -27,7 +27,7 @@ async def get_district_list(
         is_active: bool = None,
         region_id: UUID = None,
         db: Session = Depends(get_db),
-        current_user: dict = Depends(PermissionChecker(required_permissions=pages_and_permissions['Districts']['view']))
+        # current_user: dict = Depends(PermissionChecker(required_permissions=pages_and_permissions['Districts']['view']))
 ):
     return crud_districts.get_districts(db=db, page=page, size=size, region_id=region_id, is_active=is_active)
 
@@ -36,7 +36,7 @@ async def get_district_list(
 async def get_district(
         id: UUID,
         db: Session = Depends(get_db),
-        current_user: dict = Depends(PermissionChecker(required_permissions=pages_and_permissions['Districts']['view']))
+        # current_user: dict = Depends(PermissionChecker(required_permissions=pages_and_permissions['Districts']['view']))
 ):
     district = crud_districts.get_district_by_id(db=db, district_id=id)
     if not district:

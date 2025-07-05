@@ -27,7 +27,7 @@ async def get_category_list(
         size: int = 10,
         filter: FilterCategory = Depends(),
         db: Session = Depends(get_db),
-        current_user: dict = Depends(PermissionChecker(required_permissions=pages_and_permissions['Categories']['view']))
+        # current_user: dict = Depends(PermissionChecker(required_permissions=pages_and_permissions['Categories']['view']))
 ):
     return crud_categories.get_categories(db=db, page=page, size=size, filter=filter)
 
@@ -36,7 +36,7 @@ async def get_category_list(
 async def get_category(
         id: UUID,
         db: Session = Depends(get_db),
-        current_user: dict = Depends(PermissionChecker(required_permissions=pages_and_permissions['Categories']['view']))
+        # current_user: dict = Depends(PermissionChecker(required_permissions=pages_and_permissions['Categories']['view']))
 ):
     category = crud_categories.get_category_by_id(db=db, category_id=id)
     return category
@@ -73,7 +73,7 @@ async def get_category_tree(
         size: int = 10,
         filter: FilterCategory = Depends(),
         db: Session = Depends(get_db),
-        current_user: dict = Depends(PermissionChecker(required_permissions=pages_and_permissions['Categories']['view']))
+        # current_user: dict = Depends(PermissionChecker(required_permissions=pages_and_permissions['Categories']['view']))
 ):
     categories = crud_categories.get_categories(db=db, page=page, size=size, filter=filter)
     return categories

@@ -25,7 +25,7 @@ async def get_region_list(
         size: int = 10,
         is_active: bool = None,
         db: Session = Depends(get_db),
-        current_user: dict = Depends(PermissionChecker(required_permissions=pages_and_permissions['Regions']['view']))
+        # current_user: dict = Depends(PermissionChecker(required_permissions=pages_and_permissions['Regions']['view']))
 ):
     return crud_regions.get_regions(db=db, page=page, size=size, is_active=is_active)
 
@@ -34,7 +34,7 @@ async def get_region_list(
 async def get_region(
         id: UUID,
         db: Session = Depends(get_db),
-        current_user: dict = Depends(PermissionChecker(required_permissions=pages_and_permissions['Regions']['view']))
+        # current_user: dict = Depends(PermissionChecker(required_permissions=pages_and_permissions['Regions']['view']))
 ):
     region = crud_regions.get_region_by_id(db=db, region_id=id)
     if not region:

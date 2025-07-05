@@ -23,7 +23,7 @@ async def get_brand_list(
         page: int = 1,
         size: int = 10,
         db: Session = Depends(get_db),
-        current_user: dict = Depends(PermissionChecker(required_permissions=pages_and_permissions['Brands']['view']))
+        # current_user: dict = Depends(PermissionChecker(required_permissions=pages_and_permissions['Brands']['view']))
 ):
     return crud_brands.get_brands(db=db, page=page, size=size)
 
@@ -33,7 +33,7 @@ async def get_brand_list(
 async def get_brand(
         brand_id: UUID,
         db: Session = Depends(get_db),
-        current_user: dict = Depends(PermissionChecker(required_permissions=pages_and_permissions['Brands']['view']))
+        # current_user: dict = Depends(PermissionChecker(required_permissions=pages_and_permissions['Brands']['view']))
 ):
     brand = crud_brands.get_brand_by_id(db=db, brand_id=brand_id)
     if not brand:

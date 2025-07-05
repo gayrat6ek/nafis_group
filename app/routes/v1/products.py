@@ -30,7 +30,7 @@ async def get_products_list(
         size: int = 10,
         is_active: bool = None,
         db: Session = Depends(get_db),
-        current_user: dict = Depends(PermissionChecker(required_permissions=pages_and_permissions['Products']['view']))
+        # current_user: dict = Depends(PermissionChecker(required_permissions=pages_and_permissions['Products']['view']))
 ):
     return crud_products.get_products(db=db, page=page, size=size, is_active=is_active)
 
@@ -40,7 +40,7 @@ async def get_products_list(
 async def get_product(
         id: UUID,
         db: Session = Depends(get_db),
-        current_user: dict = Depends(PermissionChecker(required_permissions=pages_and_permissions['Products']['view']))
+        # current_user: dict = Depends(PermissionChecker(required_permissions=pages_and_permissions['Products']['view']))
 ):
     product = crud_products.get_product_by_id(db=db, product_id=id)
     if not product:

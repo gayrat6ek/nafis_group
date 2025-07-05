@@ -25,7 +25,7 @@ loan_months_router = APIRouter()
 async def get_loan_months_list(
         is_active: bool = None,
         db: Session = Depends(get_db),
-        current_user: dict = Depends(PermissionChecker(required_permissions=pages_and_permissions['LoanMonths']['view']))
+        # current_user: dict = Depends(PermissionChecker(required_permissions=pages_and_permissions['LoanMonths']['view']))
 ):
     return crud_loans_months.get_loan_months(db=db, is_active=is_active)
 
@@ -34,7 +34,7 @@ async def get_loan_months_list(
 async def get_loan_months(
         id: UUID,
         db: Session = Depends(get_db),
-        current_user: dict = Depends(PermissionChecker(required_permissions=pages_and_permissions['LoanMonths']['view']))
+        # current_user: dict = Depends(PermissionChecker(required_permissions=pages_and_permissions['LoanMonths']['view']))
 ):
     loan_months = crud_loans_months.get_loan_months_by_id(db=db, loan_months_id=id)
     if not loan_months:

@@ -27,7 +27,7 @@ async def get_color_list(
 
         is_active: bool = None,
         db: Session = Depends(get_db),
-        current_user: dict = Depends(PermissionChecker(required_permissions=pages_and_permissions['Colors']['view']))
+        # current_user: dict = Depends(PermissionChecker(required_permissions=pages_and_permissions['Colors']['view']))
 ):
     return crud_colors.get_colors(db=db, is_active=is_active)
 
@@ -37,7 +37,7 @@ async def get_color_list(
 async def get_color(
         id: UUID,
         db: Session = Depends(get_db),
-        current_user: dict = Depends(PermissionChecker(required_permissions=pages_and_permissions['Colors']['view']))
+        # current_user: dict = Depends(PermissionChecker(required_permissions=pages_and_permissions['Colors']['view']))
 ):
     color = crud_colors.get_color_by_id(db=db, color_id=id)
     if not color:
