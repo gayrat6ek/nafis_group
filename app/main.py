@@ -4,6 +4,7 @@ from fastapi.middleware.cors import CORSMiddleware
 # ----------import packages
 from fastapi.openapi.docs import get_swagger_ui_html
 from fastapi.openapi.utils import get_openapi
+from fastapi.staticfiles import StaticFiles
 from fastapi_pagination import add_pagination
 
 from app.core.config import settings
@@ -20,8 +21,10 @@ from app.routes.v1.colors import colors_router
 from app.routes.v1.loan_months import loan_months_router
 from app.routes.v1.products import products_router
 from app.routes.v1.productDetails   import product_details_router
+from app.routes.v1.files import files_router
 
 from app.utils.utils import get_current_user_for_docs
+
 
 
 # from app.utils.websocket_connections import manager
@@ -46,6 +49,7 @@ app.include_router(colors_router, prefix="/api/v1", tags=["Colors"])
 app.include_router(loan_months_router, prefix="/api/v1", tags=["Loan Months"])
 app.include_router(products_router, prefix="/api/v1", tags=["Products"])
 app.include_router(product_details_router, prefix="/api/v1", tags=["Product Details"])
+app.include_router(files_router, prefix="/api/v1", tags=["Files"] )
 
 
 
@@ -62,7 +66,7 @@ async def get_open_api_endpoint(current_user: str = Depends(get_current_user_for
 
 Base.metadata.create_all(bind=engine)
 
-# app.mount("/files", StaticFiles(directory="files"), name="files")
+app.mount("/files", StaticFiles(directory="files"), name="files")
 
 
 

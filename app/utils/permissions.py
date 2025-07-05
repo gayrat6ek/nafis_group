@@ -52,6 +52,9 @@ pages_and_permissions = {
         "view": "PD1",
         "update": "PD2",
         "create": "PD4"
+    },
+    "Files":{
+        'upload':'F1'
     }
 
 
