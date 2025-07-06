@@ -12,7 +12,6 @@ from sqlalchemy import or_, and_, Date, cast,String
 from uuid import UUID
 
 from app.models.Roles import Roles
-from app.models.Accesses import Accesses
 from app.schemas.roles import CreateRole, UpdateRole
 
 

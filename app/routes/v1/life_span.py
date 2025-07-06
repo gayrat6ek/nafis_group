@@ -4,13 +4,6 @@ import pytz
 from sqlalchemy.orm import Session
 
 from app.core.config import settings
-from app.crud.pages_and_permissions import (
-    create_permission_page,
-    create_permission,
-    get_permission_page,
-    get_permission,
-    get_permission_link
-)
 from app.crud.roles import create_role,  get_role_by_name,update_role
 from app.crud.users import create_user, get_user_by_username
 from app.schemas.roles import UpdateRole
@@ -19,23 +12,6 @@ from app.utils.permissions import pages_and_permissions
 
 timezonetash = pytz.timezone('Asia/Tashkent')
 
-
-# #create new permission
-# @asynccontextmanager
-# async def create_permissions_lifespan():
-#     db: Session = next(get_db())
-#     for key, value in pages_and_permissions.items():
-#         permission_page = get_permission_page(db=db, name=key)
-#         if permission_page:
-#             permission_page_id = permission_page.id
-#         else:
-#             permission_page_id = create_permission_page(db=db, name=key).id
-#         for name, link in value.items():
-#             permission = get_permission(db=db, link=link, permission_page_id=permission_page_id)
-#             if not permission:
-#                 create_permission(db=db, name=name, link=link, permission_page_id=permission_page_id)
-
-#     yield  #--------------  HERE YOU CAN WRITE LOG ON CLOSING AFTER YIELD ------------
 
 
 #---------------------- CREATE ROLE AND USERS FOR DEFAULT ADMIN USER --------------------------

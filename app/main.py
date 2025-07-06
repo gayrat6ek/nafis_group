@@ -22,6 +22,7 @@ from app.routes.v1.loan_months import loan_months_router
 from app.routes.v1.products import products_router
 from app.routes.v1.productDetails   import product_details_router
 from app.routes.v1.files import files_router
+from app.routes.v1.discounts import discounts_router
 
 from app.utils.utils import get_current_user_for_docs
 
@@ -50,7 +51,7 @@ app.include_router(loan_months_router, prefix="/api/v1", tags=["Loan Months"])
 app.include_router(products_router, prefix="/api/v1", tags=["Products"])
 app.include_router(product_details_router, prefix="/api/v1", tags=["Product Details"])
 app.include_router(files_router, prefix="/api/v1", tags=["Files"] )
-
+app.include_router(discounts_router, prefix="/api/v1", tags=["Discounts"])
 
 
 @app.get("/docs", include_in_schema=False)

@@ -25,7 +25,7 @@ class Discounts(Base):
     description_uz = Column(String, nullable=True)
     description_ru = Column(String, nullable=True)
     description_en = Column(String, nullable=True)
-    has_discount = Column(Boolean, default=False)  # Indicates if the discount is featured as news
+    is_news = Column(Boolean, default=False)  # Assuming this is a flag for news or special discounts
 
     is_active = Column(Boolean, default=True)
     amount = Column(Float, nullable=False)

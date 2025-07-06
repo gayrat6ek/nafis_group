@@ -55,7 +55,12 @@ pages_and_permissions = {
     },
     "Files":{
         'upload':'F1'
-    }
+    },
+    "Discounts": {
+        "view": "D1",
+        "update": "D2",
+        "create": "D4"
+    },
 
 
 }

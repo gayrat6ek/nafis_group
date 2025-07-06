@@ -42,10 +42,10 @@ class Users(Base):
     person_passport_image = Column(String, nullable=True)
     passport_series = Column(String, nullable=True)
 
-    phone_number = Column(String, nullable=True, unique=True)
+    # phone_number = Column(String, nullable=True, unique=True)
     extra_phone_number = Column(String, nullable=True, unique=True)
     birth_date = Column(DateTime(timezone=True), nullable=True)  # Assuming birth date
-
+    otp = Column(String,nullable=True)
 
 
     email = Column(String, nullable=True, unique=True)
@@ -63,5 +63,7 @@ class Users(Base):
     bank_cards = relationship("BankCards", back_populates="user")  # Assuming BankCards model has a user relationship
     orders = relationship("Orders", back_populates="user")  # Assuming Orders model has
     logs = relationship("Logs", back_populates="user")  # Assuming Logs model has a user relationship
+
+    
 
     

@@ -19,6 +19,7 @@ from app.db.session import SessionLocal
 
 
 
+
 timezonetash = pytz.timezone("Asia/Tashkent")
 security = HTTPBasic()
 
@@ -74,3 +75,12 @@ def create_refresh_token(subject: Union[str, Any], expires_delta: int = None,per
     to_encode = {"exp": expires_delta, "sub": str(subject),"permissions":permissions,"user":user_info}
     encoded_jwt = jwt.encode(to_encode, settings.jwt_refresh_secret_key, settings.jwt_algorithm)
     return encoded_jwt
+
+
+def generateOtp(length):
+    if length <= 0:
+        raise ValueError("OTP length must be greater than 0")
+    otp = ''.join([str(random.randint(0, 9)) for _ in range(length)])
+    return otp
+
+
