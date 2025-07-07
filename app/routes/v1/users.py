@@ -74,7 +74,7 @@ async def get_me(
     return current_user
 
 
-@user_router.get("/users", response_model=user_sch.GetUserFullData)
+@user_router.get("/users", response_model=Page[user_sch.GetUserFullData])
 async def get_users(
         page: int = 1,
         size: int = 10,

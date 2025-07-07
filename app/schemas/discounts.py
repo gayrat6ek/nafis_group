@@ -3,13 +3,29 @@ from symtable import Class
 from typing import Optional, List
 from uuid import UUID
 from pydantic import BaseModel, Field, ConfigDict
-from app.schemas.products import ProductGet
 
 class BaseConfig(BaseModel):
     model_config = ConfigDict(
         from_attributes=True
     )
 
+
+
+class ProductGet(BaseConfig):
+    id: Optional[UUID] = None
+    name_uz: Optional[str] = None
+    name_ru: Optional[str] = None
+    name_en: Optional[str] = None
+    description_uz: Optional[str] = None        
+    description_ru: Optional[str] = None
+    description_en: Optional[str] = None
+
+    delivery_days: Optional[int] = None
+    is_active: Optional[bool] = True
+    loan_accessable: Optional[bool] = True
+    category_id: Optional[UUID] = None  # Assuming products are linked to categories
+    brand_id: Optional[UUID] = None  # Assuming products are linked to brands
+    created_at: Optional[datetime] = None
 
 
 class DiscountProducts(BaseConfig):

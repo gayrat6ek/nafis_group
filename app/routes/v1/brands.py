@@ -1,4 +1,5 @@
 
+from typing import Optional
 from uuid import UUID
 from fastapi import APIRouter
 from fastapi import (
@@ -22,10 +23,12 @@ brands_router = APIRouter()
 async def get_brand_list(
         page: int = 1,
         size: int = 10,
+        is_active:Optional[bool]=None,
+        search:Optional[str]=None,
         db: Session = Depends(get_db),
         # current_user: dict = Depends(PermissionChecker(required_permissions=pages_and_permissions['Brands']['view']))
 ):
-    return crud_brands.get_brands(db=db, page=page, size=size)
+    return crud_brands.get_brands(db=db, page=page, size=size,search=search,is_active=is_active)
 
 
 
@@ -66,6 +69,6 @@ async def update_brand(
     if not existing_brand:
         raise HTTPException(status_code=404, detail="Brand not found")
     
-    updated_brand = crud_brands.update_brand(db=db, brand_id=brand_id, brand=brand)
+    updated_brand = crud_brands.update_brand(db=db, brand_id=brand_id, data=brand)
     return updated_brand
 

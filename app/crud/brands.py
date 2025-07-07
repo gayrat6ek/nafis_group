@@ -36,9 +36,17 @@ def create_brand(db: Session, data: CreateBrand) -> Brands:
     
 
 
-def get_brands(db: Session, page: int = 1, size: int = 10):
+def get_brands(db: Session, page: int = 1, size: int = 10,search:Optional[str]=None,is_active:Optional[bool]=None):
     try:
         query = db.query(Brands)
+        if search is not None:
+            query = query.filter(or_(
+                Brands.name_en.ilike(f"%{search}%"),
+                Brands.name_uz.ilike(f"%{search}%"),
+                Brands.name_ru.ilike(f"%{search}%"),
+                ))
+        if is_active is not None:
+            query = query.filter(Brands.is_active==is_active)
         total_count = query.count()
         brands = query.offset((page - 1) * size).limit(size).all()
         

@@ -17,9 +17,9 @@ from app.db.base import Base
 class Discounts(Base):
     __tablename__ = "discounts"
     id = Column(UUID(as_uuid=True), primary_key=True, index=True, default=uuid.uuid4)
-    name_uz = Column(String, nullable=False, unique=True)
-    name_ru = Column(String, nullable=False, unique=True)
-    name_en = Column(String, nullable=False, unique=True)
+    name_uz = Column(String, nullable=False, )
+    name_ru = Column(String, nullable=False,)
+    name_en = Column(String, nullable=False, )
 
 
     description_uz = Column(String, nullable=True)

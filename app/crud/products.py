@@ -4,6 +4,9 @@ from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import Session
 from typing import Optional
 import bcrypt
+from app.models.Products import Products
+from app.models.discounts import Discounts
+from app.models.discountProducts import DiscountProducts
 
 import pytz
 from sqlalchemy.sql import func
@@ -13,6 +16,7 @@ from uuid import UUID
 
 from app.models.Products import Products
 from app.schemas.products import CreateProduct, UpdateProduct
+from app.utils.utils import timezonetash
 
 
 def create_product(db: Session, data: CreateProduct) -> Products:
@@ -38,26 +42,45 @@ def create_product(db: Session, data: CreateProduct) -> Products:
         db.rollback()
         raise e
     
+from sqlalchemy.orm import joinedload
+from datetime import datetime
 
-def get_products(db: Session, page: int = 1, size: int = 10, is_active: Optional[bool] = None) -> list[Products]:
+def get_products(
+    db: Session,
+    page: int = 1,
+    size: int = 10,
+    is_active: Optional[bool] = None
+):
     try:
-        query = db.query(Products)
+        now = datetime.now(timezonetash)
+
+        query = db.query(Products).options(
+            joinedload(Products.discounts).joinedload(DiscountProducts.discount)
+        )
+
         if is_active is not None:
             query = query.filter(Products.is_active == is_active)
-        
+
         total_count = query.count()
         products = query.offset((page - 1) * size).limit(size).all()
-        
+
+        # Filter each product's discounts in Python
+        for product in products:
+            product.discounts = [
+                dp for dp in product.discounts
+                if dp.discount.is_active and dp.discount.active_from <= now and dp.discount.active_to >= now
+            ]
+
         return {
             "items": products,
             "total": total_count,
             "page": page,
             "size": size,
-            'pages': (total_count + size - 1) // size 
+            "pages": (total_count + size - 1) // size
         }
+
     except SQLAlchemyError as e:
         raise e
-    
 
 def get_product_by_id(db: Session, product_id: UUID) -> Optional[Products]:
     try:
