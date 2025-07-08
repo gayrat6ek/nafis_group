@@ -48,9 +48,9 @@ def get_product_details(db: Session, product_id: UUID, is_active: Optional[bool]
     except SQLAlchemyError as e:
         raise e
 
-def get_product_details_by_id(db: Session, product_details_id: UUID) -> Optional[ProductDetails]:
+def get_product_details_by_id(db: Session, product_detail_id: UUID) -> Optional[ProductDetails]:
     try:
-        return db.query(ProductDetails).filter(ProductDetails.id == product_details_id).first()
+        return db.query(ProductDetails).filter(ProductDetails.id == product_detail_id).first()
     except SQLAlchemyError as e:
         raise e
     
