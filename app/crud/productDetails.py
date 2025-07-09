@@ -55,9 +55,9 @@ def get_product_details_by_id(db: Session, product_detail_id: UUID) -> Optional[
         raise e
     
 
-def update_product_details(db: Session, product_details_id: UUID, data: UpdateProductDetails) -> Optional[ProductDetails]:
+def update_product_details(db: Session, product_detail_id: UUID, data: UpdateProductDetails) -> Optional[ProductDetails]:
     try:
-        product_details = db.query(ProductDetails).filter(ProductDetails.id == product_details_id).first()
+        product_details = db.query(ProductDetails).filter(ProductDetails.id == product_detail_id).first()
         if not product_details:
             return None
         
