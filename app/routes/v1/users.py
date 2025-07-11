@@ -120,14 +120,14 @@ async def update_user_data(
 
 
 
-@user_router.post("/users/{user_id}/otp", )
+@user_router.post("/users/otp", )
 async def send_otp(
-        user_id: str,
+
+        data: user_sch.SendOtpClient,
         db: Session = Depends(get_db),
         # current_user: dict = Depends(PermissionChecker(required_permissions=pages_and_permissions['Users']['update'])),
 ):
-    user_id = UUID(user_id)
-    user = get_user_by_id(db=db, user_id=user_id)
+    user = get_user_by_id(db=db, username=data.username)
     
     if not user:
         raise HTTPException(status_code=404, detail="User not found")

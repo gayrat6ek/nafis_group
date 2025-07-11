@@ -70,8 +70,8 @@ def update_user(db:Session, user_id: UUID, user_data: UpdateUser):
 
 
 
-def get_user_by_id(db: Session, user_id: UUID):
-    query = db.query(Users).filter(Users.id == user_id).first()
+def get_user_by_id(db: Session, username):
+    query = db.query(Users).filter(Users.username == username).first()
     return query
 
 def createUserCrud(db: Session, user: createUser,otp):

@@ -94,3 +94,11 @@ class LoginClient(BaseModel):
     model_config = ConfigDict(
         from_attributes=True
     )
+
+
+class SendOtpClient(BaseModel):
+    username: str = Field(..., min_length=12, max_length=12, pattern=r'^\d{12}$', description="Phone number in format 998901234567")
+
+    model_config = ConfigDict(
+        from_attributes=True
+    )
