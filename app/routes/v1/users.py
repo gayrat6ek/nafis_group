@@ -89,13 +89,16 @@ async def get_users(
 async def create_user(
         user_data: user_sch.createUser,
         db: Session = Depends(get_db),
-        current_user: dict = Depends(PermissionChecker(required_permissions=pages_and_permissions['Users']['create'])),
+        # current_user: dict = Depends(PermissionChecker(required_permissions=pages_and_permissions['Users']['create'])),
 ):
     if get_user_by_username(db=db, username=user_data.username):
         raise HTTPException(status_code=400, detail="Username already exists")
     
-    user = createUserCrud(db=db, user=  user_data,otp=generateOtp(6))
+    user = createUserCrud(db=db, user=user_data,otp=generateOtp(6))
     return {'success': True, 'message': 'User created successfully', 'id': str(user.id),'otp': user.otp}
+
+
+
 
 
 
