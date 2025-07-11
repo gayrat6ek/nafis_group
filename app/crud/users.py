@@ -75,11 +75,14 @@ def get_user_by_id(db: Session, user_id: UUID):
     return query
 
 def createUserCrud(db: Session, user: createUser,otp):
-    hashed_password = hash_password(user.password)
+    if user.password is not None:
+        user.password = hash_password(user.password)
+    
+
     new_user = Users(
         username=user.username,
         full_name=user.full_name,
-        password=hashed_password,
+        password=user.password,
         role_id=user.role_id,
         is_client=user.is_client,
         otp=otp,
