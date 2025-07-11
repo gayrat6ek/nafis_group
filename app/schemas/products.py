@@ -5,6 +5,7 @@ from uuid import UUID
 from pydantic import BaseModel, Field, ConfigDict
 from app.schemas.brands import BrandGet
 from app.schemas.categories import CategoryGet
+from app.schemas.productDetails import ProductDetailsBasicData
 
 
 class BaseConfig(BaseModel):
@@ -57,6 +58,7 @@ class ProductGet(BaseConfig):
     category:Optional[CategoryGet]=None
     brand:Optional[BrandGet]=None
     discounts: Optional[List[DiscountsProducts]] = None  # Assuming products can have multiple discounts
+    details: Optional[List[ProductDetailsBasicData]] = None  # Assuming products can have details
 
 
 class ProductList(BaseConfig):
@@ -68,6 +70,7 @@ class ProductList(BaseConfig):
     description_ru: Optional[str] = None
     description_en: Optional[str] = None
 
+
     delivery_days: Optional[int] = None
     is_active: Optional[bool] = True
     loan_accessable: Optional[bool] = True
@@ -75,6 +78,8 @@ class ProductList(BaseConfig):
     brand_id: Optional[UUID] = None  # Assuming products are linked to brands
     created_at: Optional[datetime] = None
     discounts: Optional[List[DiscountsProducts]] = None  # Assuming products can have multiple discounts
+    details: Optional[List[ProductDetailsBasicData]] = None  # Assuming products can have details
+
 
 
 class CreateProduct(BaseConfig):
