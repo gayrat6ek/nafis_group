@@ -32,7 +32,7 @@ class createUser(BaseModel):
     #username as phone number like 998901234567
     username: str = Field(..., min_length=12, max_length=12, pattern=r'^\d{12}$', description="Phone number in format 998901234567")
     full_name: Optional[str] = Field(None, description="Full name of the user")
-    password: Optional[str] = Field(..., min_length=6, description="Password for the user")
+    password: Optional[str] = Field(None, min_length=6, description="Password for the user")
     role_id: Optional[UUID] = Field(None, description="Role ID of the user")
     is_client: Optional[bool] = Field(True, description="Indicates if the user is a client")
 
