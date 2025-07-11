@@ -42,7 +42,7 @@ async def login_user(
     }
 
 
-@user_router.post('/login')
+@user_router.post('/client/login')
 async def login_user(
         form_data:user_sch.LoginClient,
         db: Session = Depends(get_db)
