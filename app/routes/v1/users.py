@@ -48,12 +48,14 @@ async def login_user(
         form_data:user_sch.LoginClient,
         db: Session = Depends(get_db)
 ):
+    created = False
     user = get_user_by_username(db=db, username=form_data.username)
 
     if not user:
         if not check_otp(db=db, phone_number=form_data.username, otp_code=form_data.otp):
             raise HTTPException(status_code=404, detail="Invalid OTP")
         user = create_otp_verified_user(db=db, username=form_data.username, otp=form_data.otp)
+        created = True
         
         
 
@@ -69,6 +71,7 @@ async def login_user(
     return {
         "access_token": create_access_token(subject=user.username, permissions=permissions, user_info=user_info),
         "refresh_token": create_refresh_token(subject=user.username, permissions=permissions, user_info=user_info)
+        , "created": created
     }
 
 
