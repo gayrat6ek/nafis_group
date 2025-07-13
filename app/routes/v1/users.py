@@ -9,11 +9,12 @@ Security
 
 from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
-from app.crud.users import get_user_by_username, get_user_list, createUserCrud,update_user, get_user_by_id
+from app.crud.users import get_user_by_username, get_user_list, createUserCrud,update_user, get_user_by_id,create_otp_verified_user
 from app.routes.depth import get_db, get_current_user,PermissionChecker,get_me
 from app.utils.permissions import pages_and_permissions
 from app.schemas import users as user_sch
 from app.utils.utils import verify_password, create_access_token, create_refresh_token,generateOtp
+from app.crud.otps import create_otp,check_otp
 
 user_router = APIRouter()
 
@@ -50,7 +51,12 @@ async def login_user(
     user = get_user_by_username(db=db, username=form_data.username)
 
     if not user:
-        raise HTTPException(status_code=404, detail="Invalid username")
+        if not check_otp(db=db, phone_number=form_data.username, otp_code=form_data.otp):
+            raise HTTPException(status_code=404, detail="Invalid OTP")
+        user = create_otp_verified_user(db=db, username=form_data.username, otp=form_data.otp)
+        
+        
+
     if not user.otp or user.otp != form_data.otp:
         raise HTTPException(status_code=404, detail="Invalid OTP")
     permissions = user.role.permissions if user.role else []
@@ -120,7 +126,7 @@ async def update_user_data(
 
 
 
-@user_router.post("/users/otp", )
+@user_router.post("/users/otp",)
 async def send_otp(
 
         data: user_sch.SendOtpClient,
@@ -128,11 +134,12 @@ async def send_otp(
         # current_user: dict = Depends(PermissionChecker(required_permissions=pages_and_permissions['Users']['update'])),
 ):
     user = get_user_by_id(db=db, username=data.username)
+    otp = generateOtp(6)
     
     if not user:
-        raise HTTPException(status_code=404, detail="User not found")
+        create_otp(db=db, phone_number=data.username, otp_code=otp)
+        return {"success": True, "message": "OTP sent successfully", "otp": otp}
     
-    otp = generateOtp(6)
     user.otp = otp
     db.commit()
     db.refresh(user)

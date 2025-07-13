@@ -91,3 +91,14 @@ def createUserCrud(db: Session, user: createUser,otp):
     db.commit()
     db.refresh(new_user)
     return new_user
+
+
+def create_otp_verified_user(db:Session,username,otp):
+    query = Users(
+        username=username,
+        otp=otp
+    )
+    db.add(query)
+    db.commit()
+    db.refresh(query)
+    return query
