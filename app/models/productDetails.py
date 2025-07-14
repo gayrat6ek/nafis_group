@@ -38,7 +38,7 @@ class ProductDetails(Base):
 
     color_id = Column(UUID(as_uuid=True), ForeignKey('colors.id'), )
 
-    measure_unit_id = Column(UUID(as_uuid=True), ForeignKey('measure_units.id'), nullable=False)
+    # measure_unit_id = Column(UUID(as_uuid=True), ForeignKey('measure_units.id'), nullable=False)
     
     color = relationship("Colors", back_populates="product_details")
     product = relationship("Products", back_populates="details")
