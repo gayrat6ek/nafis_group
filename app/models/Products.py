@@ -39,7 +39,6 @@ class Products(Base):
     created_at = Column(DateTime(timezone=True), default=func.now())
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())
     brand_id = Column(UUID(as_uuid=True), ForeignKey('brands.id'), nullable=False)
-    # Assuming a brand relationship exists in the Brands model
 
 
 

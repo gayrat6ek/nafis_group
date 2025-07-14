@@ -37,7 +37,10 @@ class ProductDetails(Base):
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())
 
     color_id = Column(UUID(as_uuid=True), ForeignKey('colors.id'), )
+
+    measure_unit_id = Column(UUID(as_uuid=True), ForeignKey('measure_units.id'), nullable=False)
     
     color = relationship("Colors", back_populates="product_details")
     product = relationship("Products", back_populates="details")
     order_items = relationship("OrderItems", back_populates="product_detail")  # Assuming OrderItems model has a product_detail relationship
+    # measure_unit = relationship("MeasureUnits", back_populates="product_details")  # Assuming MeasureUnits model has a product_details relationship

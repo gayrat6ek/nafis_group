@@ -70,8 +70,9 @@ async def login_user(
 
     return {
         "access_token": create_access_token(subject=user.username, permissions=permissions, user_info=user_info),
-        "refresh_token": create_refresh_token(subject=user.username, permissions=permissions, user_info=user_info)
-        , "created": created
+        "refresh_token": create_refresh_token(subject=user.username, permissions=permissions, user_info=user_info),
+        "created": created,
+        "id": str(user.id),
     }
 
 
