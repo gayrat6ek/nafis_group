@@ -118,7 +118,7 @@ async def update_user_data(
         user_id: str,
         user_data: user_sch.UpdateUser,
         db: Session = Depends(get_db),
-        current_user: dict = Depends(PermissionChecker(required_permissions=pages_and_permissions['Users']['update'])),
+        current_user: dict = Depends(PermissionChecker(required_permissions='U3')),
 ):
     user_id = UUID(user_id)
     updated_user = update_user(db=db, user_id=user_id, user_data=user_data)
