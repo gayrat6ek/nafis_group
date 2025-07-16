@@ -40,15 +40,13 @@ class Products(Base):
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())
     brand_id = Column(UUID(as_uuid=True), ForeignKey('brands.id'), nullable=False)
 
-
-
-
     # files = relationship("Files", back_populates="product")
     category = relationship("Categories", back_populates="products")
     discounts = relationship("DiscountProducts", back_populates="product")
     brand = relationship("Brands", back_populates="products")
     ratings = relationship("Ratings", back_populates="product")
-    details = relationship("ProductDetails", back_populates="product")  # Assuming one-to-one relationship with ProductDetails
-    questions = relationship("Questions", back_populates="product")  # Assuming Questions model has a product relationship
+    details = relationship("ProductDetails", back_populates="product")
+    questions = relationship("Questions", back_populates="product")  
+    materials = relationship("ProductMaterials", back_populates="product")  
 
 

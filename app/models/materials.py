@@ -1,3 +1,4 @@
+
 import uuid
 from sqlalchemy import (
     Column,
@@ -11,19 +12,18 @@ from sqlalchemy import (
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
+
 from app.db.base import Base
 
-class MeasureUnits(Base):
-    __tablename__ = "measure_units"
+
+class Materials(Base):
+    __tablename__ = "materials"
     id = Column(UUID(as_uuid=True), primary_key=True, index=True, default=uuid.uuid4)
-    name_uz = Column(String, nullable=False, unique=True)  # e.g., 'kilogram', 'liter'
+    name_uz = Column(String, nullable=False, unique=True)  # e.g., 'steel', 'wood'
     name_ru = Column(String, nullable=True, unique=True)
     name_en = Column(String, nullable=True, unique=True)
+
     created_at = Column(DateTime(timezone=True), default=func.now())
-    updated_at = Column(DateTime(timezone=True), onupdate=func.now())
+    is_active = Column(Boolean, default=True)  # To mark if the material is active or not
 
-    is_active = Column(Boolean, default=True)  # To mark if the unit is active or not
-    product_details = relationship("ProductDetails", back_populates="measure_unit")  # Assuming
-
-    
-
+    products = relationship("ProductMaterials", back_populates="material")  # Assuming a ProductMaterials model exists

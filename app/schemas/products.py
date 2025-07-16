@@ -6,6 +6,7 @@ from pydantic import BaseModel, Field, ConfigDict
 from app.schemas.brands import BrandGet
 from app.schemas.categories import CategoryGet
 from app.schemas.productDetails import ProductDetailsBasicData
+from .materials import getBasicMaterials
 
 
 class BaseConfig(BaseModel):
@@ -39,6 +40,10 @@ class DiscountGet(BaseConfig):
 class DiscountsProducts(BaseConfig):
     discount: Optional[DiscountGet] = None  # Assuming discounts can be linked to products
 
+class materialsGet(BaseConfig):
+    material: Optional[getBasicMaterials] = None  # Assuming materials can be linked to products
+
+
 
 class ProductGet(BaseConfig):
     id: Optional[UUID] = None
@@ -59,6 +64,7 @@ class ProductGet(BaseConfig):
     brand:Optional[BrandGet]=None
     discounts: Optional[List[DiscountsProducts]] = None  # Assuming products can have multiple discounts
     details: Optional[List[ProductDetailsBasicData]] = None  # Assuming products can have details
+    materials: Optional[List[materialsGet]] = None  # Assuming products can have multiple materials
 
 
 class ProductList(BaseConfig):
@@ -79,6 +85,7 @@ class ProductList(BaseConfig):
     created_at: Optional[datetime] = None
     discounts: Optional[List[DiscountsProducts]] = None  # Assuming products can have multiple discounts
     details: Optional[List[ProductDetailsBasicData]] = None  # Assuming products can have details
+    materials: Optional[List[materialsGet]] = None  # Assuming products can have multiple materials
 
 
 
@@ -95,6 +102,8 @@ class CreateProduct(BaseConfig):
     loan_accessable: Optional[bool] = True
     category_id: UUID  # Required to link the product to a category
     brand_id: UUID  # Required to link the product to a brand
+    materials: Optional[List[UUID]] = None  # Assuming products can have multiple materials
+    
 
 
 class UpdateProduct(BaseConfig):
@@ -110,3 +119,4 @@ class UpdateProduct(BaseConfig):
     loan_accessable: Optional[bool] = True
     category_id: Optional[UUID] = None  # Optional to allow updating without changing the category
     brand_id: Optional[UUID] = None  # Optional to allow updating without changing the brand
+    materials: Optional[List[UUID]] = None  # Optional to allow updating without changing the materials

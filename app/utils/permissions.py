@@ -61,6 +61,16 @@ pages_and_permissions = {
         "update": "D2",
         "create": "D4"
     },
+    "Materials": {
+        "view": "M1",
+        "update": "M2",
+        "create": "M4"
+    },
+    "MeasureUnits": {
+        "view": "MU1",
+        "update": "MU2",    
+        "create": "MU4"
+    },
 
 
 }

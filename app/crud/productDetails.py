@@ -18,7 +18,7 @@ def create_product_details(db: Session, data: CreateProductDetails) -> ProductDe
     try:
         product_details = ProductDetails(
             product_id=data.product_id,
-            size=data.size,
+            sizes=data.sizes,
             characteristics=data.characteristics,
             is_active=True,
             video_info=data.video_info,
@@ -26,6 +26,7 @@ def create_product_details(db: Session, data: CreateProductDetails) -> ProductDe
             price=data.price,
             quantity=data.quantity,
             color_id=data.color_id,
+            measure_unit_id=data.measure_unit_id  # Assuming measure_unit_id is part of the CreateProductDetails schema
         )
         db.add(product_details)
         db.commit()

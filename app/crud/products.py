@@ -17,6 +17,7 @@ from uuid import UUID
 from app.models.Products import Products
 from app.schemas.products import CreateProduct, UpdateProduct
 from app.utils.utils import timezonetash
+from app.models.productMaterials import ProductMaterials
 
 
 def create_product(db: Session, data: CreateProduct) -> Products:
@@ -34,13 +35,27 @@ def create_product(db: Session, data: CreateProduct) -> Products:
             category_id=data.category_id,
             brand_id=data.brand_id,
         )
+        #here whe should add materials if provided and after getting the product id
         db.add(product)
         db.commit()
-        db.refresh(product)
+        db.refresh(product) 
+        if data.materials:
+            for material in data.materials:
+                product_material = ProductMaterials(
+                    product_id=product.id,
+                    material_id=material
+                )
+                db.add(product_material)
+            db.commit()
+            db.refresh(product)
         return product
     except SQLAlchemyError as e:
         db.rollback()
         raise e
+        
+
+
+    
     
 from sqlalchemy.orm import joinedload
 from datetime import datetime
@@ -120,6 +135,20 @@ def update_product(db: Session, product_id: UUID, data: UpdateProduct) -> Option
         
         db.commit()
         db.refresh(product)
+        if data.materials:
+            # Clear existing materials
+            db.query(ProductMaterials).filter(ProductMaterials.product_id == product.id).delete()
+            db.commit()
+            
+            # Add new materials
+            for material in data.materials:
+                product_material = ProductMaterials(
+                    product_id=product.id,
+                    material_id=material
+                )
+                db.add(product_material)
+            db.commit()
+            db.refresh(product)
         return product
     
     except SQLAlchemyError as e:

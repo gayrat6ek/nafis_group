@@ -95,7 +95,7 @@ async def get_users(
 
 
 
-@user_router.post("/users", )
+@user_router.post("/users")
 async def create_user(
         user_data: user_sch.createUser,
         db: Session = Depends(get_db),
@@ -132,7 +132,6 @@ async def update_user_data(
 
 @user_router.post("/users/otp",)
 async def send_otp(
-
         data: user_sch.SendOtpClient,
         db: Session = Depends(get_db),
         # current_user: dict = Depends(PermissionChecker(required_permissions=pages_and_permissions['Users']['update'])),
