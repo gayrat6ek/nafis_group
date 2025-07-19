@@ -19,7 +19,6 @@ def create_product_details(db: Session, data: CreateProductDetails) -> ProductDe
         product_details = ProductDetails(
             product_id=data.product_id,
             sizes=data.sizes,
-            characteristics=data.characteristics,
             is_active=True,
             video_info=data.video_info,
             images=data.images,

@@ -49,7 +49,8 @@ class GetCategoriesTree(BaseConfig):
     image: Optional[str] = None  # Assuming image is a URL or path to the image
     parent_id: Optional[UUID] = None  # ID of the parent category, if any
     is_active: Optional[bool] = True  # Indicates if the category is active or not
-    children: Optional[List['GetCategoriesTree']] = []  # List of child categories, if any
+    # children: Optional[List['GetCategoriesTree']] = []  # List of child categories, if any
+    parent: Optional['GetCategoriesTree'] = None  # Parent category, if any
 
     class Config:
         orm_mode = True  # Enable ORM mode for compatibility with SQLAlchemy models

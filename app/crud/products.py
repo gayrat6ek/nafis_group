@@ -34,6 +34,7 @@ def create_product(db: Session, data: CreateProduct) -> Products:
             delivery_days=data.delivery_days,
             category_id=data.category_id,
             brand_id=data.brand_id,
+            characteristics=data.characteristics,  # Assuming characteristics is a JSON object
         )
         #here whe should add materials if provided and after getting the product id
         db.add(product)
@@ -132,6 +133,8 @@ def update_product(db: Session, product_id: UUID, data: UpdateProduct) -> Option
             product.category_id = data.category_id
         if data.brand_id is not None:
             product.brand_id = data.brand_id
+        if data.characteristics is not None:
+            product.characteristics = data.characteristics
         
         db.commit()
         db.refresh(product)

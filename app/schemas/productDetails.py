@@ -16,7 +16,6 @@ class ProductDetailsGet(BaseConfig):
     id: Optional[UUID] = None
     product_id: Optional[UUID] = None
     sizes:Optional[str]=None
-    characteristics: Optional[dict] = None
 
     video_info: Optional[list] = None
 
@@ -34,7 +33,6 @@ class ProductDetailsList(BaseConfig):
     id: UUID
     product_id: Optional[UUID] = None
     sizes:Optional[str]=None
-    characteristics: Optional[dict] = None
 
     video_info: Optional[list] = None
 
@@ -52,7 +50,6 @@ class ProductDetailsList(BaseConfig):
 class CreateProductDetails(BaseConfig):
     product_id: UUID  # Required to link the product detail to a product
     sizes:Optional[str]=None
-    characteristics: Optional[dict] = None
 
     video_info: Optional[list] = None
 
@@ -66,7 +63,6 @@ class CreateProductDetails(BaseConfig):
 
 class UpdateProductDetails(BaseConfig):
     sizes:Optional[str]=None
-    characteristics: Optional[dict] = None
 
     video_info: Optional[list] = None
 
@@ -83,7 +79,6 @@ class UpdateProductDetails(BaseConfig):
 class ProductDetailsBasicData(BaseConfig):
     id: UUID
     sizes:Optional[str]=None
-    characteristics: Optional[dict] = None
     video_info: Optional[list] = None
     images: Optional[list] = None
     is_active: Optional[bool] = True

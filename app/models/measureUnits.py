@@ -16,6 +16,9 @@ from app.db.base import Base
 class MeasureUnits(Base):
     __tablename__ = "measure_units"
     id = Column(UUID(as_uuid=True), primary_key=True, index=True, default=uuid.uuid4)
+    title_uz = Column(String, nullable=True, unique=True)  # e.g., product kilogram
+    title_ru = Column(String, nullable=True, unique=True)
+    title_en = Column(String, nullable=True, unique=True)
     name_uz = Column(String, nullable=False, unique=True)  # e.g., 'kilogram', 'liter'
     name_ru = Column(String, nullable=True, unique=True)
     name_en = Column(String, nullable=True, unique=True)

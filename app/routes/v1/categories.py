@@ -79,6 +79,18 @@ async def get_category_tree(
     return categories
 
 
+@categories_router.get('/categories/tree/{id}', response_model=GetCategoriesTree)
+async def get_category_tree_by_id(
+        id: UUID,
+        db: Session = Depends(get_db),
+        # current_user: dict = Depends(PermissionChecker(required_permissions=pages_and_permissions['Categories']['view']))
+):
+    category = crud_categories.get_category_by_id(db=db, category_id=id)
+    if not category:
+        raise HTTPException(status_code=404, detail="Category not found")
+    
+    return category
+
 
 
 

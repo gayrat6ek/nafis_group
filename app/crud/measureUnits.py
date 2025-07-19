@@ -21,6 +21,9 @@ from app.schemas.measureUnits import CreateMeasureUnits, UpdateMeasureUnits
 def create_measure_unit(db: Session, data: CreateMeasureUnits) -> MeasureUnits:
     try:
         measure_unit = MeasureUnits(
+            title_uz=data.title_uz,
+            title_ru=data.title_ru,
+            title_en=data.title_en,
             name_uz=data.name_uz,
             name_ru=data.name_ru,
             name_en=data.name_en,
@@ -70,6 +73,12 @@ def update_measure_unit(db: Session, measure_unit_id: UUID, data: UpdateMeasureU
             measure_unit.name_en = data.name_en
         if data.is_active is not None:
             measure_unit.is_active = data.is_active
+        if data.title_uz is not None:
+            measure_unit.title_uz = data.title_uz
+        if data.title_ru is not None:
+            measure_unit.title_ru = data.title_ru
+        if data.title_en is not None:
+            measure_unit.title_en = data.title_en
         
         db.commit()
         db.refresh(measure_unit)

@@ -4,7 +4,7 @@ from typing import Optional, List
 from uuid import UUID
 from pydantic import BaseModel, Field, ConfigDict
 from app.schemas.brands import BrandGet
-from app.schemas.categories import CategoryGet
+from app.schemas.categories import CategoryGet,GetCategoriesTree
 from app.schemas.productDetails import ProductDetailsBasicData
 from .materials import getBasicMaterials
 
@@ -53,6 +53,8 @@ class ProductGet(BaseConfig):
     description_uz: Optional[str] = None        
     description_ru: Optional[str] = None
     description_en: Optional[str] = None
+    characteristics: Optional[dict] = None
+
 
     delivery_days: Optional[int] = None
     is_active: Optional[bool] = True
@@ -60,7 +62,7 @@ class ProductGet(BaseConfig):
     category_id: Optional[UUID] = None  # Assuming products are linked to categories
     brand_id: Optional[UUID] = None  # Assuming products are linked to brands
     created_at: Optional[datetime] = None
-    category:Optional[CategoryGet]=None
+    category:Optional[GetCategoriesTree]=None
     brand:Optional[BrandGet]=None
     discounts: Optional[List[DiscountsProducts]] = None  # Assuming products can have multiple discounts
     details: Optional[List[ProductDetailsBasicData]] = None  # Assuming products can have details
@@ -96,6 +98,8 @@ class CreateProduct(BaseConfig):
     description_uz: Optional[str] = None        
     description_ru: Optional[str] = None
     description_en: Optional[str] = None
+    characteristics: Optional[dict] = None
+
 
     delivery_days: Optional[int] = None
     is_active: Optional[bool] = True
@@ -113,6 +117,8 @@ class UpdateProduct(BaseConfig):
     description_uz: Optional[str] = None        
     description_ru: Optional[str] = None
     description_en: Optional[str] = None
+    characteristics: Optional[dict] = None
+
 
     delivery_days: Optional[int] = None
     is_active: Optional[bool] = True

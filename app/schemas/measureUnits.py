@@ -16,6 +16,9 @@ class BaseConfig(BaseModel):
 
 class MeasureUnitsGet(BaseConfig):
     id: Optional[UUID] = None
+    title_uz:Optional[str]=None
+    title_ru:Optional[str]=None
+    title_en:Optional[str]=None
     name_uz: Optional[str] = None
     name_ru: Optional[str] = None
     name_en: Optional[str] = None
@@ -24,6 +27,9 @@ class MeasureUnitsGet(BaseConfig):
 
 class MeasureUnitsList(BaseConfig):
     id: UUID
+    title_uz:Optional[str]=None
+    title_ru:Optional[str]=None
+    title_en:Optional[str]=None
     name_uz: Optional[str] = None
     name_ru: Optional[str] = None
     name_en: Optional[str] = None
@@ -32,6 +38,9 @@ class MeasureUnitsList(BaseConfig):
 
 
 class CreateMeasureUnits(BaseConfig):
+    title_uz:Optional[str]=None
+    title_ru:Optional[str]=None
+    title_en:Optional[str]=None
     name_uz: str
     name_ru: Optional[str] = None
     name_en: Optional[str] = None
@@ -39,6 +48,9 @@ class CreateMeasureUnits(BaseConfig):
 
     
 class UpdateMeasureUnits(BaseConfig):
+    title_uz:Optional[str]=None
+    title_ru:Optional[str]=None
+    title_en:Optional[str]=None
     name_uz: Optional[str] = None
     name_ru: Optional[str] = None
     name_en: Optional[str] = None
@@ -47,6 +59,9 @@ class UpdateMeasureUnits(BaseConfig):
 
 class getBasicMeasureUnits(BaseConfig):
     id: UUID
+    title_uz:Optional[str]=None
+    title_ru:Optional[str]=None
+    title_en:Optional[str]=None
     name_uz: Optional[str] = None
     name_ru: Optional[str] = None
     name_en: Optional[str] = None

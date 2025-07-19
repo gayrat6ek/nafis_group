@@ -33,6 +33,8 @@ class Products(Base):
     delivery_days = Column(String, nullable=True)  # Estimated delivery days
     is_active = Column(Boolean, default=True)
     loan_accessable = Column(Boolean, default=True)
+    characteristics = Column(JSONB, nullable=True)  # Assuming characteristics are stored as a JSON object
+
 
 
     category_id = Column(UUID(as_uuid=True), ForeignKey('categories.id'), nullable=False)

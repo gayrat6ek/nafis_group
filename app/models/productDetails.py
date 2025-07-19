@@ -26,7 +26,6 @@ class ProductDetails(Base):
     
 
     
-    characteristics = Column(JSONB, nullable=True)  # Assuming characteristics are stored as a JSON object
     video_info = Column(JSONB, nullable=True)  # Assuming video information is stored as a JSON object
     images = Column(JSONB, nullable=True)  # Assuming images are stored as a JSON array of URLs or paths
 
