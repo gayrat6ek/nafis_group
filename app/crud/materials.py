@@ -33,11 +33,17 @@ def create_material(db: Session, data: CreateMaterials) -> Materials:
         raise e
     
 
-def get_materials(db: Session, is_active: Optional[bool] = None, page: int = 1, size: int = 10):
+def get_materials(db: Session, is_active: Optional[bool] = None, page: int = 1, size: int = 10,name: Optional[str] = None):
     try:
         query = db.query(Materials)
         if is_active is not None:
             query = query.filter(Materials.is_active == is_active)
+        if name is not None:
+            query = query.filter(or_(
+                Materials.name_uz.ilike(f"%{name}%"),
+                Materials.name_ru.ilike(f"%{name}%"),
+                Materials.name_en.ilike(f"%{name}%")
+            ))
         
         total_count = query.count()
         materials = query.offset((page - 1) * size).limit(size).all()

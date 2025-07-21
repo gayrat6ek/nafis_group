@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Optional
 from uuid import UUID
 from fastapi import APIRouter
 from fastapi import (
@@ -28,10 +28,13 @@ materials_router = APIRouter()
 @materials_router.get('/materials', response_model=Page[MaterialsList])
 async def get_materials_list(
         is_active: bool = None,
+        page: int = 1,
+        size: int = 10,
+        name:Optional[str] = None,
         db: Session = Depends(get_db),
         # current_user: dict = Depends(PermissionChecker(required_permissions=pages_and_permissions['Materials']['view']))
 ):
-    return crud_materials.get_materials(db=db, is_active=is_active)
+    return crud_materials.get_materials(db=db, is_active=is_active,name=name, page=page, size=size)
 
 
 
