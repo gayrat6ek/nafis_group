@@ -64,7 +64,7 @@ async def update_region(
     if not region:
         raise HTTPException(status_code=404, detail="Region not found")
     
-    updated_region = update_region(db=db, region_id=id, data=body)
+    updated_region = crud_regions.update_region(db=db, region_id=id, data=body)
     return updated_region
 
 
