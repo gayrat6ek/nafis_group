@@ -25,7 +25,8 @@ def create_category(db: Session, data: CreateCategory) -> Categories:
             description_uz=data.description_uz,
             image=data.image,
             parent_id=data.parent_id,
-            is_active=data.is_active
+            is_active=data.is_active,
+            is_child=data.is_child  # Indicates if the category is a child of another category
         )
         db.add(category)
         db.commit()

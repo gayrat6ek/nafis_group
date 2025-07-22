@@ -27,6 +27,7 @@ class Categories(Base):
     is_active = Column(Boolean, default=True)  # Indicates if the category is active
     parent_id = Column(UUID(as_uuid=True), ForeignKey('categories.id'), nullable=True)
     parent = relationship("Categories", remote_side=[id], backref="children")
+    is_child = Column(Boolean, default=False)  # Indicates if the category is a child of another category
     created_at = Column(DateTime(timezone=True), default=func.now())
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())
     products = relationship("Products", back_populates="category")

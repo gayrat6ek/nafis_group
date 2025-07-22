@@ -23,6 +23,7 @@ class CategoryGet(BaseConfig):
     image: Optional[str] = None  # Assuming image is a URL or path to the image
     parent_id: Optional[UUID] = None  # ID of the parent category, if any
     is_active: Optional[bool] = True  # Indicates if the category is active or not
+    is_child: Optional[bool] = False  # Indicates if the category is a child of another category
 
 class CategoryList(BaseConfig):
     id: UUID
@@ -36,6 +37,7 @@ class CategoryList(BaseConfig):
     parent_id: Optional[UUID] = None  # ID of the parent category, if any
     is_active: Optional[bool] = True  # Indicates if the category is active or not
     created_at: Optional[datetime] = None  # Timestamp when the category was created
+    is_child: Optional[bool] = False  # Indicates if the category is a child of another category
 
 
 class GetCategoriesTree(BaseConfig):
@@ -51,6 +53,7 @@ class GetCategoriesTree(BaseConfig):
     is_active: Optional[bool] = True  # Indicates if the category is active or not
     # children: Optional[List['GetCategoriesTree']] = []  # List of child categories, if any
     parent: Optional['GetCategoriesTree'] = None  # Parent category, if any
+    is_child: Optional[bool] = False  # Indicates if the category is a child of another category
 
     class Config:
         orm_mode = True  # Enable ORM mode for compatibility with SQLAlchemy models
@@ -65,6 +68,7 @@ class CreateCategory(BaseConfig):
     image: Optional[str] = None  # Assuming image is a URL or path to the image
     parent_id: Optional[UUID] = None  # ID of the parent category, if any
     is_active: Optional[bool] = True  # Indicates if the category is active or not
+    is_child: Optional[bool] = False  # Indicates if the category is a child of another category
 
 
 class UpdateCategory(BaseConfig):
@@ -77,6 +81,7 @@ class UpdateCategory(BaseConfig):
     image: Optional[str] = None  # Assuming image is a URL or path to the image
     parent_id: Optional[UUID] = None  # ID of the parent category, if any
     is_active: Optional[bool] = True  # Indicates if the category is active or not
+    is_child: Optional[bool] = False  # Indicates if the category is a child of another category
 
 
 class FilterCategory(BaseConfig):
