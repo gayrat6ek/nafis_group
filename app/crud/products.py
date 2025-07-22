@@ -7,6 +7,9 @@ import bcrypt
 from app.models.Products import Products
 from app.models.discounts import Discounts
 from app.models.discountProducts import DiscountProducts
+from app.models.productDetails import ProductDetails
+from app.models.sizes import Sizes
+from sqlalchemy.orm import selectinload, with_loader_criteria
 
 import pytz
 from sqlalchemy.sql import func
@@ -70,8 +73,39 @@ def get_products(
     try:
         now = datetime.now(timezonetash)
 
-        query = db.query(Products).options(
-            joinedload(Products.discounts).joinedload(DiscountProducts.discount)
+        query = (
+            db.query(Products)
+            .options(
+                # Load discounts through DiscountProducts
+                joinedload(Products.discounts)
+                .joinedload(DiscountProducts.discount),
+                
+                # Only include discounts that are currently active
+                with_loader_criteria(
+                    DiscountProducts,
+                    lambda dp: and_(
+                        dp.discount.has(
+                            and_(
+                                Discounts.is_active == True,
+                                Discounts.active_from <= now,
+                                Discounts.active_to >= now
+                            )
+                        )
+                    ),
+                    include_aliases=True
+                ),
+
+                # Eager-load product details
+                joinedload(Products.details)
+                .joinedload(ProductDetails.size),
+
+                # Filter sizes: only sizes not marked as deleted
+                with_loader_criteria(
+                    Sizes,
+                    lambda s: s.is_deleted == False,
+                    include_aliases=True
+                )
+            )
         )
 
         if is_active is not None:
@@ -100,7 +134,39 @@ def get_products(
 
 def get_product_by_id(db: Session, product_id: UUID) -> Optional[Products]:
     try:
-        return db.query(Products).filter(Products.id == product_id).first()
+        now = datetime.now(timezonetash)
+
+        product = (
+            db.query(Products)
+            .options(
+                joinedload(Products.discounts)
+                .joinedload(DiscountProducts.discount),
+
+                with_loader_criteria(
+                    DiscountProducts,
+                    lambda dp: dp.discount.has(
+                        and_(
+                            Discounts.is_active == True,
+                            Discounts.active_from <= now,
+                            Discounts.active_to >= now
+                        )
+                    ),
+                    include_aliases=True
+                ),
+
+                joinedload(Products.details)
+                .joinedload(ProductDetails.size),
+
+                with_loader_criteria(
+                    Sizes,
+                    lambda s: s.is_deleted == False,
+                    include_aliases=True
+                )
+            )
+            .filter(Products.id == product_id)
+            .first()
+        )
+        return product
     except SQLAlchemyError as e:
         raise e
     

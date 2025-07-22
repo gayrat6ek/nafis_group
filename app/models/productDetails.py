@@ -20,9 +20,8 @@ class ProductDetails(Base):
     __tablename__ = "product_details"
     id = Column(UUID(as_uuid=True), primary_key=True, index=True, default=uuid.uuid4)
     product_id = Column(UUID(as_uuid=True), ForeignKey('products.id'), nullable=False)
-    # size = Column(JSONB, nullable=True)  # Assuming size is stored as a JSON object (e.g., {"size": "M", "dimensions": {"length": 10, "width": 5}})
     is_active = Column(Boolean, default=True)  # Indicates if the product detail is active
-    sizes =Column(String, nullable=True)  # Assuming sizes are stored as a comma-separated string (e.g., "S,M,L,XL")
+    # sizes =Column(String, nullable=True)  # Assuming sizes are stored as a comma-separated string (e.g., "S,M,L,XL")
     
 
     
@@ -31,7 +30,7 @@ class ProductDetails(Base):
 
 
     quantity = Column(Float, nullable=True)
-    price = Column(Float, nullable=False)
+    # price = Column(Float, nullable=False)
 
 
     created_at = Column(DateTime(timezone=True), default=func.now())
@@ -45,3 +44,4 @@ class ProductDetails(Base):
     product = relationship("Products", back_populates="details")
     order_items = relationship("OrderItems", back_populates="product_detail")  # Assuming OrderItems model has a product_detail relationship
     measure_unit = relationship("MeasureUnits", back_populates="product_details")  # Assuming MeasureUnits model has a product_details relationship
+    size = relationship("Sizes", back_populates="product_details")  # Assuming Sizes model has a product_details relationship

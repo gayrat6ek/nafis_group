@@ -16,6 +16,8 @@ from app.schemas.productDetails import (
     ProductDetailsList,
     CreateProductDetails,
     UpdateProductDetails,
+    CreateSize,
+    UpdateSize
 )
 
 from app.models.productDetails import ProductDetails
@@ -69,3 +71,50 @@ async def update_product_details(
     if not updated_product_detail:
         raise HTTPException(status_code=404, detail="Product detail not found")
     return updated_product_detail
+
+
+@product_details_router.delete('/product/size/{id}')
+async def delete_product_size(
+        id: UUID,
+        db: Session = Depends(get_db),
+        current_user: dict = Depends(PermissionChecker(required_permissions=pages_and_permissions['ProductDetails']['delete']))
+):
+    try:
+        size = crud_product_details.delete_size(db=db, size_id=id)
+        
+        return {"detail": "Size deleted successfully"}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+    
+
+@product_details_router.post('/product/size', response_model=ProductDetailsGet)
+async def add_product_size(
+        body: CreateSize,
+        db: Session = Depends(get_db),
+        current_user: dict = Depends(PermissionChecker(required_permissions=pages_and_permissions['ProductDetails']['create']))
+):
+    try:
+        created_size = crud_product_details.product_size_add(db=db, data=body)
+        if not created_size:
+            raise HTTPException(status_code=400, detail="Failed to add size")
+        
+        return {"detail": "Size added successfully", "size": created_size}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@product_details_router.put('/product/size/{id}', response_model=ProductDetailsGet)
+async def update_product_size(
+        id: UUID,
+        body: UpdateSize,
+        db: Session = Depends(get_db),
+        current_user: dict = Depends(PermissionChecker(required_permissions=pages_and_permissions['ProductDetails']['update']))
+):
+    try:
+        updated_size = crud_product_details.update_size(db=db, size_id=id, data=body)
+        if not updated_size:
+            raise HTTPException(status_code=404, detail="Size not found")
+        
+        return {"detail": "Size updated successfully", "size": updated_size}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+

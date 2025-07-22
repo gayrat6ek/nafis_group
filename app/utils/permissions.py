@@ -51,7 +51,8 @@ pages_and_permissions = {
     "ProductDetails": {
         "view": "PD1",
         "update": "PD2",
-        "create": "PD4"
+        "create": "PD4",
+        "delete": "PD5"
     },
     "Files":{
         'upload':'F1'
