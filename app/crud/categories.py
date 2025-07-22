@@ -37,7 +37,7 @@ def create_category(db: Session, data: CreateCategory) -> Categories:
     
 
 
-def get_categories(db: Session, page: int = 1, size: int = 10,filter:Optional[FilterCategory]=None) -> list[Categories]:
+def get_categories(db: Session, filter:Optional[FilterCategory]=None) -> list[Categories]:
     try:
         query = db.query(Categories)
         if filter:
@@ -60,17 +60,10 @@ def get_categories(db: Session, page: int = 1, size: int = 10,filter:Optional[Fi
             query = query.filter(Categories.parent_id == filter.parent_id)
 
             
-        query = query.order_by(Categories.created_at.desc())
-        total_count = query.count()
-        categories = query.offset((page - 1) * size).limit(size).all()
+        categories = query.all()
         
-        return {
-            "items": categories,
-            "total": total_count,
-            "page": page,
-            "size": size,
-            'pages': (total_count + size - 1) // size 
-        }
+        return categories
+         
     except SQLAlchemyError as e:
         raise e
     

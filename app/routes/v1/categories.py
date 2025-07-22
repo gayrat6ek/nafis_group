@@ -1,4 +1,5 @@
 
+from typing import List
 from uuid import UUID
 from fastapi import APIRouter
 from fastapi import (
@@ -21,15 +22,14 @@ categories_router = APIRouter()
 
 
 
-@categories_router.get('/categories', response_model=Page[CategoryList])
+@categories_router.get('/categories', response_model=List[CategoryList])
 async def get_category_list(
-        page: int = 1,
-        size: int = 10,
+
         filter: FilterCategory = Depends(),
         db: Session = Depends(get_db),
         # current_user: dict = Depends(PermissionChecker(required_permissions=pages_and_permissions['Categories']['view']))
 ):
-    return crud_categories.get_categories(db=db, page=page, size=size, filter=filter)
+    return crud_categories.get_categories(db=db, filter=filter)
 
 
 @categories_router.get('/category/{id}', response_model=CategoryGet)
@@ -67,15 +67,14 @@ async def update_category(
     return updated_category
 
 
-@categories_router.get('/categories/tree', response_model=Page[GetCategoriesTree])
+@categories_router.get('/categories/tree', response_model=List[GetCategoriesTree])
 async def get_category_tree(
-        page: int = 1,
-        size: int = 10,
+
         filter: FilterCategory = Depends(),
         db: Session = Depends(get_db),
         # current_user: dict = Depends(PermissionChecker(required_permissions=pages_and_permissions['Categories']['view']))
 ):
-    categories = crud_categories.get_categories(db=db, page=page, size=size, filter=filter)
+    categories = crud_categories.get_categories(db=db, filter=filter)
     return categories
 
 
