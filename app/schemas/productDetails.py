@@ -121,3 +121,13 @@ class ProductDetailsBasicData(BaseConfig):
     color:Optional[ColorGet] = None  # Assuming product details can have a color relationship
     measure_unit: Optional[getBasicMeasureUnits] = None  # Assuming product details can have a measure unit relationship
     size: Optional[List[GetSize]] = None  # Assuming product details can have multiple sizes
+
+
+
+
+class ProductDetailsInOrders(BaseConfig):
+    id: UUID
+    images: Optional[list] = None
+    is_active: Optional[bool] = True
+    color:Optional[ColorGet] = None  # Assuming product details can have a color relationship
+    measure_unit: Optional[getBasicMeasureUnits] = None  # Assuming product details can have a measure unit relationship

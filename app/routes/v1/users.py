@@ -15,6 +15,7 @@ from app.utils.permissions import pages_and_permissions
 from app.schemas import users as user_sch
 from app.utils.utils import verify_password, create_access_token, create_refresh_token,generateOtp
 from app.crud.otps import create_otp,check_otp
+from app.crud.roles import get_role_by_name
 
 user_router = APIRouter()
 
@@ -54,7 +55,11 @@ async def login_user(
     if not user:
         if not check_otp(db=db, phone_number=form_data.username, otp_code=form_data.otp):
             raise HTTPException(status_code=404, detail="Invalid OTP")
-        user = create_otp_verified_user(db=db, username=form_data.username, otp=form_data.otp)
+        role = get_role_by_name(db=db, role_name='Clients')
+        if not role:
+            raise HTTPException(status_code=404, detail="Role not found")
+        
+        user = create_otp_verified_user(db=db, username=form_data.username, otp=form_data.otp,role_id=role.id)
         created = True
         
         

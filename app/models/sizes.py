@@ -24,3 +24,6 @@ class Sizes(Base):
 
     product_details = relationship("ProductDetails", back_populates="size")  # Assuming ProductDetails has a size relationship
     is_deleted = Column(Boolean, default=False)  # Indicates if the size is deleted
+    created_at = Column(DateTime(timezone=True), default=func.now())
+    updated_at = Column(DateTime(timezone=True), onupdate=func.now())
+    order_items = relationship("OrderItems", back_populates="size")  # Assuming OrderItems model has a size relationship

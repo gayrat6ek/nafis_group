@@ -87,7 +87,7 @@ async def delete_product_size(
         raise HTTPException(status_code=500, detail=str(e))
     
 
-@product_details_router.post('/product/size', response_model=ProductDetailsGet)
+@product_details_router.post('/product/size')
 async def add_product_size(
         body: CreateSize,
         db: Session = Depends(get_db),
@@ -102,7 +102,7 @@ async def add_product_size(
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
-@product_details_router.put('/product/size/{id}', response_model=ProductDetailsGet)
+@product_details_router.put('/product/size/{id}')
 async def update_product_size(
         id: UUID,
         body: UpdateSize,

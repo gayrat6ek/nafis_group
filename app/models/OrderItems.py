@@ -23,10 +23,12 @@ class OrderItems(Base):
     quantity = Column(Integer, nullable=False, default=1)
     price = Column(Float, nullable=False) # Price per item at the time of order
     product_detail_id = Column(UUID(as_uuid=True), ForeignKey('product_details.id'), nullable=False)
+    size_id = Column(UUID(as_uuid=True), ForeignKey('sizes.id'), nullable=True)  # Optional size for the item
+
 
     created_at = Column(DateTime(timezone=True), default=func.now())
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())
     
-
+    size = relationship("Sizes", back_populates="order_items")  # Assuming Sizes model has an order_items relationship
     order = relationship("Orders", back_populates="items")
     product_detail = relationship("ProductDetails", back_populates="order_items")  # Assuming ProductDetails model has an order_items relationship

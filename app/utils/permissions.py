@@ -72,6 +72,12 @@ pages_and_permissions = {
         "update": "MU2",    
         "create": "MU4"
     },
+    "Orders": {
+        "view": "O1",
+        "update": "O2",
+        "create": "O4",
+        "delete": "O5"
+    }
 
 
 }

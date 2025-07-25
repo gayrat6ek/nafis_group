@@ -1,6 +1,7 @@
 # from app.models import PermissionPages
 # from app.models import Permissions
 # from app.models import Accesses
+
 from app.models import Roles
 from app.models import Users
 from app.models import regions
@@ -10,6 +11,8 @@ from app.models import Categories
 from app.models import Brands
 from app.models import Products
 from app.models import productDetails
+from app.models import sizes
+
 from app.models import ratings
 from app.models import discounts
 from app.models import discountProducts

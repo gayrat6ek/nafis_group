@@ -93,10 +93,11 @@ def createUserCrud(db: Session, user: createUser,otp):
     return new_user
 
 
-def create_otp_verified_user(db:Session,username,otp):
+def create_otp_verified_user(db:Session,username,otp,role_id: Optional[UUID] = None):
     query = Users(
         username=username,
-        otp=otp
+        otp=otp,
+        role_id=role_id
     )
     db.add(query)
     db.commit()

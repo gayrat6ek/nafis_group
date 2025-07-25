@@ -141,4 +141,11 @@ def update_size(db: Session, size_id: UUID, data: UpdateSize) -> Optional[Sizes]
     except SQLAlchemyError as e:
         db.rollback()
         raise e
+    
+
+def get_size_by_id(db: Session, size_id: UUID) -> Optional[Sizes]:
+    try:
+        return db.query(Sizes).filter(Sizes.id == size_id).first()
+    except SQLAlchemyError as e:
+        raise e
 
