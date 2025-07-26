@@ -40,7 +40,6 @@ class ConfirmOrder(BaseConfig):
     discount_id: Optional[UUID] = None  # ID of the discount applied to the order, if any
     district_id: Optional[UUID] = None  # ID of the district for delivery, if applicable
     description: Optional[str] = Field(None, max_length=500, description="Optional description for the order")
-    payment_method: Optional[str] = Field(None, description="Payment method used for the order")  # e.g., 'credit_card', 'cash', etc.
 
 
     #filter payment methods only allow card, cash, 

@@ -54,9 +54,8 @@ def get_product_details(db: Session, product_id: UUID, is_active: Optional[bool]
             db.query(ProductDetails)
             .filter(ProductDetails.product_id == product_id)
             .options(
-                selectinload(ProductDetails.size).options(
-                    with_loader_criteria(Sizes, Sizes.is_deleted == False)
-                )
+                selectinload(ProductDetails.size),
+                with_loader_criteria(Sizes, Sizes.is_deleted == False)
             )
 )
 
