@@ -45,7 +45,7 @@ def get_all_roles(db: Session):
 
 
 def get_one_role(db: Session, role_id):
-    query = db.query(Roles).get(ident=role_id)
+    query = db.query(Roles).get(role_id)
     return query
 
 
@@ -68,8 +68,8 @@ def add_role(db:Session, data: CreateRole):
         return None
 
 
-def update_role(db:Session, data: UpdateRole,id: Optional[UUID] = None):
-    role = db.query(Roles).get(ident=id)
+def update_role(db:Session, data: UpdateRole,id: UUID):
+    role = db.query(Roles).get(id)
     if data.name is not None:
         role.name = data.name
     if data.description is not None:

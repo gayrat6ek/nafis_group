@@ -49,7 +49,7 @@ async def update_roles(
         db: Session = Depends(get_db),
         current_user: dict = Depends(PermissionChecker(required_permissions=pages_and_permissions['Roles']['update']))
 ):
-    updated_role = update_role(db=db, data=body)
+    updated_role = update_role(db=db,id=id, data=body)
     return updated_role
 
 
