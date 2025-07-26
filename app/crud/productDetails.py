@@ -68,9 +68,9 @@ def get_product_details_by_id(db: Session, product_detail_id: UUID) -> Optional[
     try:
         return (db.query(ProductDetails).filter(ProductDetails.id == product_detail_id)
                 .options(
-                    selectinload(ProductDetails.size).options(
-                        with_loader_criteria(Sizes, Sizes.is_deleted == False)
-                    )   
+                    selectinload(ProductDetails.size),
+                    with_loader_criteria(Sizes, Sizes.is_deleted == False)
+                    
                 )
                 .first()
                 )
