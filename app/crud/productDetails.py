@@ -31,13 +31,14 @@ def create_product_details(db: Session, data: CreateProductDetails) -> ProductDe
         )
         db.add(product_details)
         db.commit()
-        for size in data.size:
-            size_instance = Sizes(
-                value=size['value'],  # Assuming size is a dictionary with a 'value' key
-                price=size.get('price'),  # Optional price for the size
-                detail_id=product_details.id  # Linking the size to the product detail
-            )
-            db.add(size_instance)
+        if data.size:
+            for size in data.size:
+                size_instance = Sizes(
+                    value=size['value'],  # Assuming size is a dictionary with a 'value' key
+                    price=size.get('price'),  # Optional price for the size
+                    detail_id=product_details.id  # Linking the size to the product detail
+                )
+                db.add(size_instance)
         db.commit()
         db.refresh(product_details)
 
