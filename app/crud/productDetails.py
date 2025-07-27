@@ -83,13 +83,18 @@ def update_product_details(db: Session, product_detail_id: UUID, data: UpdatePro
         product_details = db.query(ProductDetails).filter(ProductDetails.id == product_detail_id).first()
         if not product_details:
             return None
-        
-        product_details.is_active = data.is_active
-        product_details.video_info = data.video_info
-        product_details.images = data.images 
-        product_details.quantity = data.quantity
-        product_details.color_id = data.color_id
-        product_details.measure_unit_id = data.measure_unit_id  # Assuming measure_unit_id is part of the UpdateProductDetails schema   
+        if data.is_active is not None:
+            product_details.is_active = data.is_active
+        if data.video_info is not None:
+            product_details.video_info = data.video_info
+        if data.images is not None:
+            product_details.images = data.images 
+        if data.quantity is not None:
+            product_details.quantity = data.quantity
+        if data.color_id is not None:
+            product_details.color_id = data.color_id
+        if data.measure_unit_id is not None:
+            product_details.measure_unit_id = data.measure_unit_id  # Assuming measure_unit_id is part of the UpdateProductDetails schema   
 
 
 
