@@ -10,6 +10,7 @@ from app.models.discountProducts import DiscountProducts
 from app.models.productDetails import ProductDetails
 from app.models.sizes import Sizes
 from sqlalchemy.orm import selectinload, with_loader_criteria
+from app.crud.categories import get_category_with_children
 
 import pytz
 from sqlalchemy.sql import func
@@ -68,6 +69,7 @@ def get_products(
     db: Session,
     page: int = 1,
     size: int = 10,
+    category_id: Optional[UUID] = None,
     is_active: Optional[bool] = None
 ):
     try:
@@ -110,6 +112,9 @@ def get_products(
 
         if is_active is not None:
             query = query.filter(Products.is_active == is_active)
+        if category_id is not None:
+            category_ids = get_category_with_children(db, category_id)
+            query = query.filter(Products.category_id.in_(category_ids))
 
         total_count = query.count()
         products = query.offset((page - 1) * size).limit(size).all()

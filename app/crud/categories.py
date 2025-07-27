@@ -3,6 +3,7 @@ from pickletools import read_unicodestringnl
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import Session
 from typing import Optional
+from sqlalchemy.orm import joinedload
 import bcrypt
 
 import pytz
@@ -92,3 +93,21 @@ def update_category(db: Session, category_id: UUID, data: UpdateCategory) -> Opt
         db.rollback()
         raise e
 
+
+
+
+def get_category_with_children(db: Session, category_id: UUID) -> list[UUID]:
+    def collect_ids(category: Categories) -> list[UUID]:
+        ids = [category.id]
+        for child in category.children:
+            ids.extend(collect_ids(child))
+        return ids
+
+    root_category = (
+        db.query(Categories)
+        .options(joinedload(Categories.children))
+        .filter(Categories.id == category_id)
+        .first()
+    )
+
+    return collect_ids(root_category) if root_category else []
