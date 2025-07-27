@@ -84,8 +84,15 @@ def update_product_details(db: Session, product_detail_id: UUID, data: UpdatePro
         if not product_details:
             return None
         
-        for key, value in data.dict(exclude_unset=True).items():
-            setattr(product_details, key, value)
+        product_details.is_active = data.is_active
+        product_details.video_info = data.video_info
+        product_details.images = data.images 
+        product_details.quantity = data.quantity
+        product_details.color_id = data.color_id
+        product_details.measure_unit_id = data.measure_unit_id  # Assuming measure_unit_id is part of the UpdateProductDetails schema   
+
+
+
         
         db.commit()
         db.refresh(product_details)
