@@ -89,7 +89,7 @@ class CreateProductDetails(BaseConfig):
     quantity: Optional[float] = None  # Required for the product detail quantity
     measure_unit_id: Optional[UUID] = None  # Optional to allow creation without a measure unit
     #size input dict inside list and value and price inside of dict
-    sizes: Optional[List[dict]] = Field(
+    size: Optional[List[dict]] = Field(
         default=None, 
         description="List of size dictionaries, each containing 'value' and 'price' keys. Example: [{'value': 'S', 'price': 10.0}, {'value': 'M', 'price': 12.0}]")
 
@@ -107,6 +107,7 @@ class UpdateProductDetails(BaseConfig):
     # price: Optional[float] = None  # Optional to allow updating without changing the price
     quantity: Optional[float] = None  # Optional to allow updating without changing the quantity
     measure_unit_id: Optional[UUID] = None  # Optional to allow updating without changing the measure unit
+    size: Optional[List[UpdateSize]] = None  # Optional to allow updating without changing the sizes
 
 
 

@@ -31,7 +31,7 @@ def create_product_details(db: Session, data: CreateProductDetails) -> ProductDe
         )
         db.add(product_details)
         db.commit()
-        for size in data.sizes:
+        for size in data.size:
             size_instance = Sizes(
                 value=size['value'],  # Assuming size is a dictionary with a 'value' key
                 price=size.get('price'),  # Optional price for the size
@@ -70,7 +70,6 @@ def get_product_details_by_id(db: Session, product_detail_id: UUID) -> Optional[
                 .options(
                     selectinload(ProductDetails.size),
                     with_loader_criteria(Sizes, Sizes.is_deleted == False)
-                    
                 )
                 .first()
                 )
@@ -89,6 +88,40 @@ def update_product_details(db: Session, product_detail_id: UUID, data: UpdatePro
         
         db.commit()
         db.refresh(product_details)
+
+        # Update sizes if provided and if size inside of detail is not in data.sizes the delete =True
+
+        if data.size:
+            # Step 1: Get all current sizes from DB for this detail
+            existing_sizes = db.query(Sizes).filter(Sizes.detail_id == product_detail_id, Sizes.is_deleted == False).all()
+
+            # Step 2: Track incoming size values
+            incoming_values = set(size_data.value for size_data in data.size)
+
+            # Step 3: Soft-delete sizes that are not in incoming data
+            for existing_size in existing_sizes:
+                if existing_size.value not in incoming_values:
+                    existing_size.is_deleted = True
+
+            # Step 4: Update existing or create new
+            for size_data in data.size:
+                size = db.query(Sizes).filter(
+                    Sizes.value == size_data.value,
+                    Sizes.detail_id == product_detail_id
+                ).first()
+
+                if size:
+                    size.price = size_data.price
+                    size.is_deleted = False  # In case it was soft-deleted earlier
+                else:
+                    new_size = Sizes(
+                        value=size_data.value,
+                        price=size_data.price,
+                        detail_id=product_detail_id
+                    )
+                    db.add(new_size)
+
+            db.commit()
         return product_details
     except SQLAlchemyError as e:
         db.rollback()
