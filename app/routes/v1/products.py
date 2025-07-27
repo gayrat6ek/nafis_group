@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Optional
 from uuid import UUID
 from fastapi import APIRouter
 from fastapi import (
@@ -28,11 +28,12 @@ products_router = APIRouter()
 async def get_products_list(
         page: int = 1,
         size: int = 10,
+        category_id: Optional[UUID] = None,
         is_active: bool = None,
         db: Session = Depends(get_db),
         # current_user: dict = Depends(PermissionChecker(required_permissions=pages_and_permissions['Products']['view']))
 ):
-    return crud_products.get_products(db=db, page=page, size=size, is_active=is_active)
+    return crud_products.get_products(db=db, page=page, size=size, is_active=is_active, category_id=category_id)
 
 
 
