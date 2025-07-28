@@ -55,7 +55,7 @@ async def login_user(
     if not user:
         if not check_otp(db=db, phone_number=form_data.username, otp_code=form_data.otp):
             raise HTTPException(status_code=404, detail="Invalid OTP")
-        role = get_role_by_name(db=db, role_name='Clients')
+        role = get_role_by_name(db=db, name='Clients')
         if not role:
             raise HTTPException(status_code=404, detail="Role not found")
         
