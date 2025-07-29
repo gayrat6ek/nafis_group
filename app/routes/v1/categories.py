@@ -79,7 +79,7 @@ async def get_category_tree(
 
 
 
-@categories_router.get('/categories/reversed/tree', response_model=List[GetCategoriesTree])
+@categories_router.get('/categories/reversed/tree', response_model=List[GetCategoriesTreeReversed])
 async def get_category_tree(
 
         filter: FilterCategory = Depends(),
@@ -104,7 +104,7 @@ async def get_category_tree_by_id(
 
 
 
-@categories_router.get('/categories/reversed/tree/{id}', response_model=GetCategoriesTree)
+@categories_router.get('/categories/reversed/tree/{id}', response_model=GetCategoriesTreeReversed)
 async def get_category_tree_by_id(
         id: UUID,
         db: Session = Depends(get_db),
