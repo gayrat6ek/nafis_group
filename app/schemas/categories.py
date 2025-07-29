@@ -72,7 +72,7 @@ class GetCategoriesTreeReversed(BaseConfig):
     parent_id: Optional[UUID] = None  # ID of the parent category, if any
     is_active: Optional[bool] = True  # Indicates if the category is active or not
     # children: Optional[List['GetCategoriesTree']] = []  # List of child categories, if any
-    parent: Optional['GetCategoriesTree'] = None  # Parent category, if any
+    parent: Optional['GetCategoriesTreeReversed'] = None  # Parent category, if any
     is_child: Optional[bool] = False  # Indicates if the category is a child of another category
 
     class Config:
