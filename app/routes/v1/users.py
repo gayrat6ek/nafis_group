@@ -9,7 +9,7 @@ Security
 
 from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
-from app.crud.users import get_user_by_username, get_user_list, createUserCrud,update_user, get_user_by_id,create_otp_verified_user
+from app.crud.users import get_user_by_username, get_user_list, createUserCrud,update_user, get_user_by_id,create_otp_verified_user,get_one_user
 from app.routes.depth import get_db, get_current_user,PermissionChecker,get_me
 from app.utils.permissions import pages_and_permissions
 from app.schemas import users as user_sch
@@ -97,6 +97,22 @@ async def get_users(
         current_user: dict= Depends(PermissionChecker(required_permissions=pages_and_permissions['Users']['view'])),
 ):
     return get_user_list(db=db, page=page, size=size)
+
+
+
+@user_router.get("/users/{user_id}", response_model=user_sch.GetUserFullData)
+async def get_user(
+        user_id: str,
+        db: Session = Depends(get_db),
+        current_user: dict = Depends(PermissionChecker(required_permissions=pages_and_permissions['Users']['view'])),
+):
+    user_id = UUID(user_id)
+    user = get_one_user(db=db, user_id=user_id)
+    
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+    
+    return user
 
 
 

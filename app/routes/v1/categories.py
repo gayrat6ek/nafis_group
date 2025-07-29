@@ -12,7 +12,7 @@ from fastapi_pagination import Page
 from sqlalchemy.orm import Session
 from app.crud import categories as crud_categories
 from app.routes.depth import get_db, PermissionChecker
-from app.schemas.categories import CategoryGet, CategoryList, CreateCategory, UpdateCategory,FilterCategory,GetCategoriesTree
+from app.schemas.categories import CategoryGet, CategoryList, CreateCategory, UpdateCategory,FilterCategory,GetCategoriesTree,GetCategoriesTreeReversed
 from app.models.Categories import Categories
 from app.utils.permissions import pages_and_permissions
 
@@ -78,7 +78,33 @@ async def get_category_tree(
     return categories
 
 
+
+@categories_router.get('/categories/reversed/tree', response_model=List[GetCategoriesTree])
+async def get_category_tree(
+
+        filter: FilterCategory = Depends(),
+        db: Session = Depends(get_db),
+        # current_user: dict = Depends(PermissionChecker(required_permissions=pages_and_permissions['Categories']['view']))
+):
+    categories = crud_categories.get_categories(db=db, filter=filter)
+    return categories
+
+
 @categories_router.get('/categories/tree/{id}', response_model=GetCategoriesTree)
+async def get_category_tree_by_id(
+        id: UUID,
+        db: Session = Depends(get_db),
+        # current_user: dict = Depends(PermissionChecker(required_permissions=pages_and_permissions['Categories']['view']))
+):
+    category = crud_categories.get_category_by_id(db=db, category_id=id)
+    if not category:
+        raise HTTPException(status_code=404, detail="Category not found")
+    
+    return category
+
+
+
+@categories_router.get('/categories/reversed/tree/{id}', response_model=GetCategoriesTree)
 async def get_category_tree_by_id(
         id: UUID,
         db: Session = Depends(get_db),

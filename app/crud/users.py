@@ -74,6 +74,9 @@ def get_user_by_id(db: Session, username):
     query = db.query(Users).filter(Users.username == username).first()
     return query
 
+
+
+
 def createUserCrud(db: Session, user: createUser,otp):
     if user.password is not None:
         user.password = hash_password(user.password)
@@ -102,4 +105,9 @@ def create_otp_verified_user(db:Session,username,otp,role_id: Optional[UUID] = N
     db.add(query)
     db.commit()
     db.refresh(query)
+    return query
+
+
+def get_one_user(db: Session, user_id: UUID):
+    query = db.query(Users).filter(Users.id == user_id).first()
     return query
