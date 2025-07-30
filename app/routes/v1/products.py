@@ -33,7 +33,17 @@ async def get_products_list(
         db: Session = Depends(get_db),
         # current_user: dict = Depends(PermissionChecker(required_permissions=pages_and_permissions['Products']['view']))
 ):
-    return crud_products.get_products(db=db, page=page, size=size, is_active=is_active, category_id=category_id)
+    products = crud_products.get_products(db=db, page=page, size=size, is_active=is_active, category_id=category_id)
+    #if  product has discounts then update add to detailsize product curr_discount_price discount in precentate
+    for product in products['items']:
+        if product.discounts:
+            for detail in product.details:
+                for size in detail.size:
+                    if size.price and product.discounts.amount:
+                        size.curr_disount_price = size.price / (1 + product.discounts.amount / 100)
+                    else:
+                        size.curr_disount_price = None
+    return products 
 
 
 
