@@ -50,7 +50,7 @@ async def get_products_list(
                         loan_month_prise.append({
                                 "month": month.months,
                                 "id": month.id,
-                                "total_price": size.price*extra_percent/month.months,
+                                "total_price": size.price+extra_percent/month.months,
                                 "monthly_payment": size.price + extra_percent
 
                         })
