@@ -39,10 +39,10 @@ async def get_products_list(
         if product.discounts:
             for detail in product.details:
                 for size in detail.size:
-                    if size.price and product.discounts.amount:
-                        size.curr_disount_price = size.price / (1 + product.discounts.amount / 100)
+                    if size.price and product.discounts[0].amount:
+                        size.curr_disount_price = size.price / (1 + product.discounts[0].amount / 100)
                     else:
-                        size.curr_disount_price = None
+                        size.curr_disount_price = size.price
     return products 
 
 
