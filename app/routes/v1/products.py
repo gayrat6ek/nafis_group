@@ -43,17 +43,27 @@ async def get_products_list(
                     if size.price and product.discounts:
                         size.curr_discount_price = size.price / (1 + product.discounts[0].discount.amount / 100)
                     else:
-                        size.curr_discount_price = size.price
+                        size.curr_discount_price = None
                     loan_month_prise = []
                     for month in loan_months:
-                        extra_percent = (size.price /100)*month.percent
-                        loan_month_prise.append({
-                                "month": month.months,
-                                "id": month.id,
-                                "total_price": size.price+extra_percent,
-                                "monthly_payment": size.price + extra_percent / month.months
+                        if size.curr_discount_price:
+                            extra_percent = (size.curr_discount_price / 100) * month.percent
+                            loan_month_prise.append({
+                                    "month": month.months,
+                                    "id": month.id,
+                                    "total_price": size.curr_discount_price+extra_percent,
+                                    "monthly_payment": size.curr_discount_price + extra_percent / month.months
 
-                        })
+                            })
+                        else:
+                            extra_percent = (size.price /100)*month.percent
+                            loan_month_prise.append({
+                                    "month": month.months,
+                                    "id": month.id,
+                                    "total_price": size.price+extra_percent,
+                                    "monthly_payment": size.price + extra_percent / month.months
+
+                            })
                     size.loan_months = loan_month_prise
                         
     return products 
