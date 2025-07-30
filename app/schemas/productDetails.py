@@ -19,6 +19,7 @@ class GetSize(BaseConfig):
     price: Optional[float] = None  # Optional price for the size
     curr_discount_price: Optional[float] = None  # Optional current discount price for the size
     loan_months: Optional[list] = None  # Optional loan month information
+    discount: Optional[float] = None  # Optional discount percentage for the size
 
     # there is is_deleted filed do not return size if it is True
     is_deleted: Optional[bool] = True  # Indicates if the size is deleted
@@ -120,6 +121,7 @@ class ProductDetailsBasicData(BaseConfig):
     video_info: Optional[list] = None
     images: Optional[list] = None
     is_active: Optional[bool] = True
+
     # price: Optional[float] = None  # Assuming product details have a price
     color:Optional[ColorGet] = None  # Assuming product details can have a color relationship
     measure_unit: Optional[getBasicMeasureUnits] = None  # Assuming product details can have a measure unit relationship

@@ -41,9 +41,12 @@ async def get_products_list(
             for detail in product.details:
                 for size in detail.size:
                     if size.price and product.discounts:
-                        size.curr_discount_price = size.price / (1 + product.discounts[0].discount.amount / 100)
+                        cut_percent = size.price/100 * product.discounts[0].discount.amount
+                        size.curr_discount_price = size.price - cut_percent
+                        size.discount = product.discounts[0].discount.amount
                     else:
                         size.curr_discount_price = None
+                        size.discount = None
                     loan_month_prise = []
                     for month in loan_months:
                         if size.curr_discount_price:
