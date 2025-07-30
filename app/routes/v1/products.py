@@ -46,7 +46,7 @@ async def get_products_list(
                         size.curr_discount_price = size.price
                     loan_month_prise = []
                     for month in loan_months:
-                        extra_percent = (size.price /100)*month.precent
+                        extra_percent = (size.price /100)*month.percent
                         loan_month_prise.append({
                                 "month": month.months,
                                 "id": month.id,
