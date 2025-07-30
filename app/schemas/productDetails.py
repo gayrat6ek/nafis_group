@@ -18,7 +18,7 @@ class GetSize(BaseConfig):
     value: str  # Assuming size is a string (e.g., "S", "M", "L")
     price: Optional[float] = None  # Optional price for the size
     curr_discount_price: Optional[float] = None  # Optional current discount price for the size
-    loan_month: Optional[dict] = None  # Optional loan month information
+    loan_months: Optional[dict] = None  # Optional loan month information
 
     # there is is_deleted filed do not return size if it is True
     is_deleted: Optional[bool] = True  # Indicates if the size is deleted
