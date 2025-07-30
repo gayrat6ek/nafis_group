@@ -19,6 +19,7 @@ from app.schemas.products import (
 
 
 from app.models.Products import Products
+from app.crud.loanMonths import get_loan_months
 from app.utils.permissions import pages_and_permissions
 products_router = APIRouter()
 
@@ -35,14 +36,26 @@ async def get_products_list(
 ):
     products = crud_products.get_products(db=db, page=page, size=size, is_active=is_active, category_id=category_id)
     #if  product has discounts then update add to detailsize product curr_discount_price discount in precentate
+    loan_months = get_loan_months(db=db,is_active=True)  # Ensure loan months are loaded if needed
     for product in products['items']:
-        if product.discounts:
             for detail in product.details:
                 for size in detail.size:
-                    if size.price and product.discounts[0].discount.amount:
+                    if size.price and product.discounts:
                         size.curr_discount_price = size.price / (1 + product.discounts[0].discount.amount / 100)
                     else:
                         size.curr_discount_price = size.price
+                    loan_month_prise = []
+                    for month in loan_months:
+                        extra_percent = (size.price /100)*month.precent
+                        loan_month_prise.append({
+                                "month": month.months,
+                                "id": month.id,
+                                "total_price": size.price*extra_percent/month.months,
+                                "monthly_payment": size.price + extra_percent
+
+                        })
+                    size.loan_months = loan_month_prise
+                        
     return products 
 
 
