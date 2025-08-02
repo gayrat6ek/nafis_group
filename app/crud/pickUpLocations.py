@@ -67,11 +67,18 @@ def updateUpLocations(db:Session,location_id:UUID,data:PickUpLocationUpdate):
         raise e
     
 
-def getUpLocations(db:Session,is_active:Optional[bool]=None):
+def getUpLocations(db:Session,is_active:Optional[bool]=None, name:Optional[str]=None):
     try:
         query = db.query(PickUpLocations)
         if is_active is not None:
             query = query.filter(PickUpLocations.is_active == is_active)
+        if name:
+            query = query.filter(or_(
+                PickUpLocations.name_uz.ilike(f"%{name}%"),
+                PickUpLocations.name_ru.ilike(f"%{name}%"),
+                PickUpLocations.name_en.ilike(f"%{name}%")
+            ))
+        query = query.order_by(PickUpLocations.created_at.desc())
         return query.all()
     except SQLAlchemyError as e:
         raise e

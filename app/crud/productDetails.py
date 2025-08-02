@@ -58,7 +58,10 @@ def get_product_details(db: Session, product_id: UUID, is_active: Optional[bool]
                 selectinload(ProductDetails.size),
                 with_loader_criteria(Sizes, Sizes.is_deleted == False)
             )
-)
+        )
+        query = query.order_by(ProductDetails.created_at.desc())
+        if is_active is not None:
+            query = query.filter(ProductDetails.is_active == is_active)
 
         return query.all()
         

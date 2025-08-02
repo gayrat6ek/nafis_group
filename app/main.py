@@ -26,6 +26,7 @@ from app.routes.v1.discounts import discounts_router
 from app.routes.v1.materials import materials_router
 from app.routes.v1.measureUnit import measure_units_router
 from app.routes.v1.orders import orders_router
+from app.routes.v1.pickUpLocations import pick_up_locations_router
 
 from app.utils.utils import get_current_user_for_docs
 
@@ -58,6 +59,7 @@ app.include_router(discounts_router, prefix="/api/v1", tags=["Discounts"])
 app.include_router(materials_router, prefix="/api/v1", tags=["Materials"])
 app.include_router(measure_units_router, prefix="/api/v1", tags=["Measure Units"])
 app.include_router(orders_router, prefix="/api/v1", tags=["Orders"])
+app.include_router(pick_up_locations_router, prefix="/api/v1", tags=["Pick Up Locations"])
 
 
 @app.get("/docs", include_in_schema=False)

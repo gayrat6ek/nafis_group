@@ -27,10 +27,11 @@ pick_up_locations_router = APIRouter()
 @pick_up_locations_router.get('/pick_up_locations', response_model=List[PickUpLocationList])
 async def get_pick_up_locations_list(
         is_active: bool = None,
+        name: str = None,
         db: Session = Depends(get_db),
         # current_user: dict = Depends(PermissionChecker(required_permissions=pages_and_permissions['PickUpLocations']['view']))
 ):
-    return crud_pick_up_locations.getUpLocations(db=db, is_active=is_active)
+    return crud_pick_up_locations.getUpLocations(db=db, is_active=is_active,name=name)
 
 
 
