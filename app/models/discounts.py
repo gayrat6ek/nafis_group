@@ -39,4 +39,8 @@ class Discounts(Base):
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())
     products = relationship("DiscountProducts", back_populates="discount")
 
+    @property
+    def limited_discount_products(self):
+        return self.products[:6]
+
     

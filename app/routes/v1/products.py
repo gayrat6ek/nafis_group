@@ -75,8 +75,36 @@ async def get_product(
         # current_user: dict = Depends(PermissionChecker(required_permissions=pages_and_permissions['Products']['view']))
 ):
     product = crud_products.get_product_by_id(db=db, product_id=id)
+    loan_months = get_loan_months(db=db,is_active=True)    
     if not product:
-        raise HTTPException(status_code=404, detail="Product not found")
+        raise HTTPException(status_code=404, detail="Product not found") 
+
+    for detail in product.details:
+                for size in detail.size:
+                    if size.price and product.discounts:
+                        cut_percent = size.price/100 * product.discounts[0].discount.amount
+                        size.curr_discount_price = size.price - cut_percent
+                        size.discount = product.discounts[0].discount.amount
+                    else:
+                        size.curr_discount_price = None
+                        size.discount = None
+                    loan_month_prise = []
+                    for month in loan_months:
+                        if size.curr_discount_price:
+                            extra_percent = (size.curr_discount_price / 100) * month.percent
+                            total_price = size.curr_discount_price + extra_percent
+                        else:
+                            extra_percent = (size.price / 100) * month.percent
+                            total_price = size.price + extra_percent
+
+                        loan_month_prise.append({
+                            "month": month.months,
+                            "id": month.id,
+                            "total_price": total_price,
+                            "monthly_payment": total_price / month.months
+                        })
+                    size.loan_months = loan_month_prise
+    
     return product
 
 

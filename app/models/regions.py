@@ -2,6 +2,7 @@
 import uuid
 from sqlalchemy import (
     Column,
+    Float,
     String,
     DateTime,
     Boolean,
@@ -19,6 +20,7 @@ class Regions(Base):
     name_ru = Column(String, nullable=False)  # Russian name for the region
     name_uz = Column(String, nullable=False)  # Uzbek name for the region
     is_active = Column(Boolean, default=True)  # Indicates if the region is active
+    delivery_cost = Column(Float, nullable=True, default=0.0)  # Default delivery cost for the region
 
     created_at = Column(DateTime(timezone=True), default=func.now())
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())

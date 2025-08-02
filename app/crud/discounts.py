@@ -52,8 +52,9 @@ def get_discounts(db: Session, is_active: Optional[bool] = None) -> list[Discoun
         query = db.query(Discounts)
         if is_active is not None:
             query = query.filter(Discounts.is_active == is_active)
+        query = query.order_by(Discounts.created_at.desc()).all()
         
-        return query.all()
+        return query
         
     except SQLAlchemyError as e:
         raise e

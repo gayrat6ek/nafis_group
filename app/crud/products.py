@@ -178,6 +178,9 @@ def get_product_by_id(db: Session, product_id: UUID) -> Optional[Products]:
             product.views += 1
         db.commit()  # Commit the view increment    
         db.refresh(product)  # Refresh to get the updated views count
+
+
+        product.reviews = product.reviews[:6]
         return product
     except SQLAlchemyError as e:
         raise e

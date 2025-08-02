@@ -7,6 +7,7 @@ from app.schemas.brands import BrandGet
 from app.schemas.categories import CategoryGet,GetCategoriesTree
 from app.schemas.productDetails import ProductDetailsBasicData
 from .materials import getBasicMaterials
+from app.schemas.reviews import ReviewGet
 
 
 class BaseConfig(BaseModel):
@@ -65,9 +66,10 @@ class ProductGet(BaseConfig):
     created_at: Optional[datetime] = None
     category:Optional[GetCategoriesTree]=None
     brand:Optional[BrandGet]=None
-    discounts: Optional[List[DiscountsProducts]] = None  # Assuming products can have multiple discounts
+    # discounts: Optional[List[DiscountsProducts]] = None  # Assuming products can have multiple discounts
     details: Optional[List[ProductDetailsBasicData]] = None  # Assuming products can have details
     materials: Optional[List[materialsGet]] = None  # Assuming products can have multiple materials
+    reviews: Optional[List[ReviewGet]] = None  # Assuming products can have multiple reviews
 
 
 class ProductList(BaseConfig):
@@ -86,7 +88,7 @@ class ProductList(BaseConfig):
     category_id: Optional[UUID] = None  # Assuming products are linked to categories
     brand_id: Optional[UUID] = None  # Assuming products are linked to brands
     created_at: Optional[datetime] = None
-    discounts: Optional[List[DiscountsProducts]] = None  # Assuming products can have multiple discounts
+    # discounts: Optional[List[DiscountsProducts]] = None  # Assuming products can have multiple discounts
     details: Optional[List[ProductDetailsBasicData]] = None  # Assuming products can have details
     materials: Optional[List[materialsGet]] = None  # Assuming products can have multiple materials
 

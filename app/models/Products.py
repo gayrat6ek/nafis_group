@@ -53,6 +53,7 @@ class Products(Base):
     questions = relationship("Questions", back_populates="product")  
     materials = relationship("ProductMaterials", back_populates="product")  
     likes = relationship("Likes", back_populates="product")  # Assuming Likes model has a product relationship
+    reviews = relationship("Reviews", back_populates="product")  # Assuming Reviews model has a product relationship
 
 
 

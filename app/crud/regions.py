@@ -22,7 +22,8 @@ def create_region(db: Session, data: CreateRegion) -> Regions:
             name_en=data.name_en,
             name_ru=data.name_ru,
             name_uz=data.name_uz,
-            is_active=True
+            is_active=True,
+            delivery_cost=data.delivery_cost if data.delivery_cost is not None else 0.0  # Default to 0.0 if not provided
         )
         db.add(region)
         db.commit()

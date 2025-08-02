@@ -91,6 +91,12 @@ pages_and_permissions = {
     ,
     "Likes": {
         "create": "L2",
+    },
+    "Reviews": {
+        "view": "RV1",
+        "update": "RV2",
+        "create": "RV4",
+        "delete": "RV5"
     }
 
 

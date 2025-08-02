@@ -16,6 +16,7 @@ from app.models.Orders import Orders
 from app.models.OrderItems import OrderItems
 from app.crud import productDetails as product_details_crud
 from app.schemas.orders import ConfirmOrder
+from app.crud.districts import get_district_by_id
 from app.crud.discounts import activeDisCountProd
 
 
@@ -138,10 +139,21 @@ def confirm_card(user_id: UUID, db: Session, data:ConfirmOrder):
         total_discounted_price = total_items_price - sum(item.price for item in cart.items)
         total_price = sum(item.price * item.quantity for item in cart.items)
 
+        if data.district_id is not None:
+            district = get_district_by_id(db, data.district_id)
+            if not district:
+                raise ValueError("District not found")
+            if not district.region.delivery_cost:
+                delivery_cost = 0.0
+            else:
+                delivery_cost = district.region.delivery_cost
+        else:
+            delivery_cost = 0.0
+
         cart.items_count = item_count
         cart.total_items_price = total_items_price
         cart.total_discounted_price = total_discounted_price
-        cart.total_amount = total_price
+        cart.total_amount = total_price+ delivery_cost
         
         cart.payment_method = data.payment_method
         cart.district_id = data.district_id
@@ -151,6 +163,7 @@ def confirm_card(user_id: UUID, db: Session, data:ConfirmOrder):
         cart.delivery_date = data.delivery_date
         cart.delivery_receiver = data.delivery_receiver
         cart.card_id = data.bank_card_id  # Assuming bank_card_id is the ID of the card used for payment
+        cart.delivery_fee = delivery_cost
         
         # Update the cart status to 'confirmed' (assuming '1' is the status for confirmed orders)
         cart.status = 1
