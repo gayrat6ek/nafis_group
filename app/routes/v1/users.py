@@ -16,6 +16,7 @@ from app.schemas import users as user_sch
 from app.utils.utils import verify_password, create_access_token, create_refresh_token,generateOtp
 from app.crud.otps import create_otp,check_otp
 from app.crud.roles import get_role_by_name
+from app.crud.likes import count_likes
 
 user_router = APIRouter()
 
@@ -86,6 +87,9 @@ async def get_me(
         db: Session = Depends(get_db),
         current_user: user_sch.GetUserFullData = Depends(get_me)
 ):
+    likes = count_likes(db=db, user_id=current_user.id)
+    
+    current_user.like_count = int(likes)
     return current_user
 
 

@@ -88,6 +88,10 @@ pages_and_permissions = {
         "update": "BC2",
         "create": "BC4"
     }
+    ,
+    "Likes": {
+        "create": "L2",
+    }
 
 
 }

@@ -102,3 +102,19 @@ async def update_product(
     if not updated_product:
         raise HTTPException(status_code=404, detail="Product not found")
     return updated_product
+
+
+
+
+@products_router.get('/liked/products', response_model=Page[ProductList])
+async def get_liked_products(
+        page: int = 1,
+        size: int = 10,
+        db: Session = Depends(get_db),
+        current_user: dict = Depends(PermissionChecker(required_permissions=pages_and_permissions['Products']['view']))
+):
+    """
+    Get the list of products liked by the current user.
+    """
+    liked_products = crud_products.get_liked_products(db=db, user_id=current_user['id'], page=page, size=size)
+    return liked_products

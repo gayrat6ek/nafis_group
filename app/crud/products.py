@@ -7,6 +7,7 @@ import bcrypt
 from app.models.Products import Products
 from app.models.discounts import Discounts
 from app.models.discountProducts import DiscountProducts
+from app.models.likes import Likes
 from app.models.productDetails import ProductDetails
 from app.models.sizes import Sizes
 from sqlalchemy.orm import selectinload, with_loader_criteria
@@ -234,3 +235,23 @@ def update_product(db: Session, product_id: UUID, data: UpdateProduct) -> Option
     except SQLAlchemyError as e:
         db.rollback()
         raise e
+    
+
+def get_liked_products(db: Session, user_id: UUID, page: int = 1, size: int = 10):
+    try:
+        query = db.query(Products).join(Products.likes).filter(Likes.user_id == user_id)
+        
+        total_count = query.count()
+        query = query.order_by(Products.created_at.desc())
+        products = query.offset((page - 1) * size).limit(size).all()
+        
+        return {
+            "items": products,
+            "total": total_count,
+            "page": page,
+            "size": size,
+            "pages": (total_count + size - 1) // size
+        }
+    except SQLAlchemyError as e:
+        raise e         
+    

@@ -80,6 +80,7 @@ class GetUserFullData(BaseModel):
     salary: Optional[str] = None
     exerience: Optional[float] = None
     role : Optional[RolesGet] = None
+    like_count: Optional[int] = 0  # Assuming this is the count of likes for the user
 
     model_config = ConfigDict(
         from_attributes=True

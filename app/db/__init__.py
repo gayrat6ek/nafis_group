@@ -12,6 +12,7 @@ from app.models import Brands
 from app.models import Products
 from app.models import productDetails
 from app.models import sizes
+from app.models import likes
 
 from app.models import ratings
 from app.models import discounts

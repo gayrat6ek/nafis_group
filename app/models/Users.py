@@ -63,6 +63,7 @@ class Users(Base):
     bank_cards = relationship("BankCards", back_populates="user")  # Assuming BankCards model has a user relationship
     orders = relationship("Orders", back_populates="user")  # Assuming Orders model has
     logs = relationship("Logs", back_populates="user")  # Assuming Logs model has a user relationship
+    likes = relationship("Likes", back_populates="user")  # Assuming Likes model has a user relationship
 
     
 
