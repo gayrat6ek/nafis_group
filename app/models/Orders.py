@@ -57,6 +57,8 @@ class Orders(Base):
 
     created_at = Column(DateTime(timezone=True), default=func.now())
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())
+    card_id = Column(UUID(as_uuid=True), ForeignKey('bank_cards.id'), nullable=True)  # ID of the bank card used for payment, if applicable
+    card = relationship("BankCards", back_populates="orders")  # Assuming BankCards model has an orders relationship
     
     user = relationship("Users", back_populates="orders")
     payment_dates = relationship("OrderPaymentDates", back_populates="order")

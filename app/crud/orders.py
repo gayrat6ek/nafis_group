@@ -15,6 +15,8 @@ from uuid import UUID
 from app.models.Orders import Orders
 from app.models.OrderItems import OrderItems
 from app.crud import productDetails as product_details_crud
+from app.schemas.orders import ConfirmOrder
+from app.crud.discounts import activeDisCountProd
 
 
 def get_cart_by_user_id(db: Session, user_id: UUID):
@@ -62,6 +64,13 @@ def add_or_update_item_cart(db: Session,
                      ):
     try:
         size = product_details_crud.get_size_by_id(db, size_id)
+        discount = activeDisCountProd(db, size.product_details.product_id)
+        if discount:
+            discounted_price = size.price/100* discount[0].amount
+            size_price = size.price - discounted_price
+        else:
+            size_price = size.price
+
         if not size:
             raise ValueError("Size not found")
         
@@ -73,15 +82,15 @@ def add_or_update_item_cart(db: Session,
 
         if order_item:
             # If the item already exists, update the quantity and price
-            order_item.quantity += quantity
-            order_item.price = size.price
+            order_item.quantity = quantity
+            order_item.price = size_price
         else:
 
             # If the item does not exist, create a new order item
             order_item = OrderItems(
                 product_detail_id=product_detail_id,
                 quantity=quantity,
-                price=size.price,
+                price=size_price,
                 order_id=order_id,
                 size_id=size_id  # Set the size ID
             )
@@ -94,13 +103,15 @@ def add_or_update_item_cart(db: Session,
         raise e
     
 
-def remove_item_from_cart(db: Session, order_item_id: UUID,order_id:UUID):
+def remove_item_from_cart(db: Session, order_item_id: UUID,order_id:UUID,size_id:Optional[UUID]=None):
     try:
         order_item = db.query(OrderItems).filter(
             OrderItems.product_detail_id == order_item_id,
             OrderItems.order_id == order_id
-        ).first()
-        
+        )
+        if size_id is not None:
+            order_item = order_item.filter(OrderItems.size_id == size_id)
+        order_item = order_item.first()
         if not order_item:
             return None  # Item not found in the cart
         
@@ -110,3 +121,43 @@ def remove_item_from_cart(db: Session, order_item_id: UUID,order_id:UUID):
     except SQLAlchemyError as e:
         db.rollback()
         raise e
+    
+
+
+def confirm_card(user_id: UUID, db: Session, data:ConfirmOrder):
+    try:
+        cart = db.query(Orders).filter(
+            Orders.user_id == user_id,
+            Orders.status == 0  # Assuming '0' is the status for an active cart
+        ).first()
+
+        if not cart:
+            raise ValueError("Cart not found for the user")
+        item_count = len(cart.items)
+        total_items_price = sum(item.product_detail.price * item.quantity for item in cart.items)
+        total_discounted_price = total_discounted_price - sum(item.price for item in cart.items)
+        total_price = sum(item.price * item.quantity for item in cart.items)
+
+        cart.items_count = item_count
+        cart.total_items_price = total_items_price
+        cart.total_discounted_price = total_discounted_price
+        cart.total_amount = total_price
+        
+        cart.payment_method = data.payment_method
+        cart.district_id = data.district_id
+        cart.description = data.description
+        cart.delivery_address = data.delivery_address
+        cart.delivery_phone_number = data.delivery_phone_number
+        cart.delivery_date = data.delivery_date
+        cart.delivery_receiver = data.delivery_receiver
+        cart.card_id = data.bank_card_id  # Assuming bank_card_id is the ID of the card used for payment
+        
+        # Update the cart status to 'confirmed' (assuming '1' is the status for confirmed orders)
+        cart.status = 1
+        db.commit()
+        db.refresh(cart)
+        return cart     
+    except SQLAlchemyError as e:
+        db.rollback()
+        raise e 
+    

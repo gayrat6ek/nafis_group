@@ -18,6 +18,7 @@ class BaseConfig(BaseModel):
 class PaymentMethod(str, Enum):
     card = 'card'
     cash = 'cash'
+    loan = 'loan'  # Assuming loan is a valid payment method
 
 
 class AddOrUpdateCartItem(BaseConfig):
@@ -28,6 +29,7 @@ class AddOrUpdateCartItem(BaseConfig):
 
 class RemoveCartItem(BaseConfig):
     product_detail_id: UUID
+    size: Optional[UUID] = None  # Optional size for the item, if applicable
 
 
 
@@ -41,6 +43,7 @@ class ConfirmOrder(BaseConfig):
     delivery_phone_number: Optional[str] = Field(None, max_length=15, description="Phone number for delivery")
     delivery_date: Optional[datetime] = None
     delivery_receiver: Optional[str] = Field(None, max_length=100, description="Name of the person receiving the delivery")
+    bank_card_id: Optional[UUID] = None  # ID of the bank card used for payment, if applicable
 
 
     #filter payment methods only allow card, cash, 

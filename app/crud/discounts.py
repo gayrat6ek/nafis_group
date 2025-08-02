@@ -12,8 +12,13 @@ from sqlalchemy import or_, and_, Date, cast,String
 from uuid import UUID
 
 from app.models.discounts import Discounts
+from app.models.productDetails import ProductDetails
 from app.schemas.discounts import CreateDiscount, UpdateDiscount
 from app.models.discountProducts import DiscountProducts
+from app.models.Products import Products
+import pytz
+
+time_zone = pytz.timezone("Asia/Tashkent")
 
 
 
@@ -88,3 +93,20 @@ def update_discount(db: Session, discount_id: UUID, data: UpdateDiscount) -> Opt
     except SQLAlchemyError as e:
         db.rollback()
         raise e
+    
+
+def activeDisCountProd(db: Session, product_id: UUID) -> list[Discounts]:
+    try:
+        discounts = db.query(Discounts).join(DiscountProducts).filter(
+            and_(
+                Discounts.is_active == True,
+                Discounts.active_from <= datetime.now(tz=time_zone),
+                Discounts.active_to >= datetime.now(tz=time_zone),
+                DiscountProducts.product_id == product_id
+            )
+        ).all()
+        return discounts
+    
+    except SQLAlchemyError as e:
+        raise e 
+    

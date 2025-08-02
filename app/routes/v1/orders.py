@@ -65,6 +65,7 @@ async def remove_from_cart(
     success = crud_orders.remove_item_from_cart(db=db, 
                                                 order_item_id=body.product_detail_id,
                                                 order_id=cart.id,
+                                                size_id=body.size
                                                 )
     if not success:
         raise HTTPException(status_code=404, detail="Item not found in cart")
@@ -87,3 +88,34 @@ async def get_my_cart(
     
     return cart
 
+
+
+@orders_router.post('/orders/confirm', response_model=OrdersGet)
+async def confirm_order(
+        body: ConfirmOrder,
+        db: Session = Depends(get_db),
+        current_user: dict = Depends(PermissionChecker(required_permissions=pages_and_permissions['Orders']['create']))
+):
+    """
+    Confirm the user's order.
+    """
+    cart = crud_orders.get_cart_by_user_id(db=db, user_id=current_user['id'])
+    if not cart:
+        raise HTTPException(status_code=404, detail="Cart not found")
+    
+    order = crud_orders.confirm_order(
+        db=db, 
+        order_id=cart.id, 
+        user_id=current_user['id'], 
+        payment_method=body.payment_method,
+        district_id=body.district_id,
+        description=body.description,
+        delivery_address=body.delivery_address,
+        delivery_phone_number=body.delivery_phone_number,
+        delivery_date=body.delivery_date,
+        delivery_receiver=body.delivery_receiver,
+        bank_card_id=body.bank_card_id
+    )
+    
+    if not order:
+        raise HTTPException(status_code=400, detail="Order confirmation failed")

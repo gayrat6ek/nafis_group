@@ -29,3 +29,4 @@ class BankCards(Base):
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())
 
     user = relationship("Users", back_populates="bank_cards")  # Assuming Users model has a bank_cards relationship
+    orders = relationship("Orders", back_populates="card")  # Assuming Orders model has a card relationship
