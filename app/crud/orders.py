@@ -161,3 +161,45 @@ def confirm_card(user_id: UUID, db: Session, data:ConfirmOrder):
         db.rollback()
         raise e 
     
+
+
+
+def get_orders(db: Session, user_id: Optional[UUID]=None, page: int = 1, size: int = 10):
+    try:
+        query = db.query(Orders)
+        if user_id:
+            query = query.filter(Orders.user_id == user_id)
+
+        total_count = query.count()
+        query = query.order_by(Orders.created_at.desc()) 
+        orders = query.offset((page - 1) * size).limit(size).all()
+        
+        return {
+            "items": orders,
+            "total": total_count,
+            "page": page,
+            "size": size,
+            'pages': (total_count + size - 1) // size 
+        }
+    except SQLAlchemyError as e:
+        raise e
+    
+
+
+def get_order_by_id(db: Session, order_id: UUID) -> Optional[Orders]:
+    try:
+        order = db.query(Orders).filter(Orders.id == order_id).first()
+        return order
+    
+    except SQLAlchemyError as e:
+        raise e
+    
+
+
+
+def get_order_by_id_admin(db: Session, order_id: UUID) -> Optional[Orders]:
+    try:
+        return db.query(Orders).filter(Orders.id == order_id).first()
+    
+    except SQLAlchemyError as e:
+        raise e

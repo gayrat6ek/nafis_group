@@ -171,6 +171,12 @@ def get_product_by_id(db: Session, product_id: UUID) -> Optional[Products]:
             .filter(Products.id == product_id)
             .first()
         )
+        if product and not product.views:
+            product.views = 1  # Initialize views if not set
+        else:
+            product.views += 1
+        db.commit()  # Commit the view increment    
+        db.refresh(product)  # Refresh to get the updated views count
         return product
     except SQLAlchemyError as e:
         raise e

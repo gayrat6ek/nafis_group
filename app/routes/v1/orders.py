@@ -112,3 +112,65 @@ async def confirm_order(
     if not order:
         raise HTTPException(status_code=400, detail="Order confirmation failed")
     return order
+
+
+
+@orders_router.get('/orders', response_model=Page[OrdersGet])
+async def get_orders(
+        page: int = 1,
+        size: int = 10,
+        db: Session = Depends(get_db),
+        current_user: dict = Depends(PermissionChecker(required_permissions=pages_and_permissions['Orders']['view']))
+):
+    """
+    Get a paginated list of orders for the user.
+    """
+    orders = crud_orders.get_orders(db=db, user_id=current_user['id'], page=page, size=size)
+    return orders
+
+
+@orders_router.get('/orders/{order_id}', response_model=OrdersGet)
+async def get_order(
+        order_id: UUID,
+        db: Session = Depends(get_db),
+        current_user: dict = Depends(PermissionChecker(required_permissions=pages_and_permissions['Orders']['view']))
+):
+    """
+    Get details of a specific order by its ID.
+    """
+    order = crud_orders.get_order_by_id(db=db, order_id=order_id)
+    if not order:
+        raise HTTPException(status_code=404, detail="Order not found")
+    
+    return order
+
+
+@orders_router.get("/admin/orders", response_model=Page[OrdersGet])
+async def get_all_orders(
+        page: int = 1,
+        size: int = 10,
+        db: Session = Depends(get_db),
+        current_user: dict = Depends(PermissionChecker(required_permissions=pages_and_permissions['Orders']['view']))
+):
+    """
+    Get a paginated list of all orders (admin view).
+    """
+    orders = crud_orders.get_orders(db=db, page=page, size=size)
+    return orders
+
+
+
+@orders_router.get('/admin/orders/{order_id}', response_model=OrdersGet)
+async def get_order_by_id(
+        order_id: UUID,
+        db: Session = Depends(get_db),
+        current_user: dict = Depends(PermissionChecker(required_permissions=pages_and_permissions['Orders']['view']))
+):
+    """
+    Get details of a specific order by its ID (admin view).
+    """
+    order = crud_orders.get_order_by_id_admin(db=db, order_id=order_id)
+    if not order:
+        raise HTTPException(status_code=404, detail="Order not found")
+    
+    return order

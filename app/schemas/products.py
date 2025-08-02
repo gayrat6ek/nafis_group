@@ -54,6 +54,7 @@ class ProductGet(BaseConfig):
     description_ru: Optional[str] = None
     description_en: Optional[str] = None
     characteristics: Optional[dict] = None
+    views: Optional[int] = 0  # Number of views for the product
 
 
     delivery_days: Optional[int] = None

@@ -3,6 +3,7 @@ from sqlalchemy import (
     Column,
     Float,
     ForeignKey,
+    Integer,
     String,
     DateTime,
     Boolean,
@@ -34,6 +35,7 @@ class Products(Base):
     is_active = Column(Boolean, default=True)
     loan_accessable = Column(Boolean, default=True)
     characteristics = Column(JSONB, nullable=True)  # Assuming characteristics are stored as a JSON object
+    views = Column(Integer, default=0)  # Number of views for the product
 
 
 
