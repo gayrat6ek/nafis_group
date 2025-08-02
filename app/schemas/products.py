@@ -70,6 +70,7 @@ class ProductGet(BaseConfig):
     details: Optional[List[ProductDetailsBasicData]] = None  # Assuming products can have details
     materials: Optional[List[materialsGet]] = None  # Assuming products can have multiple materials
     reviews: Optional[List[ReviewGet]] = None  # Assuming products can have multiple reviews
+    liked: Optional[bool] = False  # Indicates if the product is liked by the user
 
 
 class ProductList(BaseConfig):

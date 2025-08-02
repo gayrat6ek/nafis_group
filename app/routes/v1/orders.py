@@ -44,14 +44,17 @@ async def add_to_cart(
     )
     if not item:
         raise HTTPException(status_code=404, detail="Product detail or size not found")
-    return {"message": "Item added to cart successfully", "item_id": item.id}
+    items = 0
+    for item in cart.items:
+        items += 1
+    return {"message": "Item added to cart successfully", "items_count":items}
 
 
     
 
 @orders_router.post('/orders/cart/remove', )
 async def remove_from_cart(
-        body: RemoveCartItem,
+        body: list[RemoveCartItem],
         db: Session = Depends(get_db),
         current_user: dict = Depends(PermissionChecker(required_permissions=pages_and_permissions['Orders']['delete']))
 ):
@@ -61,14 +64,14 @@ async def remove_from_cart(
     cart = crud_orders.get_cart_by_user_id(db=db, user_id=current_user['id'])
     if not cart:
         raise HTTPException(status_code=404, detail="Cart not found")
+    for item in body:
     
-    success = crud_orders.remove_item_from_cart(db=db, 
-                                                order_item_id=body.product_detail_id,
-                                                order_id=cart.id,
-                                                size_id=body.size
-                                                )
-    if not success:
-        raise HTTPException(status_code=404, detail="Item not found in cart")
+        success = crud_orders.remove_item_from_cart(db=db, 
+                                                    order_item_id=item.product_detail_id,
+                                                    order_id=cart.id,
+                                                    size_id=item.size
+                                                    )
+        
     
     return {"message": "Item removed from cart successfully"}
 

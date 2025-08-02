@@ -43,12 +43,15 @@ class ConfirmOrder(BaseConfig):
     delivery_date: Optional[datetime] = None
     delivery_receiver: Optional[str] = Field(None, max_length=100, description="Name of the person receiving the delivery")
     bank_card_id: Optional[UUID] = None  # ID of the bank card used for payment, if applicable
+    item_ids: Optional[List[UUID]] = None  # List of product detail IDs to confirm in the order
+
 
 
    
 
 
 class OrderItems(BaseConfig):
+    id: Optional[UUID] = None
     product_detail: ProductDetailsInOrders  # Basic data of the product detail
     quantity: int = Field(..., ge=1, description="Quantity of the product in the order")
     price: float = Field(..., gt=0, description="Price of the product at the time of order")

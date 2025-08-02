@@ -36,6 +36,16 @@ class UpdateSize(BaseConfig):
     price: Optional[float] = None  # Optional to allow updating without changing the price
 
 
+class ProductBasicGet(BaseConfig):
+    id: Optional[UUID] = None
+    name_uz: Optional[str] = None
+    name_ru: Optional[str] = None
+    name_en: Optional[str] = None
+    description_uz: Optional[str] = None        
+    description_ru: Optional[str] = None
+    description_en: Optional[str] = None
+
+
     
 
 
@@ -61,7 +71,6 @@ class ProductDetailsGet(BaseConfig):
 
 class ProductDetailsList(BaseConfig):
     id: UUID
-    product_id: Optional[UUID] = None
     # sizes:Optional[str]=None
 
     video_info: Optional[list] = None
@@ -132,6 +141,8 @@ class ProductDetailsBasicData(BaseConfig):
 
 class ProductDetailsInOrders(BaseConfig):
     id: UUID
+    product: Optional[ProductBasicGet] = None  # Basic data of the product
+
     images: Optional[list] = None
     is_active: Optional[bool] = True
     color:Optional[ColorGet] = None  # Assuming product details can have a color relationship

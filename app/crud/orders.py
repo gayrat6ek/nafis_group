@@ -2,6 +2,7 @@
 
 from pickletools import read_unicodestringnl
 
+from fastapi import HTTPException
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import Session
 from typing import Optional
@@ -132,8 +133,31 @@ def confirm_card(user_id: UUID, db: Session, data:ConfirmOrder):
             Orders.status == 0  # Assuming '0' is the status for an active cart
         ).first()
 
-        if not cart:
-            raise ValueError("Cart not found for the user")
+        # new_cart = get_cart_by_user_id(db, user_id)
+
+        # if not new_cart:
+        #     new_cart = create_cart(db, user_id)
+        new_cart = []
+        for item in cart.items:
+            if item.id not in data.item_ids:
+                new_cart.append({
+                    "product_detail_id": item.product_detail_id,
+                    "size_id": item.size_id,
+                    "quantity": item.quantity
+                })
+                db.delete(item)
+
+                
+        db.flush()
+        db.refresh(cart)
+        # db.refresh(cart)
+        if not cart.items:
+            raise HTTPException(
+                status_code=400,
+                detail="Cart is empty. Please add items to the cart before confirming."
+            )
+
+        
         item_count = len(cart.items)
         total_items_price = sum(item.size.price * item.quantity for item in cart.items)
         total_discounted_price = total_items_price - sum(item.price for item in cart.items)
@@ -164,12 +188,30 @@ def confirm_card(user_id: UUID, db: Session, data:ConfirmOrder):
         cart.delivery_receiver = data.delivery_receiver
         cart.card_id = data.bank_card_id  # Assuming bank_card_id is the ID of the card used for payment
         cart.delivery_fee = delivery_cost
+        cart.pick_up_location_id = data.pick_up_location_id
         
         # Update the cart status to 'confirmed' (assuming '1' is the status for confirmed orders)
         cart.status = 1
+
+                
+
         db.commit()
+        nextCard = get_cart_by_user_id(db, user_id)
+        if not nextCard:
+            # If the cart was empty, create a new cart
+            nextCard = create_cart(db, user_id)
+        for nItem in new_cart:
+            add_or_update_item_cart(
+                db=db,
+                product_detail_id=nItem['product_detail_id'],
+                quantity=nItem['quantity'],
+                order_id=nextCard.id,
+                size_id=nItem['size_id']
+            )
+
         db.refresh(cart)
         return cart     
+        
     except SQLAlchemyError as e:
         db.rollback()
         raise e 
@@ -179,7 +221,9 @@ def confirm_card(user_id: UUID, db: Session, data:ConfirmOrder):
 
 def get_orders(db: Session, user_id: Optional[UUID]=None, page: int = 1, size: int = 10):
     try:
-        query = db.query(Orders)
+        query = db.query(Orders).filter(
+            Orders.status != 0  # Exclude carts
+        )
         if user_id:
             query = query.filter(Orders.user_id == user_id)
 

@@ -16,6 +16,8 @@ from app.schemas.products import (
     ProductList,
     CreateProduct,
     UpdateProduct,)
+    
+from app.crud.likes import is_liked
 
 
 from app.models.Products import Products
@@ -71,6 +73,7 @@ async def get_products_list(
 @products_router.get('/products/{id}', response_model=ProductGet)
 async def get_product(
         id: UUID,
+        user_id: Optional[UUID] = None,
         db: Session = Depends(get_db),
         # current_user: dict = Depends(PermissionChecker(required_permissions=pages_and_permissions['Products']['view']))
 ):
@@ -78,6 +81,10 @@ async def get_product(
     loan_months = get_loan_months(db=db,is_active=True)    
     if not product:
         raise HTTPException(status_code=404, detail="Product not found") 
+    if user_id is not None:
+        product.liked = is_liked(db=db, user_id=user_id, product_id=id)
+
+
 
     for detail in product.details:
                 for size in detail.size:

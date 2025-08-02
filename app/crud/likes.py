@@ -49,3 +49,14 @@ def count_likes(db: Session,user_id) -> int:
         return count
     except SQLAlchemyError as e:
         raise e
+    
+
+def is_liked(db: Session, product_id: UUID, user_id: UUID) -> bool:
+    try:
+        like = db.query(Likes).filter(
+            Likes.product_id == product_id,
+            Likes.user_id == user_id
+        ).first()
+        return True if like else False
+    except SQLAlchemyError as e:
+        raise e
