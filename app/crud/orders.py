@@ -134,8 +134,8 @@ def confirm_card(user_id: UUID, db: Session, data:ConfirmOrder):
         if not cart:
             raise ValueError("Cart not found for the user")
         item_count = len(cart.items)
-        total_items_price = sum(item.product_detail.price * item.quantity for item in cart.items)
-        total_discounted_price = total_discounted_price - sum(item.price for item in cart.items)
+        total_items_price = sum(item.size.price * item.quantity for item in cart.items)
+        total_discounted_price = total_items_price - sum(item.price for item in cart.items)
         total_price = sum(item.price * item.quantity for item in cart.items)
 
         cart.items_count = item_count

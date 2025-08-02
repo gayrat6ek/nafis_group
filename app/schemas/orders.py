@@ -10,15 +10,14 @@ from .productDetails import ProductDetailsInOrders,GetSize
 
 
 class BaseConfig(BaseModel):
-    model_config = ConfigDict(
-        from_attributes=True
-    )
+    class Config:
+        orm_mode = True
 
 
 class PaymentMethod(str, Enum):
-    card = 'card'
-    cash = 'cash'
-    loan = 'loan'  # Assuming loan is a valid payment method
+    CARD = 'card'
+    CASH = 'cash'
+    LOAN = 'loan'  # Assuming loan is a valid payment method
 
 
 class AddOrUpdateCartItem(BaseConfig):
@@ -46,7 +45,7 @@ class ConfirmOrder(BaseConfig):
     bank_card_id: Optional[UUID] = None  # ID of the bank card used for payment, if applicable
 
 
-    #filter payment methods only allow card, cash, 
+   
 
 
 class OrderItems(BaseConfig):

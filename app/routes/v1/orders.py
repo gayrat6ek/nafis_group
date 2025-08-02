@@ -103,19 +103,12 @@ async def confirm_order(
     if not cart:
         raise HTTPException(status_code=404, detail="Cart not found")
     
-    order = crud_orders.confirm_order(
+    order = crud_orders.confirm_card(
         db=db, 
-        order_id=cart.id, 
-        user_id=current_user['id'], 
-        payment_method=body.payment_method,
-        district_id=body.district_id,
-        description=body.description,
-        delivery_address=body.delivery_address,
-        delivery_phone_number=body.delivery_phone_number,
-        delivery_date=body.delivery_date,
-        delivery_receiver=body.delivery_receiver,
-        bank_card_id=body.bank_card_id
+        user_id=current_user['id'],
+        data=body
     )
     
     if not order:
         raise HTTPException(status_code=400, detail="Order confirmation failed")
+    return order

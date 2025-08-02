@@ -61,7 +61,7 @@ def get_categories(db: Session, filter:Optional[FilterCategory]=None) -> list[Ca
             # if filter.parent_id:
             query = query.filter(Categories.parent_id == filter.parent_id)
 
-            
+        query = query.order_by(Categories.name_en.asc())  # Order by English name by default
         categories = query.all()
         
         return categories

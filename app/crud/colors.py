@@ -38,7 +38,7 @@ def get_colors(db: Session, is_active: Optional[bool] = None):
         query = db.query(Colors)
         if is_active is not None:
             query = query.filter(Colors.is_active == is_active)
-        
+        query = query.order_by(Colors.name_en.asc())  # Order by English name by default
         return query.all()
         
     except SQLAlchemyError as e:

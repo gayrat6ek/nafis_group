@@ -48,6 +48,7 @@ def get_brands(db: Session, page: int = 1, size: int = 10,search:Optional[str]=N
         if is_active is not None:
             query = query.filter(Brands.is_active==is_active)
         total_count = query.count()
+        query = query.order_by(Brands.name_en.asc())  # Order by English name by default
         brands = query.offset((page - 1) * size).limit(size).all()
         
         return {
