@@ -17,6 +17,8 @@ from app.models import ratings
 from app.models import discounts
 from app.models import discountProducts
 from app.models import pickUpLocations
+from app.models import LoanMonths
+from app.models import bank_cards
 from app.models import Orders
 from app.models import OrderItems
 from app.models import logs

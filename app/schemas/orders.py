@@ -33,10 +33,14 @@ class RemoveCartItem(BaseConfig):
 
 
 class ConfirmOrder(BaseConfig):
-    address_id:Optional[UUID] = None  # ID of the address for delivery, if applicable
+    pick_up_location_id:Optional[UUID] = None  # ID of the address for delivery, if applicable
     payment_method: Optional[PaymentMethod] = Field(..., description="Payment method used for the order")
     district_id: Optional[UUID] = None  # ID of the district for delivery, if applicable
     description: Optional[str] = Field(None, max_length=500, description="Optional description for the order")
+    delivery_address: Optional[str] = Field(None, max_length=255, description="Delivery address if applicable")
+    delivery_phone_number: Optional[str] = Field(None, max_length=15, description="Phone number for delivery")
+    delivery_date: Optional[datetime] = None
+    delivery_receiver: Optional[str] = Field(None, max_length=100, description="Name of the person receiving the delivery")
 
 
     #filter payment methods only allow card, cash, 

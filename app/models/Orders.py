@@ -38,6 +38,7 @@ class Orders(Base):
 
     delivery_address = Column(String, nullable=True)  # Full address for delivery
     delivery_phone_number = Column(String, nullable=True)  # Phone number for delivery contact
+    delivery_receiver = Column(String, nullable=True)  # Name of the person receiving the delivery
     delivery_date = Column(DateTime(timezone=True), nullable=True)
     delivery_fee = Column(Float, nullable=False, default=0.0)
 
@@ -48,6 +49,7 @@ class Orders(Base):
     total_items_price = Column(Float, nullable=False, default=0.0)  # Total price of items before any discounts or fees
     total_discounted_price = Column(Float, nullable=False, default=0.0)  # Total price after applying discounts
     total_amount = Column(Float, nullable=True)
+    pick_up_location_id = Column(UUID(as_uuid=True), ForeignKey('pick_up_locations.id'), nullable=True)
 
     status = Column(Integer, nullable=False)
     is_paid = Column(Boolean, default=False)
@@ -61,6 +63,7 @@ class Orders(Base):
     district = relationship("Districts", back_populates="orders")
     items = relationship("OrderItems", back_populates="order")
     logs = relationship("Logs", back_populates="order")  # Assuming Logs model has an order relationship
+    pick_up_location = relationship("PickUpLocations", back_populates="orders")  # Assuming PickUpLocations model has an orders relationship
     
 
 

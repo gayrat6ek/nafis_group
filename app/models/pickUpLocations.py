@@ -27,5 +27,6 @@ class PickUpLocations(Base):
     lon = Column(Float, nullable=True)  # Longitude for the pickup location
     created_at = Column(DateTime(timezone=True), default=func.now())
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())
+    orders = relationship("Orders", back_populates="pick_up_location")  # Assuming Orders model has a pick_up_location relationship
     
     # Relationships can be added here if needed

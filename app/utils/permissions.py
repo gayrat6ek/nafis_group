@@ -77,6 +77,16 @@ pages_and_permissions = {
         "update": "O2",
         "create": "O4",
         "delete": "O5"
+    },
+    "PickUpLocations": {
+        "view": "PL1",
+        "update": "PL2",
+        "create": "PL4"
+    },
+    "BankCards": {
+        "view": "BC1",
+        "update": "BC2",
+        "create": "BC4"
     }
 
 

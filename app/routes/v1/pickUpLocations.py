@@ -52,7 +52,7 @@ async def get_pick_up_location(
 async def create_pick_up_location(
         pick_up_location: PickUpLocationCreate,
         db: Session = Depends(get_db),
-        # current_user: dict = Depends(PermissionChecker(required_permissions=pages_and_permissions['PickUpLocations']['create']))
+        current_user: dict = Depends(PermissionChecker(required_permissions=pages_and_permissions['PickUpLocations']['create']))
 ):
     return crud_pick_up_locations.createUpLocations(db=db, data=pick_up_location)
 
@@ -63,7 +63,7 @@ async def update_pick_up_location(
         id: UUID,
         pick_up_location: PickUpLocationUpdate,
         db: Session = Depends(get_db),
-        # current_user: dict = Depends(PermissionChecker(required_permissions=pages_and_permissions['PickUpLocations']['update']))
+        current_user: dict = Depends(PermissionChecker(required_permissions=pages_and_permissions['PickUpLocations']['update']))
 ):
     updated_location = crud_pick_up_locations.updateUpLocations(db=db, location_id=id, data=pick_up_location)
     if not updated_location:
