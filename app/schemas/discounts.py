@@ -37,7 +37,7 @@ class ProductGet(BaseConfig):
     brand:Optional[BrandGet]=None
     # discounts: Optional[List[DiscountsProducts]] = None  # Assuming products can have multiple discounts
     details: Optional[List[ProductDetailsBasicData]] = None  # Assuming products can have details
-    materials: Optional[List[materialsGet]] = None  # Assuming products can have multiple materials
+    # materials: Optional[List[materialsGet]] = None  # Assuming products can have multiple materials
 
 
 class DiscountProducts(BaseConfig):
@@ -75,7 +75,7 @@ class DiscountList(BaseConfig):
     active_from: Optional[datetime] = None  # Assuming discounts have a start date
     active_to: Optional[datetime] = None  # Assuming discounts have an end date
     image : Optional[str] = None  # Assuming discounts have an image field
-    products: Optional[List[ProductGet]] = None  # Assuming discounts can be linked to multiple products
+    product: Optional[List[ProductGet]] = None  # Assuming discounts can be linked to multiple products
 
 
 
