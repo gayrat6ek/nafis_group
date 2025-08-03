@@ -35,7 +35,7 @@ class ProductGet(BaseConfig):
     created_at: Optional[datetime] = None
     category:Optional[GetCategoriesTree]=None
     brand:Optional[BrandGet]=None
-    discounts: Optional[List[DiscountsProducts]] = None  # Assuming products can have multiple discounts
+    # discounts: Optional[List[DiscountsProducts]] = None  # Assuming products can have multiple discounts
     details: Optional[List[ProductDetailsBasicData]] = None  # Assuming products can have details
     materials: Optional[List[materialsGet]] = None  # Assuming products can have multiple materials
 
