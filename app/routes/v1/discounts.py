@@ -57,10 +57,10 @@ async def get_discount_list(
                             })
                         size.loan_months = loan_month_prise
             products.append(product.product)
-        discount.products = products
+        discount.product = products
         products = []
 
-    print("it is printiner")
+    
 
     return discounts
 
@@ -104,7 +104,7 @@ async def get_discount(
                     size.loan_months = loan_month_prise
         products.append(product.product)
 
-    discount.products = products
+    discount.product = products
     return discount
 
 
