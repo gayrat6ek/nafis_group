@@ -60,6 +60,8 @@ async def get_discount_list(
         discount.products = products
         products = []
 
+    print("it is printiner")
+
     return discounts
 
 
