@@ -32,11 +32,14 @@ def create_loan_months(db: Session, data: CreateLoanMonths) -> LoanMonths:
         db.rollback()
         raise e
     
-def get_loan_months(db: Session,is_active: Optional[bool] = None,):
+def get_loan_months(db: Session,is_active: Optional[bool] = None,limit:Optional[int] = None):
     try:
         query = db.query(LoanMonths)
         if is_active is not None:
             query = query.filter(LoanMonths.is_active == is_active)
+        if limit is not None:
+            query = query.limit(limit)
+        query = query.order_by(LoanMonths.months.desc())
         
         return query.all()
         

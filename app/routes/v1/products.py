@@ -38,7 +38,7 @@ async def get_products_list(
 ):
     products = crud_products.get_products(db=db, page=page, size=size, is_active=is_active, category_id=category_id)
     #if  product has discounts then update add to detailsize product curr_discount_price discount in precentate
-    loan_months = get_loan_months(db=db,is_active=True)  # Ensure loan months are loaded if needed
+    loan_months = get_loan_months(db=db,is_active=True,limit=1)  # Ensure loan months are loaded if needed
     for product in products['items']:
             for detail in product.details:
                 for size in detail.size:
