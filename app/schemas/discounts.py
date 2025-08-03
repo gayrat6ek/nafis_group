@@ -58,7 +58,7 @@ class DiscountGet(BaseConfig):
     active_from: Optional[datetime] = None  # Assuming discounts have a start date
     active_to: Optional[datetime] = None  # Assuming discounts have an end date
     image : Optional[str] = None  # Assuming discounts have an image field
-    products: Optional[List[DiscountProducts]] = None  # Assuming discounts can be linked to multiple products
+    products: Optional[List[ProductGet]] = None  # Assuming discounts can be linked to multiple products
 
 class DiscountList(BaseConfig):
     id: UUID
@@ -75,7 +75,7 @@ class DiscountList(BaseConfig):
     active_from: Optional[datetime] = None  # Assuming discounts have a start date
     active_to: Optional[datetime] = None  # Assuming discounts have an end date
     image : Optional[str] = None  # Assuming discounts have an image field
-    products: Optional[List[DiscountProducts]] = None  # Assuming discounts can be linked to multiple products
+    products: Optional[List[ProductGet]] = None  # Assuming discounts can be linked to multiple products
 
 
 

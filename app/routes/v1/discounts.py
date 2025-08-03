@@ -29,6 +29,7 @@ async def get_discount_list(
 ):
     loan_months = get_loan_months(db=db,is_active=True,limit=1)  # Ensure loan months are loaded if needed
     discounts = crud_discounts.get_discounts(db=db, is_active=is_active)
+    products = []
     for discount in discounts: 
         for product in discount.products:
             if product.product.details:
@@ -55,6 +56,9 @@ async def get_discount_list(
                                 "percent": month.percent
                             })
                         size.loan_months = loan_month_prise
+            products.append(product.product)
+        discount.products = products
+        products = []
 
     return discounts
 
@@ -69,6 +73,7 @@ async def get_discount(
     if not discount:
         raise HTTPException(status_code=404, detail="Discount not found")
     loan_months = get_loan_months(db=db,is_active=True,limit=1)  # Ensure loan months are loaded if needed
+    products = []
     for product in discount.products:
         if product.product.details:
             for detail in product.product.details:
@@ -95,6 +100,9 @@ async def get_discount(
                             "percent": month.percent
                         })
                     size.loan_months = loan_month_prise
+        products.append(product.product)
+
+    discount.products = products
     return discount
 
 
