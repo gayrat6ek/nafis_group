@@ -73,18 +73,43 @@ def update_discount(db: Session, discount_id: UUID, data: UpdateDiscount) -> Opt
         if not discount:
             return None
         
-        for key, value in data.dict(exclude_unset=True).items():
-            if key == "products":
-                # Handle products separately
-                if value is not None:
-                    # Clear existing products
-                    discount.products.clear()
-                    # Add new products
-                    for product_id in value:
-                        discount.products.append(DiscountProducts(product_id=product_id))
-            else:
-                # Set other attributes directly 
-                setattr(discount, key, value)
+        if data.name_uz is not None:
+            discount.name_uz = data.name_uz
+        if data.name_ru is not None:
+            discount.name_ru = data.name_ru
+        if data.name_en is not None:
+            discount.name_en = data.name_en
+        if data.description_uz is not None:
+            discount.description_uz = data.description_uz
+        if data.description_ru is not None:
+            discount.description_ru = data.description_ru
+        if data.description_en is not None:
+            discount.description_en = data.description_en
+        if data.is_news is not None:
+            discount.is_news = data.is_news
+        if data.is_active is not None:
+            discount.is_active = data.is_active
+        if data.amount is not None:
+            discount.amount = data.amount
+        if data.active_from is not None:
+            discount.active_from = data.active_from
+        if data.active_to is not None:
+            discount.active_to = data.active_to
+        if data.image is not None:  
+            discount.image = data.image  # Assuming image is a URL or path to the image
+        if data.product_ids is not None:
+            # Clear existing products
+            db.query(DiscountProducts).filter(DiscountProducts.discount_id == discount.id).delete()
+            db.commit()
+            
+            # Add new products
+            for product_id in data.product_ids:
+                discount_product = DiscountProducts(
+                    discount_id=discount.id,
+                    product_id=product_id
+                )
+                db.add(discount_product)
+            
 
         
         db.commit()
