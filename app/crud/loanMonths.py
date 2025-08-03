@@ -37,9 +37,10 @@ def get_loan_months(db: Session,is_active: Optional[bool] = None,limit:Optional[
         query = db.query(LoanMonths)
         if is_active is not None:
             query = query.filter(LoanMonths.is_active == is_active)
+        query = query.order_by(LoanMonths.months.desc())
+        
         if limit is not None:
             query = query.limit(limit)
-        query = query.order_by(LoanMonths.months.desc())
         
         return query.all()
         
