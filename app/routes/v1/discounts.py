@@ -12,6 +12,7 @@ from fastapi.security import OAuth2PasswordRequestForm
 from fastapi_pagination import Page
 from sqlalchemy.orm import Session
 from app.crud import discounts as crud_discounts
+from app.crud.loanMonths import get_loan_months
 from app.routes.depth import get_db, PermissionChecker
 
 from app.schemas.discounts import DiscountGet, DiscountList, CreateDiscount, UpdateDiscount
@@ -26,7 +27,35 @@ async def get_discount_list(
         db: Session = Depends(get_db),
         # current_user: dict = Depends(PermissionChecker(required_permissions=pages_and_permissions['Discounts']['view']))
 ):
+    loan_months = get_loan_months(db=db,is_active=True,limit=1)  # Ensure loan months are loaded if needed
     discounts = crud_discounts.get_discounts(db=db, is_active=is_active)
+    for discount in discounts: 
+        for product in discount.products:
+            if product.details:
+                for detail in product.details:
+                    for size in detail.size:
+                        if size.price and discount.amount:
+                            cut_percent = size.price / 100 * discount.amount
+                            size.curr_discount_price = size.price - cut_percent
+                            size.discount = discount.amount
+                        else:
+                            size.curr_discount_price = None
+                            size.discount = None
+                        loan_month_prise = []
+                        for month in loan_months:
+                            if size.curr_discount_price:
+                                extra_percent = (size.curr_discount_price / 100) * month.percent
+                                total_price = size.curr_discount_price + extra_percent
+                            else:
+                                extra_percent = (size.price / 100) * month.percent
+                                total_price = size.price + extra_percent
+                            loan_month_prise.append({
+                                "month": month.months,
+                                "total_price": total_price,
+                                "percent": month.percent
+                            })
+                        size.loan_months = loan_month_prise
+
     return discounts
 
 
@@ -39,6 +68,33 @@ async def get_discount(
     discount = crud_discounts.get_discount_by_id(db=db, discount_id=id)
     if not discount:
         raise HTTPException(status_code=404, detail="Discount not found")
+    loan_months = get_loan_months(db=db,is_active=True,limit=1)  # Ensure loan months are loaded if needed
+    for product in discount.products:
+        if product.details:
+            for detail in product.details:
+                for size in detail.size:
+                    if size.price and discount.amount:
+                        cut_percent = size.price / 100 * discount.amount
+                        size.curr_discount_price = size.price - cut_percent
+                        size.discount = discount.amount
+                    else:
+                        size.curr_discount_price = None
+                        size.discount = None
+                    loan_month_prise = []
+                    for month in loan_months:
+                        if size.curr_discount_price:
+                            extra_percent = (size.curr_discount_price / 100) * month.percent
+                            total_price = size.curr_discount_price + extra_percent
+                        else:
+                            extra_percent = (size.price / 100) * month.percent
+                            total_price = size.price + extra_percent
+
+                        loan_month_prise.append({
+                            "month": month.months,
+                            "total_price": total_price,
+                            "percent": month.percent
+                        })
+                    size.loan_months = loan_month_prise
     return discount
 
 
