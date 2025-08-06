@@ -20,7 +20,7 @@ class CreateBankCard(BaseConfig):
     cvv: Optional[str] = Field(None, min_length=3, max_length=4, description="3 or 4-digit CVV code")
     is_active: bool = Field(default=True, description="Indicates if the card is active")
     card_phone_number: Optional[str] = Field(None, max_length=15, description="Phone number associated with the card, if applicable")
-    user_id: UUID = Field(..., description="ID of the user to whom the card belongs")
+    user_id: UUID = Field(None, description="ID of the user to whom the card belongs")
 
 
 

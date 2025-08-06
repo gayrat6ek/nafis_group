@@ -51,6 +51,8 @@ async def create_bank_card(
         db: Session = Depends(get_db),
         current_user: dict = Depends(PermissionChecker(required_permissions=pages_and_permissions['BankCards']['create']))
 ):
+    if body.user_id is None:
+        body.user_id = current_user['id']
     created_bank_card = crud_bank_cards.create_bank_card(db=db, data=body)
     return created_bank_card
 
