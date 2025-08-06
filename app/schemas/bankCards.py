@@ -15,9 +15,9 @@ class BaseConfig(BaseModel):
 
 class CreateBankCard(BaseConfig):
     card_number: str = Field(..., min_length=16, max_length=16, description="16-digit card number")
-    cardholder_name: Optional[str] = Field(..., max_length=100, description="Name of the cardholder")
+    cardholder_name: Optional[str] = Field(None, max_length=100, description="Name of the cardholder")
     expiration_date: str = Field(..., pattern=r"^(0[1-9]|1[0-2])/\d{2}$", description="Expiration date in MM/YY format")
-    cvv: Optional[str] = Field(..., min_length=3, max_length=4, description="3 or 4-digit CVV code")
+    cvv: Optional[str] = Field(None, min_length=3, max_length=4, description="3 or 4-digit CVV code")
     is_active: bool = Field(default=True, description="Indicates if the card is active")
     card_phone_number: Optional[str] = Field(None, max_length=15, description="Phone number associated with the card, if applicable")
     user_id: UUID = Field(..., description="ID of the user to whom the card belongs")
