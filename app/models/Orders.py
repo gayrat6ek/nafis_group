@@ -54,6 +54,7 @@ class Orders(Base):
     status = Column(Integer, nullable=False)
     is_paid = Column(Boolean, default=False)
     is_delivered = Column(Boolean, default=False)  # Indicates if the order has been delivered
+    user_location_id = Column(UUID(as_uuid=True), ForeignKey('user_locations.id'), nullable=True)
 
     created_at = Column(DateTime(timezone=True), default=func.now())
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())
@@ -66,6 +67,7 @@ class Orders(Base):
     items = relationship("OrderItems", back_populates="order")
     logs = relationship("Logs", back_populates="order")  # Assuming Logs model has an order relationship
     pick_up_location = relationship("PickUpLocations", back_populates="orders")  # Assuming PickUpLocations model has an orders relationship
+    user_location = relationship("UserLocations", back_populates="orders")
     
 
 

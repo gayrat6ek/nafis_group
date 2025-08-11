@@ -65,7 +65,4 @@ class Users(Base):
     logs = relationship("Logs", back_populates="user")  # Assuming Logs model has a user relationship
     likes = relationship("Likes", back_populates="user")  # Assuming Likes model has a user relationship
     reviews = relationship("Reviews", back_populates="user")  # Assuming Reviews model has a user relationship
-
-    
-
-    
+    user_locations = relationship("UserLocations", back_populates="user")  # User locations relationship

@@ -31,3 +31,4 @@ from app.models import materials
 from app.models import productMaterials
 from app.models import measureUnits
 from app.models import reviews
+from app.models import userLocations

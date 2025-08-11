@@ -30,6 +30,8 @@ from app.routes.v1.pickUpLocations import pick_up_locations_router
 from app.routes.v1.bankCards import bank_cards_router
 from app.routes.v1.likes import likes_router
 from app.routes.v1.reviews import reviews_router
+from app.routes.v1.userLocations import router as user_locations_router
+
 
 from app.utils.utils import get_current_user_for_docs
 
@@ -66,6 +68,8 @@ app.include_router(pick_up_locations_router, prefix="/api/v1", tags=["Pick Up Lo
 app.include_router(bank_cards_router, prefix="/api/v1", tags=["Bank Cards"])
 app.include_router(likes_router, prefix="/api/v1", tags=["Likes"])
 app.include_router(reviews_router, prefix="/api/v1", tags=["Reviews"])
+app.include_router(user_locations_router, prefix="/api/v1/user-locations", tags=["User Locations"])
+
 
 
 @app.get("/docs", include_in_schema=False)
