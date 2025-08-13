@@ -67,9 +67,8 @@ async def remove_from_cart(
     for item in body:
     
         success = crud_orders.remove_item_from_cart(db=db, 
-                                                    order_item_id=item.product_detail_id,
+                                                    id=item.item_id,
                                                     order_id=cart.id,
-                                                    size_id=item.size
                                                     )
         
     

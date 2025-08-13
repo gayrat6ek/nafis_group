@@ -105,14 +105,11 @@ def add_or_update_item_cart(db: Session,
         raise e
     
 
-def remove_item_from_cart(db: Session, order_item_id: UUID,order_id:UUID,size_id:Optional[UUID]=None):
+def remove_item_from_cart(db: Session, id:UUID,order_id:UUID,):
     try:
         order_item = db.query(OrderItems).filter(
-            OrderItems.product_detail_id == order_item_id,
-            OrderItems.order_id == order_id
+            OrderItems.id == id,
         )
-        if size_id is not None:
-            order_item = order_item.filter(OrderItems.size_id == size_id)
         order_item = order_item.first()
         if not order_item:
             return None  # Item not found in the cart

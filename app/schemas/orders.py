@@ -27,8 +27,7 @@ class AddOrUpdateCartItem(BaseConfig):
 
 
 class RemoveCartItem(BaseConfig):
-    product_detail_id: UUID
-    size: Optional[UUID] = None  # Optional size for the item, if applicable
+    item_id:UUID  # Optional size for the item, if applicable
 
 
 
