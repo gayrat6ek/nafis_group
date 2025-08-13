@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Optional, Union
 from uuid import UUID
 from fastapi import APIRouter
 from fastapi import (
@@ -76,8 +76,9 @@ async def remove_from_cart(
 
 
 
-@orders_router.get('/my/cart', response_model=OrdersGet)
+@orders_router.get('/my/cart', response_model=Union[ dict,OrdersGet])
 async def get_my_cart(
+        get_len:Optional[bool] = False,
         db: Session = Depends(get_db),
         current_user: dict = Depends(PermissionChecker(required_permissions=pages_and_permissions['Orders']['view']))
 ):
@@ -87,7 +88,9 @@ async def get_my_cart(
     cart = crud_orders.get_cart_by_user_id(db=db, user_id=current_user['id'])
     if not cart:
         raise HTTPException(status_code=404, detail="Cart not found")
-    
+    if get_len:
+        items_count = len(cart.items)
+        return {"items_count": items_count}
     return cart
 
 
