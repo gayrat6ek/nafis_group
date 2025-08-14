@@ -87,7 +87,7 @@ async def get_my_cart(
     """
     cart = crud_orders.get_cart_by_user_id(db=db, user_id=current_user['id'])
     if not cart:
-        raise HTTPException(status_code=404, detail="Cart not found")
+        return {"items_count": 0, "message": "Cart is empty"}
     if get_len:
         items_count = len(cart.items)
         return {"items_count": items_count}
