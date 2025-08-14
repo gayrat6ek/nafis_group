@@ -7,6 +7,8 @@ import bcrypt
 from app.models.Products import Products
 from app.models.discounts import Discounts
 from app.models.discountProducts import DiscountProducts
+from app.models.Categories import Categories
+from app.models.Brands import Brands
 from app.models.likes import Likes
 from app.models.productDetails import ProductDetails
 from app.models.sizes import Sizes
@@ -257,4 +259,49 @@ def get_liked_products(db: Session, user_id: UUID, page: int = 1, size: int = 10
         }
     except SQLAlchemyError as e:
         raise e         
+    
+
+def search_products(
+    db: Session,
+    query: str,
+    page: int = 1,
+    size: int = 10,
+    is_active: Optional[bool] = None
+):
+    try:
+        search_query = f"%{query}%"
+        product_query = db.query(Products).join(Products.category).join(Products.brand).filter(
+            or_(
+                Products.name_en.ilike(search_query),
+                Products.name_ru.ilike(search_query),
+                Products.name_uz.ilike(search_query),
+                Products.description_en.ilike(search_query),
+                Products.description_ru.ilike(search_query),
+                Products.description_uz.ilike(search_query),
+                Categories.name_en.ilike(search_query),
+                Categories.name_ru.ilike(search_query),
+                Categories.name_uz.ilike(search_query),
+                Brands.name_en.ilike(search_query),
+                Brands.name_ru.ilike(search_query),
+                Brands.name_uz.ilike(search_query)
+            )
+        )
+
+
+
+        if is_active is not None:
+            product_query = product_query.filter(Products.is_active == is_active)
+
+        total_count = product_query.count()
+        products = product_query.offset((page - 1) * size).limit(size).all()
+
+        return {
+            "items": products,
+            "total": total_count,
+            "page": page,
+            "size": size,
+            "pages": (total_count + size - 1) // size
+        }
+    except SQLAlchemyError as e:
+        raise e
     

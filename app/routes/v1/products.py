@@ -153,3 +153,17 @@ async def get_liked_products(
     """
     liked_products = crud_products.get_liked_products(db=db, user_id=current_user['id'], page=page, size=size)
     return liked_products
+
+@products_router.get('/search/products', response_model=Page[ProductList])
+async def search_products(  
+        query: str,
+        page: int = 1,
+        size: int = 10,
+        db: Session = Depends(get_db),
+        # current_user: dict = Depends(PermissionChecker(required_permissions=pages_and_permissions['Products']['view']))
+):
+    """
+    Search for products based on a query string.
+    """
+    products = crud_products.search_products(db=db, query=query, page=page, size=size)
+    return products
