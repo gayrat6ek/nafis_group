@@ -1,6 +1,7 @@
 
 
 from pickletools import read_unicodestringnl
+from re import L
 
 from fastapi import HTTPException
 from sqlalchemy.exc import SQLAlchemyError
@@ -19,6 +20,7 @@ from app.crud import productDetails as product_details_crud
 from app.schemas.orders import ConfirmOrder
 from app.crud.districts import get_district_by_id
 from app.crud.discounts import activeDisCountProd
+from app.crud.loanMonths import get_loan_months_by_id
 
 
 def get_cart_by_user_id(db: Session, user_id: UUID):
@@ -130,6 +132,17 @@ def confirm_card(user_id: UUID, db: Session, data:ConfirmOrder):
             Orders.status == 0  # Assuming '0' is the status for an active cart
         ).first()
 
+
+        if data.loan_month_id:
+            loan_month = get_loan_months_by_id(db, data.loan_month_id)
+            if not loan_month:
+                raise HTTPException(status_code=404, detail="Loan month not found")
+            if not loan_month.is_active:
+                raise HTTPException(status_code=400, detail="Loan month is not active")
+            loan_month_percent = loan_month.percent
+        else:
+            loan_month_percent = 1
+
         # new_cart = get_cart_by_user_id(db, user_id)
 
         # if not new_cart:
@@ -158,7 +171,9 @@ def confirm_card(user_id: UUID, db: Session, data:ConfirmOrder):
         item_count = len(cart.items)
         total_items_price = sum(item.size.price * item.quantity for item in cart.items)
         total_discounted_price = total_items_price - sum(item.price for item in cart.items)
-        total_price = sum(item.price * item.quantity for item in cart.items)
+        total_price = sum(item.price * item.quantity for item in cart.items) 
+        
+
 
         if data.district_id is not None:
             district = get_district_by_id(db, data.district_id)
@@ -174,7 +189,8 @@ def confirm_card(user_id: UUID, db: Session, data:ConfirmOrder):
         cart.items_count = item_count
         cart.total_items_price = total_items_price
         cart.total_discounted_price = total_discounted_price
-        cart.total_amount = total_price+ delivery_cost
+        cart.loan_month_price = (total_price+ delivery_cost)*loan_month_percent/100
+        cart.total_amount = (total_price+ delivery_cost)+cart.loan_month_price
         
         cart.payment_method = data.payment_method
         cart.district_id = data.district_id
@@ -186,7 +202,9 @@ def confirm_card(user_id: UUID, db: Session, data:ConfirmOrder):
         cart.card_id = data.bank_card_id  # Assuming bank_card_id is the ID of the card used for payment
         cart.delivery_fee = delivery_cost
         cart.pick_up_location_id = data.pick_up_location_id
-        
+        cart.loan_month_id = data.loan_month_id
+        cart.loan_month_percent = loan_month_percent
+
         # Update the cart status to 'confirmed' (assuming '1' is the status for confirmed orders)
         cart.status = 1
 

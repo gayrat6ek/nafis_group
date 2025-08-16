@@ -43,6 +43,7 @@ class ConfirmOrder(BaseConfig):
     delivery_receiver: Optional[str] = Field(None, max_length=100, description="Name of the person receiving the delivery")
     bank_card_id: Optional[UUID] = None  # ID of the bank card used for payment, if applicable
     item_ids: Optional[List[UUID]] = None  # List of product detail IDs to confirm in the order
+    loan_month_id: Optional[UUID] = None  # ID of the loan month used for payment, if applicable
 
 
 
@@ -78,6 +79,9 @@ class OrdersGet(BaseConfig):
     is_delivered: Optional[bool] = False
     created_at: Optional[datetime] = None
     items: List[OrderItems] = []  # List of order items associated with the order
+    loan_month_id: Optional[UUID] = None
+    loan_month_percent: Optional[float] = 0.0
+    loan_month_price: Optional[float] = 0.0
 
     
 

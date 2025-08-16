@@ -50,7 +50,9 @@ class Orders(Base):
     total_discounted_price = Column(Float, nullable=False, default=0.0)  # Total price after applying discounts
     total_amount = Column(Float, nullable=True)
     pick_up_location_id = Column(UUID(as_uuid=True), ForeignKey('pick_up_locations.id'), nullable=True)
-
+    loan_month_id = Column(UUID(as_uuid=True), ForeignKey('loan_months.id'), nullable=True)
+    loan_month_percent = Column(Float, nullable=True, default=0.0)
+    loan_month_price = Column(Float, nullable=True, default=0.0)
     status = Column(Integer, nullable=False)
     is_paid = Column(Boolean, default=False)
     is_delivered = Column(Boolean, default=False)  # Indicates if the order has been delivered
@@ -68,7 +70,7 @@ class Orders(Base):
     logs = relationship("Logs", back_populates="order")  # Assuming Logs model has an order relationship
     pick_up_location = relationship("PickUpLocations", back_populates="orders")  # Assuming PickUpLocations model has an orders relationship
     user_location = relationship("UserLocations", back_populates="orders")
-    
+    loan_month = relationship("LoanMonths", back_populates="orders")
 
 
 

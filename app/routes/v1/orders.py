@@ -10,6 +10,7 @@ from fastapi.security import OAuth2PasswordRequestForm
 from fastapi_pagination import Page
 from sqlalchemy.orm import Session
 from app.crud import orders as crud_orders
+from app.crud import loanMonths as crud_loanMonths
 from app.routes.depth import get_db, PermissionChecker
 from app.schemas.orders import (
     AddOrUpdateCartItem,
@@ -128,6 +129,8 @@ async def confirm_order(
     """
     Confirm the user's order.
     """
+
+        
     cart = crud_orders.get_cart_by_user_id(db=db, user_id=current_user['id'])
     if not cart:
         raise HTTPException(status_code=404, detail="Cart not found")
@@ -135,7 +138,7 @@ async def confirm_order(
     order = crud_orders.confirm_card(
         db=db, 
         user_id=current_user['id'],
-        data=body
+        data=body,
     )
     
     if not order:
