@@ -12,6 +12,7 @@ from sqlalchemy.orm import Session
 from app.crud import products as crud_products
 from app.routes.depth import get_db, PermissionChecker
 from app.schemas.products import (
+    ProductFilter,
     ProductGet,
     ProductList,
     CreateProduct,
@@ -31,12 +32,11 @@ products_router = APIRouter()
 async def get_products_list(
         page: int = 1,
         size: int = 10,
-        category_id: Optional[UUID] = None,
-        is_active: bool = None,
+        filter: ProductFilter = Depends(),
         db: Session = Depends(get_db),
         # current_user: dict = Depends(PermissionChecker(required_permissions=pages_and_permissions['Products']['view']))
 ):
-    products = crud_products.get_products(db=db, page=page, size=size, is_active=is_active, category_id=category_id)
+    products = crud_products.get_products(db=db, page=page, size=size, filter=filter)
     #if  product has discounts then update add to detailsize product curr_discount_price discount in precentate
     loan_months = get_loan_months(db=db,is_active=True,limit=1)  # Ensure loan months are loaded if needed
     for product in products['items']:

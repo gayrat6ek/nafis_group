@@ -55,7 +55,7 @@ async def add_to_cart(
     cart.total_discounted_price = total_discounted_price
     cart.total_amount = total_price
     db.commit()
-    
+
     if not item:
         raise HTTPException(status_code=404, detail="Product detail or size not found")
     items = 0
@@ -70,7 +70,7 @@ async def add_to_cart(
 async def remove_from_cart(
         body: list[RemoveCartItem],
         db: Session = Depends(get_db),
-        current_user: dict = Depends(PermissionChecker(required_permissions=pages_and_permissions['Orders']['delete']))
+        current_user: dict = Depends(PermissionChecker(required_permissions=pages_and_permissions['Orders']['remove_from_cart']))
 ):
     """
     Remove an item from the user's cart.

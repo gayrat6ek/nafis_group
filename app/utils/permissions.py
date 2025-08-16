@@ -76,7 +76,8 @@ pages_and_permissions = {
         "view": "O1",
         "update": "O2",
         "create": "O4",
-        "delete": "O5"
+        "delete": "O5",
+        "remove_from_cart": "O6"
     },
     "PickUpLocations": {
         "view": "PL1",

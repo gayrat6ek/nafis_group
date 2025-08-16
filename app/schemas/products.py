@@ -3,17 +3,30 @@ from symtable import Class
 from typing import Optional, List
 from uuid import UUID
 from pydantic import BaseModel, Field, ConfigDict
+from pydantic_core.core_schema import NoneSchema
 from app.schemas.brands import BrandGet
 from app.schemas.categories import CategoryGet,GetCategoriesTree
 from app.schemas.productDetails import ProductDetailsBasicData
 from .materials import getBasicMaterials
 from app.schemas.reviews import ReviewGet
+from enum import Enum
+
+
+class OrderBy(str,Enum):
+    price_asc = "price_asc"
+    price_desc = "price_desc"
+    views_desc = "views_desc"
+    views_asc = "views_asc"
+    created_at_asc = "created_at_asc"
+    created_at_desc = "created_at_desc"
 
 
 class BaseConfig(BaseModel):
     model_config = ConfigDict(
         from_attributes=True
     )
+
+
 
 class DiscountGet(BaseConfig):
     id: Optional[UUID] = None
@@ -130,3 +143,15 @@ class UpdateProduct(BaseConfig):
     category_id: Optional[UUID] = None  # Optional to allow updating without changing the category
     brand_id: Optional[UUID] = None  # Optional to allow updating without changing the brand
     materials: Optional[List[UUID]] = None  # Optional to allow updating without changing the materials
+
+
+
+class ProductFilter(BaseConfig):
+    order_by: Optional[OrderBy] = None
+    category_id: Optional[UUID] = None
+    brands: Optional[List[UUID]] = None
+    is_active: Optional[bool] = None
+    loan_accessable: Optional[bool] = None
+    materials: Optional[List[UUID]] = None
+    price_from: Optional[float]=None
+    price_to: Optional[float]=None

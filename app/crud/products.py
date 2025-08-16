@@ -14,6 +14,7 @@ from app.models.productDetails import ProductDetails
 from app.models.sizes import Sizes
 from sqlalchemy.orm import selectinload, with_loader_criteria
 from app.crud.categories import get_category_with_children
+from app.models.materials import Materials
 
 import pytz
 from sqlalchemy.sql import func
@@ -22,7 +23,7 @@ from sqlalchemy import or_, and_, Date, cast,String
 from uuid import UUID
 
 from app.models.Products import Products
-from app.schemas.products import CreateProduct, UpdateProduct
+from app.schemas.products import CreateProduct, OrderBy, ProductFilter, UpdateProduct
 from app.utils.utils import timezonetash
 from app.models.productMaterials import ProductMaterials
 
@@ -72,8 +73,8 @@ def get_products(
     db: Session,
     page: int = 1,
     size: int = 10,
-    category_id: Optional[UUID] = None,
-    is_active: Optional[bool] = None
+    filter: ProductFilter = None,
+
 ):
     try:
         now = datetime.now(timezonetash)
@@ -113,11 +114,34 @@ def get_products(
             )
         )
 
-        if is_active is not None:
-            query = query.filter(Products.is_active == is_active)
-        if category_id is not None:
-            category_ids = get_category_with_children(db, category_id)
+        if filter.is_active is not None:
+            query = query.filter(Products.is_active == filter.is_active)
+        if filter.category_id is not None:
+            category_ids = get_category_with_children(db, filter.category_id)
             query = query.filter(Products.category_id.in_(category_ids))
+        if filter.brands is not None:
+            query = query.filter(Products.brand_id.in_(filter.brands))
+        if filter.materials is not None:
+            query = query.filter(Products.materials.any(Materials.id.in_(filter.materials)))
+        if filter.price_from is not None:
+            query = query.filter(Products.details.any(ProductDetails.size.any(Sizes.price >= filter.price_from)))
+        if filter.price_to is not None:
+            query = query.filter(Products.details.any(ProductDetails.size.any(Sizes.price <= filter.price_to)))
+        if filter.order_by is not None:
+            if filter.order_by == OrderBy.price_asc:
+                query = query.order_by(Products.price.asc())
+            elif filter.order_by == OrderBy.price_desc:
+                query = query.order_by(Products.price.desc())
+            elif filter.order_by == OrderBy.views_desc:
+                query = query.order_by(Products.views.desc())
+            elif filter.order_by == OrderBy.views_asc:
+                query = query.order_by(Products.views.asc())
+            elif filter.order_by == OrderBy.created_at_desc:
+                query = query.order_by(Products.created_at.desc())
+            elif filter.order_by == OrderBy.created_at_asc:
+                query = query.order_by(Products.created_at.asc())
+            
+            
 
         total_count = query.count()
         products = query.offset((page - 1) * size).limit(size).all()
