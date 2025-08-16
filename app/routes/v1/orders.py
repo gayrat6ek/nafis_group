@@ -42,6 +42,20 @@ async def add_to_cart(
         size_id=body.size_id, 
         quantity=body.quantity
     )
+    cart = crud_orders.get_cart_by_user_id(db=db, user_id=current_user['id'])
+
+    item_count = len(cart.items)
+    total_items_price = sum(item.size.price * item.quantity for item in cart.items)
+    total_discounted_price = total_items_price - sum(item.price for item in cart.items)
+    total_price = sum(item.price * item.quantity for item in cart.items)
+
+
+    cart.items_count = item_count
+    cart.total_items_price = total_items_price
+    cart.total_discounted_price = total_discounted_price
+    cart.total_amount = total_price
+    db.commit()
+    
     if not item:
         raise HTTPException(status_code=404, detail="Product detail or size not found")
     items = 0
@@ -70,7 +84,17 @@ async def remove_from_cart(
                                                     id=item.item_id,
                                                     order_id=cart.id,
                                                     )
-        
+
+    cart = crud_orders.get_cart_by_user_id(db=db, user_id=current_user['id'])
+    item_count = len(cart.items)
+    total_items_price = sum(item.size.price * item.quantity for item in cart.items)
+    total_discounted_price = total_items_price - sum(item.price for item in cart.items)
+    total_price = sum(item.price * item.quantity for item in cart.items)
+    cart.items_count = item_count
+    cart.total_items_price = total_items_price
+    cart.total_discounted_price = total_discounted_price
+    cart.total_amount = total_price
+    db.commit()
     
     return {"message": "Item removed from cart successfully"}
 
