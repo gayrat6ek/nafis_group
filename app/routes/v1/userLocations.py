@@ -44,7 +44,7 @@ def get_user_location(
         )
     return user_location_obj
 
-@router.get("/user/list", response_model=List[UserLocation])
+@router.get("/", response_model=List[UserLocation])
 def get_user_locations(
     db: Session = Depends(get_db),
     current_user: dict = Depends(PermissionChecker(required_permissions=pages_and_permissions['UserLocations']['view']))
