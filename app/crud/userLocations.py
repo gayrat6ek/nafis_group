@@ -10,7 +10,7 @@ class CRUDUserLocation:
     def get(self, db: Session, id: UUID) -> Optional[UserLocations]:
         return db.query(UserLocations).filter(UserLocations.id == id).first()
     
-    def get_by_user_id(self, db: Session, user_id: UUID) -> List[UserLocations]:
+    def get_by_user_id(self, db: Session, user_id: UUID):
         return db.query(UserLocations).filter(UserLocations.user_id == user_id).all()
     
     def get_default_location(self, db: Session, user_id: UUID) -> Optional[UserLocations]:
