@@ -44,29 +44,29 @@ def get_user_location(
         )
     return user_location_obj
 
-@router.get("/user/{user_id}", response_model=List[UserLocation])
+@router.get("/user", response_model=List[UserLocation])
 def get_user_locations(
     *,
     db: Session = Depends(get_db),
-    user_id: UUID,
     current_user: dict = Depends(PermissionChecker(required_permissions=pages_and_permissions['UserLocations']['view']))
 ):
     """
     Get all locations for a specific user.
     """
+    user_id = current_user['id']
     user_locations = user_location.get_by_user_id(db=db, user_id=user_id)
     return user_locations
 
-@router.get("/user/{user_id}/default", response_model=UserLocation)
+@router.get("/user/default", response_model=UserLocation)
 def get_user_default_location(
     *,
     db: Session = Depends(get_db),
-    user_id: UUID,
     current_user: dict = Depends(PermissionChecker(required_permissions=pages_and_permissions['UserLocations']['view']))
 ):
     """
     Get default location for a specific user.
     """
+    user_id = current_user['id']
     default_location = user_location.get_default_location(db=db, user_id=user_id)
     if not default_location:
         raise HTTPException(
