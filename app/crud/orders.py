@@ -7,15 +7,21 @@ from fastapi import HTTPException
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import Session
 from typing import Optional
+from sqlalchemy.orm import selectinload, with_loader_criteria
 import bcrypt
-
+from sqlalchemy.orm import joinedload
 import pytz
 from sqlalchemy.sql import func
 from datetime import datetime,timedelta
 from sqlalchemy import or_, and_, Date, cast,String
 from uuid import UUID
+from app.utils.utils import timezonetash
 from app.models.Orders import Orders
 from app.models.OrderItems import OrderItems
+from app.models.Products import Products
+from app.models.productDetails import ProductDetails
+from app.models.discountProducts import DiscountProducts
+from app.models.discounts import Discounts
 from app.crud import productDetails as product_details_crud
 from app.schemas.orders import ConfirmOrder
 from app.crud.districts import get_district_by_id
@@ -25,10 +31,33 @@ from app.crud.loanMonths import get_loan_months_by_id
 
 def get_cart_by_user_id(db: Session, user_id: UUID):
     try:
-        query = db.query(Orders).filter(
+        now = datetime.now(timezonetash)
+
+
+        query = (
+            db.query(Orders).
+            options(
+                joinedload(Orders.items).
+                joinedload(OrderItems.product_detail).
+                joinedload(ProductDetails.product),
+                with_loader_criteria(
+                    DiscountProducts,
+                    lambda dp: and_(
+                        dp.discount.has(
+                            and_(
+                                Discounts.is_active == True,
+                                Discounts.active_from <= now,
+                                Discounts.active_to >= now
+                            )
+                        )
+                    ),
+                    include_aliases=True
+                ),
+            ).
+            filter(
             Orders.user_id == user_id,
             Orders.status == 0  # Assuming 'cart' is the status for active carts
-        ).first()
+        ).first())
         return query
     except SQLAlchemyError as e:
         db.rollback()

@@ -20,7 +20,7 @@ from app.schemas.orders import (
     )
 
 from app.utils.permissions import pages_and_permissions
-
+from app.crud.loanMonths import get_loan_months
 
 orders_router = APIRouter()
 @orders_router.post('/orders/cart/add', response_model=None)
@@ -116,6 +116,52 @@ async def get_my_cart(
     if get_len:
         items_count = len(cart.items)
         return {"items_count": items_count}
+    
+    loan_month = get_loan_months(db=db, is_active=True,limit=1)
+    
+    for item in cart.items:
+        if item.product_detail.product.discounts:
+            cut_percent = item.size.price / 100 * item.product_detail.product.discounts[0].discount.amount
+            item.size.curr_discount_price = item.size.price - cut_percent
+            item.size.discount = item.product_detail.product.discounts[0].discount.amount
+        else:
+            item.size.curr_discount_price = None
+            item.size.discount = None
+        
+        loan_month_prise = []
+        for month in loan_month:
+            if item.size.curr_discount_price:
+                extra_percent = (item.size.curr_discount_price / 100) * month.percent
+                total_price = item.size.curr_discount_price + extra_percent
+            else:
+                extra_percent = (item.size.price / 100) * month.percent
+                total_price = item.size.price + extra_percent
+
+            loan_month_prise.append({
+                "month": month.months,
+                "id": month.id,
+                "total_price": total_price,
+                "monthly_payment": total_price / month.months
+            })
+        item.size.loan_months = loan_month_prise
+
+    if not cart.items:
+        raise HTTPException(
+            status_code=400,
+            detail="Cart is empty. Please add items to the cart before confirming."
+        )
+
+    item_count = len(cart.items)
+    total_items_price = sum(item.size.price * item.quantity for item in cart.items)
+    total_discounted_price = total_items_price - sum(item.price for item in cart.items)
+    total_price = sum(item.price * item.quantity for item in cart.items)
+
+    cart.items_count = item_count
+    cart.total_items_price = total_items_price
+    cart.total_discounted_price = total_discounted_price
+
+
+
     return cart
 
 
