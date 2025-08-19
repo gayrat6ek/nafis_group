@@ -145,11 +145,7 @@ async def get_my_cart(
             })
         item.size.loan_months = loan_month_prise
 
-    if not cart.items:
-        raise HTTPException(
-            status_code=400,
-            detail="Cart is empty. Please add items to the cart before confirming."
-        )
+   
 
     item_count = len(cart.items)
     total_items_price = sum(item.size.price * item.quantity for item in cart.items)
