@@ -27,6 +27,9 @@ from app.schemas.orders import ConfirmOrder
 from app.crud.districts import get_district_by_id
 from app.crud.discounts import activeDisCountProd
 from app.crud.loanMonths import get_loan_months_by_id
+from app.crud.regions import get_region_by_name
+from app.utils.utils import find_region
+from app.crud.userLocations import user_location as user_location_crud
 
 
 def get_cart_by_user_id(db: Session, user_id: UUID):
@@ -172,6 +175,22 @@ def confirm_card(user_id: UUID, db: Session, data:ConfirmOrder):
         else:
             loan_month_percent = 1
 
+        if data.user_location_id:
+            user_location = user_location_crud.get(db, id=data.user_location_id)
+            region = find_region(lat=user_location.latitude, lon=user_location.longitude)
+            if not region:
+                raise HTTPException(status_code=404, detail="Region not found for the provided location")
+
+            region = get_region_by_name(db, region['NAME_1'])
+            if not region:
+                raise HTTPException(status_code=404, detail="Region not found in the database")
+            delivery_cost = region.delivery_cost if region else 0.0
+            delivery_date = datetime.now(timezonetash) + timedelta(days=region.delivery_days) if region else None
+            
+        else:
+            delivery_cost = 0.0
+            delivery_date = None
+
         # new_cart = get_cart_by_user_id(db, user_id)
 
         # if not new_cart:
@@ -203,17 +222,7 @@ def confirm_card(user_id: UUID, db: Session, data:ConfirmOrder):
         total_price = sum(item.price * item.quantity for item in cart.items) 
         
 
-
-        if data.district_id is not None:
-            district = get_district_by_id(db, data.district_id)
-            if not district:
-                raise ValueError("District not found")
-            if not district.region.delivery_cost:
-                delivery_cost = 0.0
-            else:
-                delivery_cost = district.region.delivery_cost
-        else:
-            delivery_cost = 0.0
+        
 
         cart.items_count = item_count
         cart.total_items_price = total_items_price
@@ -222,17 +231,17 @@ def confirm_card(user_id: UUID, db: Session, data:ConfirmOrder):
         cart.total_amount = (total_price+ delivery_cost)+cart.loan_month_price
         
         cart.payment_method = data.payment_method
-        cart.district_id = data.district_id
         cart.description = data.description
         cart.delivery_address = data.delivery_address
         cart.delivery_phone_number = data.delivery_phone_number
-        cart.delivery_date = data.delivery_date
+        cart.delivery_date = delivery_date
         cart.delivery_receiver = data.delivery_receiver
         cart.card_id = data.bank_card_id  # Assuming bank_card_id is the ID of the card used for payment
         cart.delivery_fee = delivery_cost
         cart.pick_up_location_id = data.pick_up_location_id
         cart.loan_month_id = data.loan_month_id
         cart.loan_month_percent = loan_month_percent
+        cart.user_location_id = data.user_location_id  # Set the user's location ID for delivery, if applicable
 
         # Update the cart status to 'confirmed' (assuming '1' is the status for confirmed orders)
         cart.status = 1

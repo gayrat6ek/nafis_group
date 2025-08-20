@@ -23,7 +23,8 @@ def create_region(db: Session, data: CreateRegion) -> Regions:
             name_ru=data.name_ru,
             name_uz=data.name_uz,
             is_active=True,
-            delivery_cost=data.delivery_cost if data.delivery_cost is not None else 0.0  # Default to 0.0 if not provided
+            delivery_cost=data.delivery_cost if data.delivery_cost is not None else 0.0,  # Default to 0.0 if not provided
+            delivery_days=data.delivery_days
         )
         db.add(region)
         db.commit()
@@ -71,4 +72,17 @@ def update_region(db: Session, region_id: UUID, data: UpdateRegion) -> Optional[
         return region
     except SQLAlchemyError as e:
         db.rollback()
+        raise e
+    
+
+def get_region_by_name(db: Session, name: str) -> Optional[Regions]:
+    try:
+        return db.query(Regions).filter(
+            or_(
+                Regions.name_en.ilike(f"%{name}%"),
+                Regions.name_ru.ilike(f"%{name}%"),
+                Regions.name_uz.ilike(f"%{name}%")
+            )
+        ).first()
+    except SQLAlchemyError as e:
         raise e

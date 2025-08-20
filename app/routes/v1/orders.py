@@ -1,3 +1,4 @@
+from datetime import datetime, timedelta
 from typing import List, Optional, Union
 from uuid import UUID
 from fastapi import APIRouter
@@ -21,6 +22,7 @@ from app.schemas.orders import (
 
 from app.utils.permissions import pages_and_permissions
 from app.crud.loanMonths import get_loan_months
+from app.utils.utils import timezonetash
 
 orders_router = APIRouter()
 @orders_router.post('/orders/cart/add', response_model=None)
@@ -37,13 +39,21 @@ async def add_to_cart(
         cart = crud_orders.create_cart(db=db, user_id=current_user['id'])
     
     item = crud_orders.add_or_update_item_cart(
-        db=db, 
-        order_id=cart.id, 
+        db=db,
+        order_id=cart.id,
         product_detail_id=body.product_detail_id, 
         size_id=body.size_id, 
         quantity=body.quantity
     )
     cart = crud_orders.get_cart_by_user_id(db=db, user_id=current_user['id'])
+
+    # delivery_date = 0
+
+    # for item in cart.items:
+    #     if item.product_detail.product.delivery_days:
+    #         delivery_date = max(delivery_date, item.product_detail.product.delivery_days)
+    # cart.delivery_date = datetime.now(tz=timezonetash) + timedelta(days=delivery_date)
+
 
     item_count = len(cart.items)
     total_items_price = sum(item.size.price * item.quantity for item in cart.items)

@@ -17,6 +17,8 @@ from apscheduler.jobstores.base import JobLookupError, ConflictingIdError
 from app.core.config import settings
 from app.db.session import SessionLocal
 
+import json
+from shapely.geometry import shape, Point
 
 
 
@@ -84,3 +86,18 @@ def generateOtp(length):
     return otp
 
 
+
+
+
+
+def find_region(lat, lon, geojson_path="app/utils/geo.json"):
+    # Load GeoJSON data once per call
+    with open(geojson_path, "r", encoding="utf-8") as f:
+        data = json.load(f)
+
+    point = Point(lon, lat)  # GeoJSON uses (lon, lat)
+    for feature in data["features"]:
+        polygon = shape(feature["geometry"])
+        if polygon.contains(point):
+            return feature["properties"]
+    return None

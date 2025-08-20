@@ -34,7 +34,6 @@ class Orders(Base):
     )
     description = Column(String, nullable=True)  # Description of the order
     user_id = Column(UUID(as_uuid=True), ForeignKey('users.id'), nullable=True)
-    district_id = Column(UUID(as_uuid=True), ForeignKey('districts.id'), nullable=True)
 
     delivery_address = Column(String, nullable=True)  # Full address for delivery
     delivery_phone_number = Column(String, nullable=True)  # Phone number for delivery contact
@@ -65,7 +64,6 @@ class Orders(Base):
     
     user = relationship("Users", back_populates="orders")
     payment_dates = relationship("OrderPaymentDates", back_populates="order")
-    district = relationship("Districts", back_populates="orders")
     items = relationship("OrderItems", back_populates="order")
     logs = relationship("Logs", back_populates="order")  # Assuming Logs model has an order relationship
     pick_up_location = relationship("PickUpLocations", back_populates="orders")  # Assuming PickUpLocations model has an orders relationship

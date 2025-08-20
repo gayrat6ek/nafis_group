@@ -18,6 +18,8 @@ class PaymentMethod(str, Enum):
     CARD = 'card'
     CASH = 'cash'
     LOAN = 'loan'  # Assuming loan is a valid payment method
+    PAYME = 'payme'  # Assuming payme is a valid payment method
+    
 
 
 class AddOrUpdateCartItem(BaseConfig):
@@ -35,15 +37,15 @@ class RemoveCartItem(BaseConfig):
 class ConfirmOrder(BaseConfig):
     pick_up_location_id:Optional[UUID] = None  # ID of the address for delivery, if applicable
     payment_method: Optional[PaymentMethod] = Field(..., description="Payment method used for the order")
-    district_id: Optional[UUID] = None  # ID of the district for delivery, if applicable
     description: Optional[str] = Field(None, max_length=500, description="Optional description for the order")
     delivery_address: Optional[str] = Field(None, max_length=255, description="Delivery address if applicable")
     delivery_phone_number: Optional[str] = Field(None, max_length=15, description="Phone number for delivery")
-    delivery_date: Optional[datetime] = None
+    # delivery_date: Optional[datetime] = None
     delivery_receiver: Optional[str] = Field(None, max_length=100, description="Name of the person receiving the delivery")
     bank_card_id: Optional[UUID] = None  # ID of the bank card used for payment, if applicable
     item_ids: Optional[List[UUID]] = None  # List of product detail IDs to confirm in the order
     loan_month_id: Optional[UUID] = None  # ID of the loan month used for payment, if applicable
+    user_location_id: Optional[UUID] = None  # ID of the user's location for delivery, if applicable
 
 
 
@@ -63,8 +65,6 @@ class OrdersGet(BaseConfig):
     order_number: Optional[int] = None
     description: Optional[str] = None
     user_id: Optional[UUID] = None
-    district_id: Optional[UUID] = None
-    delivery_address: Optional[str] = None
     delivery_phone_number: Optional[str] = None
     delivery_date: Optional[datetime] = None
     delivery_fee: Optional[float] = 0.0

@@ -26,4 +26,3 @@ class Districts(Base):
     region_id = Column(UUID(as_uuid=True), ForeignKey('regions.id'), nullable=False)
     is_active = Column(Boolean, default=True)  # Indicates if the district is active
     region = relationship("Regions", back_populates="districts")  # Assuming a Regions model exists
-    orders = relationship("Orders", back_populates="district")  # Assuming an Orders model exists with a district relationship

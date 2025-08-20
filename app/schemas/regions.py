@@ -16,6 +16,7 @@ class RegionGet(BaseConfig):
     name_en: Optional[str] = None  
     is_active: Optional[bool] = True 
     delivery_cost: Optional[float] = Field(0.0, description="Default delivery cost for the region")
+    delivery_days: Optional[int] = Field(0, description="Default delivery days for the region")
 
 class RegionsList(BaseConfig):
     id: UUID
@@ -25,6 +26,7 @@ class RegionsList(BaseConfig):
     is_active: Optional[bool] = True
     created_at: Optional[datetime] = None
     delivery_cost: Optional[float] = Field(0.0, description="Default delivery cost for the region")
+    delivery_days: Optional[int] = Field(0, description="Default delivery days for the region")
 
 
 class CreateRegion(BaseConfig):
@@ -33,6 +35,7 @@ class CreateRegion(BaseConfig):
     name_en: str
     is_active: Optional[bool] = True
     delivery_cost: Optional[float] = Field(0.0, description="Default delivery cost for the region")
+    delivery_days: Optional[int] = Field(0, description="Default delivery days for the region")
 
 
 class UpdateRegion(BaseConfig):
@@ -42,3 +45,4 @@ class UpdateRegion(BaseConfig):
     is_active: Optional[bool] = True
 
     delivery_cost: Optional[float] = Field(None, description="Default delivery cost for the region")
+    delivery_days: Optional[int] = Field(0, description="Default delivery days for the region")
