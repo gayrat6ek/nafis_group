@@ -313,3 +313,30 @@ def get_order_by_id_admin(db: Session, order_id: UUID) -> Optional[Orders]:
     
     except SQLAlchemyError as e:
         raise e
+    
+
+def getOrder(db: Session, order_id: UUID):
+    try:
+        order = db.query(Orders).filter(Orders.id == order_id).first()
+        if not order:
+            raise HTTPException(status_code=404, detail="Order not found")
+        return order
+    
+    except SQLAlchemyError as e:
+        raise e
+    
+
+
+def perform_transaction_orders(db:Session,order_id):
+    try:
+        query = db.query(Orders).filter(Orders.id==order_id).first()
+        if query:
+            query.is_paid = True
+            db.commit()
+
+        return query
+    except Exception as e:
+        db.rollback()
+        raise HTTPException(status_code=500, detail=f"internal server error")
+    
+

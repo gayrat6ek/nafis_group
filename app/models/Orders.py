@@ -69,7 +69,7 @@ class Orders(Base):
     pick_up_location = relationship("PickUpLocations", back_populates="orders")  # Assuming PickUpLocations model has an orders relationship
     user_location = relationship("UserLocations", back_populates="orders")
     loan_month = relationship("LoanMonths", back_populates="orders")
-
+    transaction = relationship("Transactions", back_populates="order")  # Assuming Transactions model has an order relationship
 
 
 """
