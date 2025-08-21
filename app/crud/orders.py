@@ -185,7 +185,10 @@ def confirm_card(user_id: UUID, db: Session, data:ConfirmOrder):
             if not region:
                 raise HTTPException(status_code=404, detail="Region not found in the database")
             delivery_cost = region.delivery_cost if region else 0.0
-            delivery_date = datetime.now(timezonetash) + timedelta(days=region.delivery_days) if region else None
+            delivery_date = (
+                datetime.now(timezonetash) + timedelta(days=region.delivery_days)
+                if region and region.delivery_days is not None else None
+            )
             
         else:
             delivery_cost = 0.0
