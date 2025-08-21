@@ -244,7 +244,7 @@ def check_authorization(auth_header: Optional[str]) -> bool:
 
 
 
-@payme_route.post('/orders/payme')
+@payme_route.post('/orders/transactions')
 async def order_statuses(
         request:Request,
         db: Session = Depends(get_db),
