@@ -67,7 +67,7 @@ async def add_to_cart(
     cart.total_amount = total_price
     db.commit()
 
-    if not item:
+    if not orderItem:
         raise HTTPException(status_code=404, detail="Product detail or size not found")
     items = 0
     for item in cart.items:
