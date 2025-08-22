@@ -80,7 +80,7 @@ async def get_discount(
         if product.product.details:
             for detail in product.product.details:
                 for size in detail.size:
-                    if size.price and discount.amount:
+                    if size.price and discount.amount is not None:
                         cut_percent = size.price / 100 * discount.amount
                         size.curr_discount_price = size.price - cut_percent
                         size.discount = discount.amount

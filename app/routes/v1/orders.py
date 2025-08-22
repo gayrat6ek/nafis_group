@@ -38,7 +38,7 @@ async def add_to_cart(
     if not cart:
         cart = crud_orders.create_cart(db=db, user_id=current_user['id'])
     
-    item = crud_orders.add_or_update_item_cart(
+    orderItem = crud_orders.add_or_update_item_cart(
         db=db,
         order_id=cart.id,
         product_detail_id=body.product_detail_id, 
@@ -72,7 +72,7 @@ async def add_to_cart(
     items = 0
     for item in cart.items:
         items += 1
-    return {"message": "Item added to cart successfully", "items_count":items}
+    return {"message": "Item added to cart successfully", "items_count":items, "id":orderItem.product_detail.product_id}
 
 
     
