@@ -15,6 +15,7 @@ from app.crud import loanMonths as crud_loanMonths
 from app.routes.depth import get_db, PermissionChecker
 from app.schemas.orders import (
     AddOrUpdateCartItem,
+    CartItemsSelect,
     RemoveCartItem,
     ConfirmOrder,
     OrdersGet
@@ -258,3 +259,29 @@ async def get_order_by_id(
         raise HTTPException(status_code=404, detail="Order not found")
     
     return order
+
+
+
+@orders_router.put('/cart/items/selection')
+async def select_cart_items(
+        body: CartItemsSelect,
+        db: Session = Depends(get_db),
+        current_user: dict = Depends(PermissionChecker(required_permissions=pages_and_permissions['Orders']['update']))
+):
+    """
+    Select specific items in the user's cart.
+    """
+    cart = crud_orders.get_cart_by_user_id(db=db, user_id=current_user['id'])
+    if not cart:
+        raise HTTPException(status_code=404, detail="Cart not found")
+    
+    updated_cart = crud_orders.update_cart_items_selection(
+        db=db,
+        order_id=cart.id,
+        item_ids=body.item_ids
+    )
+    
+    if not updated_cart:
+        raise HTTPException(status_code=400, detail="Failed to update cart items selection")
+    
+    return {"message": "Cart items selection updated successfully"}

@@ -8,9 +8,9 @@ from sqlalchemy import (
     String,
     Boolean,
     Integer,
-    Float
+    Float,
 )
-from sqlalchemy.dialects.postgresql import UUID
+from sqlalchemy.dialects.postgresql import UUID, JSONB
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
 
@@ -56,6 +56,7 @@ class Orders(Base):
     is_paid = Column(Boolean, default=False)
     is_delivered = Column(Boolean, default=False)  # Indicates if the order has been delivered
     user_location_id = Column(UUID(as_uuid=True), ForeignKey('user_locations.id'), nullable=True)
+    item_ids = Column(JSONB, nullable=True)  # List of item IDs in the order
 
     created_at = Column(DateTime(timezone=True), default=func.now())
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())

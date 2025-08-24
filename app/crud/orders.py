@@ -344,3 +344,26 @@ def perform_transaction_orders(db:Session,order_id):
         raise HTTPException(status_code=500, detail=f"internal server error")
     
 
+
+
+def update_cart_items_selection(
+        db: Session,
+        order_id: UUID,
+        item_ids: list[UUID]
+):
+    try:
+        cart = db.query(Orders).filter(
+            Orders.id == order_id,
+            Orders.status == 0  # Ensure it's still a cart
+        ).first()
+        if not cart:
+            raise HTTPException(status_code=404, detail="Cart not found")
+        
+        cart.item_ids = [str(item_id) for item_id in item_ids]
+        
+        db.commit()
+        db.refresh(cart)
+        return cart
+    except SQLAlchemyError as e:
+        db.rollback()
+        raise e

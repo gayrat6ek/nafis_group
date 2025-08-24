@@ -82,11 +82,13 @@ class OrdersGet(BaseConfig):
     loan_month_id: Optional[UUID] = None
     loan_month_percent: Optional[float] = 0.0
     loan_month_price: Optional[float] = 0.0
+    item_ids: Optional[List[UUID]] = None  # List of item IDs in the order
 
     
 
 
-
+class CartItemsSelect(BaseConfig):
+    item_ids: List[UUID]  # List of product detail IDs to select in the cart
 
 
 
