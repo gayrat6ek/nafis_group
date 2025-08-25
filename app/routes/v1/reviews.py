@@ -32,7 +32,7 @@ async def create_review(
 async def get_review(
         id: UUID,
         db: Session = Depends(get_db),
-        current_user: dict = Depends(PermissionChecker(required_permissions=pages_and_permissions['Reviews']['view']))
+        # current_user: dict = Depends(PermissionChecker(required_permissions=pages_and_permissions['Reviews']['view']))
 ):
     review = crud_reviews.get_review(db=db, review_id=id)
     if not review:
@@ -57,7 +57,7 @@ async def update_review(
 async def get_reviews_list(
         product_id: UUID = None,
         db: Session = Depends(get_db),
-        current_user: dict = Depends(PermissionChecker(required_permissions=pages_and_permissions['Reviews']['view']))
+        # current_user: dict = Depends(PermissionChecker(required_permissions=pages_and_permissions['Reviews']['view']))
 ):
     reviews = crud_reviews.get_reviews(db=db, product_id=product_id)
     return reviews

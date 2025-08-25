@@ -66,6 +66,7 @@ async def add_to_cart(
     cart.total_items_price = total_items_price
     cart.total_discounted_price = total_discounted_price
     cart.total_amount = total_price
+    cart.item_ids = []
     db.commit()
 
     if not orderItem:
@@ -115,6 +116,7 @@ async def remove_from_cart(
 @orders_router.get('/my/cart', response_model=Union[ dict,OrdersGet])
 async def get_my_cart(
         get_len:Optional[bool] = False,
+        selected:Optional[bool] = False,
         db: Session = Depends(get_db),
         current_user: dict = Depends(PermissionChecker(required_permissions=pages_and_permissions['Orders']['view']))
 ):
@@ -129,6 +131,12 @@ async def get_my_cart(
         return {"items_count": items_count}
     
     loan_month = get_loan_months(db=db, is_active=True,limit=1)
+
+    cart_items = cart.item_ids
+    if selected and cart_items:
+        for i in range(len(cart.items)-1, -1, -1):
+            if str(cart.items[i].id) not in cart_items:
+                del cart.items[i]
     
     for item in cart.items:
         if item.product_detail.product.discounts:
@@ -166,6 +174,7 @@ async def get_my_cart(
     cart.items_count = item_count
     cart.total_items_price = total_items_price
     cart.total_discounted_price = total_discounted_price
+    cart.total_amount = total_price
 
 
 
@@ -275,13 +284,29 @@ async def select_cart_items(
     if not cart:
         raise HTTPException(status_code=404, detail="Cart not found")
     
-    updated_cart = crud_orders.update_cart_items_selection(
+    cart = crud_orders.update_cart_items_selection(
         db=db,
         order_id=cart.id,
         item_ids=body.item_ids
     )
+    total_items_price = 0
+    total_discounted_price = 0
+    total_price = 0
+    item_count = 0
+    for cart_item in cart.items:
+        total_items_price += cart_item.size.price * cart_item.quantity
+        total_discounted_price += (cart_item.size.price - cart_item.price) * cart_item.quantity
+        total_price += cart_item.price * cart_item.quantity
+        item_count += 1
+
+
+    cart.items_count = item_count
+    cart.total_items_price = total_items_price
+    cart.total_discounted_price = total_discounted_price
+    cart.total_amount = total_price
+    db.commit()
     
-    if not updated_cart:
+    if not cart:
         raise HTTPException(status_code=400, detail="Failed to update cart items selection")
     
     return {"message": "Cart items selection updated successfully"}
