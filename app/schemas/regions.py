@@ -46,3 +46,5 @@ class UpdateRegion(BaseConfig):
 
     delivery_cost: Optional[float] = Field(None, description="Default delivery cost for the region")
     delivery_days: Optional[int] = Field(0, description="Default delivery days for the region")
+
+

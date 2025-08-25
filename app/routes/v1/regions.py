@@ -13,6 +13,7 @@ from app.routes.depth import get_db, PermissionChecker
 from app.schemas.regions import  RegionGet,RegionsList,CreateRegion,UpdateRegion
 from app.models.regions import Regions
 from app.utils.permissions import pages_and_permissions
+from app.utils.utils import find_region
 
 
 
@@ -68,6 +69,18 @@ async def update_region(
     return updated_region
 
 
+
+@regions_router.get('/regions/find-by-coords', response_model=RegionGet)
+async def find_region_by_coords(
+        lat: float,
+        lng: float,
+        db: Session = Depends(get_db),
+        # current_user: dict = Depends(PermissionChecker(required_permissions=pages_and_permissions['Regions']['view']))
+):
+    region = find_region(db=db, lat=lat, lng=lng)
+    if not region:
+        raise HTTPException(status_code=404, detail="Region not found")
+    return region
 
 
 
