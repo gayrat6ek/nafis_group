@@ -79,7 +79,7 @@ async def find_region_by_coords(
 ):
     region = find_region(db=db, lat=lat, lng=lng)
     if not region:
-        raise HTTPException(status_code=404, detail="Region not found")
+        raise HTTPException(status_code=404, detaiql="Region not found")
     return region
 
 

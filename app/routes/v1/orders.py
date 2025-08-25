@@ -20,6 +20,8 @@ from app.schemas.orders import (
     ConfirmOrder,
     OrdersGet
     )
+from app.schemas.products import (
+    ProductList)
 
 from app.utils.permissions import pages_and_permissions
 from app.crud.loanMonths import get_loan_months
@@ -310,3 +312,19 @@ async def select_cart_items(
         raise HTTPException(status_code=400, detail="Failed to update cart items selection")
     
     return {"message": "Cart items selection updated successfully"}
+
+
+@orders_router.get('/purchased/products', response_model=Page[ProductList])
+async def get_purchased_products(
+        page: int = 1,
+        size: int = 10,
+        db: Session = Depends(get_db),
+        current_user: dict = Depends(PermissionChecker(required_permissions=pages_and_permissions['Orders']['view']))
+):
+    """
+    Get the list of products purchased by the current user.
+    """
+    products = crud_orders.get_purchased_product_list(db=db, user_id=current_user['id'], page=page, size=size)
+
+    return products
+

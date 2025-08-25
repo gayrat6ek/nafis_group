@@ -367,3 +367,35 @@ def update_cart_items_selection(
     except SQLAlchemyError as e:
         db.rollback()
         raise e
+    
+
+
+def get_purchased_product_list(db: Session, user_id: UUID, page: int = 1, size: int = 10):
+    try:
+        products = (
+            db.query(Products)
+            .join(ProductDetails, Products.id == ProductDetails.product_id)
+            .join(OrderItems, ProductDetails.id == OrderItems.product_detail_id)
+            .join(Orders, OrderItems.order_id == Orders.id)
+            .filter(
+                Orders.user_id == user_id,
+                Orders.status.in_([1, 2, 3, 4])
+            )
+            .group_by(Products.id)
+            .order_by(func.max(Orders.created_at).desc())
+            .offset((page - 1) * size)
+            .limit(size)
+            .all()
+        )
+
+        return {
+            "items": products,
+            "total": len(products),
+            "page": page,
+            "size": size,
+            'pages': (len(products) + size - 1) // size
+        }
+
+
+    except SQLAlchemyError as e:
+        raise e

@@ -329,3 +329,5 @@ def search_products(
     except SQLAlchemyError as e:
         raise e
     
+
+
