@@ -76,7 +76,7 @@ async def add_to_cart(
     items = 0
     for item in cart.items:
         items += 1
-    return {"message": "Item added to cart successfully", "items_count":items, "id":orderItem.product_detail.product_id}
+    return {"message": "Item added to cart successfully", "items_count":items, "id":orderItem.id}
 
 
     
@@ -285,6 +285,13 @@ async def select_cart_items(
     cart = crud_orders.get_cart_by_user_id(db=db, user_id=current_user['id'])
     if not cart:
         raise HTTPException(status_code=404, detail="Cart not found")
+    loan_month = 1
+    if body.loan_month_id:
+        loan_month_data = crud_loanMonths.get_loan_months_by_id(db=db, loan_month_id=body.loan_month_id)
+        if not loan_month_data:
+            raise HTTPException(status_code=404, detail="Loan month not found")
+        loan_month = loan_month_data.percent
+
     
     cart = crud_orders.update_cart_items_selection(
         db=db,
@@ -305,7 +312,8 @@ async def select_cart_items(
     cart.items_count = item_count
     cart.total_items_price = total_items_price
     cart.total_discounted_price = total_discounted_price
-    cart.total_amount = total_price
+    cart.total_amount = total_price+(total_price/100*loan_month)
+    cart.loan_month_id = body.loan_month_id
     db.commit()
     
     if not cart:
