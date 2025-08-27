@@ -103,10 +103,10 @@ def get_discounts(db: Session, is_active: Optional[bool] = None) -> list[Discoun
         if is_active is not None:
             query = query.filter(Discounts.is_active == is_active).filter(
                 
-                    # and_(
-                    #     Discounts.active_from <= datetime.now(tz=time_zone),
-                    #     Discounts.active_to >= datetime.now(tz=time_zone)
-                    # )
+                    and_(
+                        Discounts.active_from <= datetime.now(tz=time_zone),
+                        Discounts.active_to >= datetime.now(tz=time_zone)
+                    )
                 
                  
             )
