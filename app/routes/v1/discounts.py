@@ -23,7 +23,7 @@ discounts_router = APIRouter()
 
 @discounts_router.get('/discounts', response_model=List[DiscountList])
 async def get_discount_list(
-        is_active: bool = False,
+        is_active: bool = None,
         db: Session = Depends(get_db),
         # current_user: dict = Depends(PermissionChecker(required_permissions=pages_and_permissions['Discounts']['view']))
 ):
