@@ -285,9 +285,9 @@ async def select_cart_items(
     cart = crud_orders.get_cart_by_user_id(db=db, user_id=current_user['id'])
     if not cart:
         raise HTTPException(status_code=404, detail="Cart not found")
-    loan_month = 1
+    loan_month = 0
     if body.loan_month_id:
-        loan_month_data = crud_loanMonths.get_loan_months_by_id(db=db, loan_month_id=body.loan_month_id)
+        loan_month_data = crud_loanMonths.get_loan_months_by_id(db=db, loan_months_id=body.loan_month_id)
         if not loan_month_data:
             raise HTTPException(status_code=404, detail="Loan month not found")
         loan_month = loan_month_data.percent
