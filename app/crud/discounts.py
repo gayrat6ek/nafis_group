@@ -102,16 +102,13 @@ def get_discounts(db: Session, is_active: Optional[bool] = None) -> list[Discoun
         query = db.query(Discounts)
         if is_active is not None:
             query = query.filter(Discounts.is_active == is_active).filter(
-                (
+                
                     and_(
                         Discounts.active_from <= datetime.now(tz=time_zone),
                         Discounts.active_to >= datetime.now(tz=time_zone)
                     )
-                ) | (
-                    Discounts.active_from == None,
-                ) | (
-                    Discounts.active_to == None
-                )
+                
+                 
             )
         query = query.order_by(Discounts.created_at.desc()).all()
         
