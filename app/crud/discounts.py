@@ -83,6 +83,8 @@ def create_discount(db: Session, data: CreateDiscount) -> Discounts:
         )
         db.add(discount)
         db.commit()
+        db.refresh(discount)
+
         for product_id in data.product_ids:
                 if not getActiveProductWithDate(db=db,product_id=product_id,active_from=discount.active_from,active_to=discount.active_to):
                     discount_product = DiscountProducts(
@@ -90,7 +92,6 @@ def create_discount(db: Session, data: CreateDiscount) -> Discounts:
                         product_id=product_id
                     )
                     db.add(discount_product)
-        db.refresh(discount)
         return discount
     except SQLAlchemyError as e:
         db.rollback()

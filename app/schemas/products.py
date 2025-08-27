@@ -147,7 +147,7 @@ class UpdateProduct(BaseConfig):
 
 
 class ProductFilter(BaseConfig):
-    order_by: Optional[OrderBy] = None
+    order_by: Optional[OrderBy] = "created_at_desc"
     category_id: Optional[UUID] = None
     brands: Optional[List[UUID]] = None
     is_active: Optional[bool] = None
