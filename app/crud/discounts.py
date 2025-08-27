@@ -79,10 +79,17 @@ def create_discount(db: Session, data: CreateDiscount) -> Discounts:
             image=data.image,  # Assuming image is a URL or path to the image
             active_from=data.active_from,
             active_to=data.active_to,
-            products=[DiscountProducts(product_id=product_id) for product_id in data.product_ids] if data.product_ids else []
+            # products=[DiscountProducts(product_id=product_id) for product_id in data.product_ids] if data.product_ids else []
         )
         db.add(discount)
         db.commit()
+        for product_id in data.product_ids:
+                if not getActiveProductWithDate(db=db,product_id=product_id,active_from=discount.active_from,active_to=discount.active_to):
+                    discount_product = DiscountProducts(
+                        discount_id=discount.id,
+                        product_id=product_id
+                    )
+                    db.add(discount_product)
         db.refresh(discount)
         return discount
     except SQLAlchemyError as e:
