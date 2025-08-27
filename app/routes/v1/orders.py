@@ -296,8 +296,10 @@ async def select_cart_items(
     cart = crud_orders.update_cart_items_selection(
         db=db,
         order_id=cart.id,
-        item_ids=body.item_ids
+        item_ids=body.item_ids,
     )
+    cart = crud_orders.get_cart_by_user_id(db=db, user_id=current_user['id'])
+    
     total_items_price = 0
     total_discounted_price = 0
     total_price = 0

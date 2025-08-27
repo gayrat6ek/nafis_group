@@ -18,9 +18,51 @@ from app.models.discountProducts import DiscountProducts
 from app.models.Products import Products
 import pytz
 
+
 time_zone = pytz.timezone("Asia/Tashkent")
 
+def activeDisCountProd(db: Session, product_id: UUID) -> list[Discounts]:
+    try:
+        discounts = db.query(Discounts).join(DiscountProducts).filter(
+            and_(
+                Discounts.is_active == True,
+                Discounts.active_from <= datetime.now(tz=time_zone),
+                Discounts.active_to >= datetime.now(tz=time_zone),
+                DiscountProducts.product_id == product_id
+            )
+        ).all()
+        return discounts
+    
+    except SQLAlchemyError as e:
+        raise e 
 
+def getActiveProductWithDate(db:Session,product_id:UUID, active_from:datetime,active_to:datetime)->list[Discounts]:
+    try:
+        discounts = db.query(Discounts).join(DiscountProducts).filter(
+            and_(
+                Discounts.is_active == True,
+                or_(
+                    and_(
+                        Discounts.active_from <= active_from,
+                        Discounts.active_to >= active_from
+                    ),
+                    and_(
+                        Discounts.active_from <= active_to,
+                        Discounts.active_to >= active_to
+                    ),
+                    and_(
+                        Discounts.active_from >= active_from,
+                        Discounts.active_to <= active_to
+                    )
+                ),
+                DiscountProducts.product_id == product_id
+            )
+        ).all()
+        return discounts
+    
+    except SQLAlchemyError as e:
+        raise e
+    
 
 def create_discount(db: Session, data: CreateDiscount) -> Discounts:
     try:
@@ -45,7 +87,7 @@ def create_discount(db: Session, data: CreateDiscount) -> Discounts:
         return discount
     except SQLAlchemyError as e:
         db.rollback()
-        raise e
+        raise False
     
 def get_discounts(db: Session, is_active: Optional[bool] = None) -> list[Discounts]:
     try:
@@ -103,12 +145,14 @@ def update_discount(db: Session, discount_id: UUID, data: UpdateDiscount) -> Opt
             db.commit()
             
             # Add new products
+            
             for product_id in data.product_ids:
-                discount_product = DiscountProducts(
-                    discount_id=discount.id,
-                    product_id=product_id
-                )
-                db.add(discount_product)
+                if not getActiveProductWithDate(db=db,product_id=product_id,active_from=discount.active_from,active_to=discount.active_to):
+                    discount_product = DiscountProducts(
+                        discount_id=discount.id,
+                        product_id=product_id
+                    )
+                    db.add(discount_product)
             
 
         
@@ -121,18 +165,3 @@ def update_discount(db: Session, discount_id: UUID, data: UpdateDiscount) -> Opt
         raise e
     
 
-def activeDisCountProd(db: Session, product_id: UUID) -> list[Discounts]:
-    try:
-        discounts = db.query(Discounts).join(DiscountProducts).filter(
-            and_(
-                Discounts.is_active == True,
-                Discounts.active_from <= datetime.now(tz=time_zone),
-                Discounts.active_to >= datetime.now(tz=time_zone),
-                DiscountProducts.product_id == product_id
-            )
-        ).all()
-        return discounts
-    
-    except SQLAlchemyError as e:
-        raise e 
-    
