@@ -11,8 +11,28 @@ from sqlalchemy.sql import func
 from datetime import datetime,timedelta
 from sqlalchemy import or_, and_, Date, cast,String
 from uuid import UUID
+
 from app.models.reviews import Reviews
+from app.models.Products import Products
 from app.schemas.reviews import CreateReview, UpdateReview
+
+def ProductsRatingUpdate(db: Session, product_id: UUID):
+    try:
+        average_rating = db.query(func.avg(Reviews.rating)).filter(
+            Reviews.product_id == product_id,
+        ).scalar()
+        # Update the product's rating
+        product = db.query(Products).filter(Products.id == product_id).first()
+        if product:
+            product.rating = average_rating
+            db.commit()
+            db.refresh(product)
+        
+        return average_rating
+    
+    except SQLAlchemyError as e:
+        db.rollback()
+        raise e
 
 
 
@@ -39,6 +59,7 @@ def create_review(db: Session, data: CreateReview,user_id) -> Reviews:
         )
         db.add(review)
         db.commit()
+        ProductsRatingUpdate(db=db,product_id=data.product_id)
         db.refresh(review)
         return review
     

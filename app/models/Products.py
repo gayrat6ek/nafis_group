@@ -43,6 +43,7 @@ class Products(Base):
     created_at = Column(DateTime(timezone=True), default=func.now())
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())
     brand_id = Column(UUID(as_uuid=True), ForeignKey('brands.id'), nullable=False)
+    rating = Column(Float, default=0.0)  # Average rating for the product
 
     # files = relationship("Files", back_populates="product")
     category = relationship("Categories", back_populates="products")
