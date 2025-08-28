@@ -212,7 +212,7 @@ async def confirm_order(
 
 
 
-@orders_router.get('/orders', response_model=Page[OrdersGet])
+@orders_router.get('/orders', response_model=Page[OrdersFullGet])
 async def get_orders(
         page: int = 1,
         size: int = 10,
