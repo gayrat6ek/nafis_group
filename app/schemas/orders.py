@@ -5,7 +5,7 @@ from symtable import Class
 from typing import Optional, List
 from uuid import UUID
 from pydantic import BaseModel, Field, ConfigDict
-from .productDetails import ProductDetailsInOrders,GetSize
+from .productDetails import ProductDetailsInOrders,GetSize, ProductDetailsInOrdersFull
 from app.schemas.users import GetUser
 
 
@@ -61,6 +61,14 @@ class OrderItems(BaseConfig):
     size: GetSize
 
 
+class OrderFullItems(BaseConfig):
+    id: Optional[UUID] = None
+    product_detail: ProductDetailsInOrdersFull  # Basic data of the product detail
+    quantity: int = Field(..., ge=1, description="Quantity of the product in the order")
+    price: float = Field(..., gt=0, description="Price of the product at the time of order")
+    size: GetSize
+
+
 class OrdersGet(BaseConfig):
     id: Optional[UUID] = None
     order_number: Optional[int] = None
@@ -80,6 +88,33 @@ class OrdersGet(BaseConfig):
     is_delivered: Optional[bool] = False
     created_at: Optional[datetime] = None
     items: List[OrderItems] = []  # List of order items associated with the order
+    loan_month_id: Optional[UUID] = None
+    loan_month_percent: Optional[float] = 0.0
+    loan_month_price: Optional[float] = 0.0
+    item_ids: Optional[List[UUID]] = None  # List of item IDs in the order
+    user: Optional[GetUser] = None  # Basic user information associated with the order
+    
+
+
+class OrdersFullGet(BaseConfig):
+    id: Optional[UUID] = None
+    order_number: Optional[int] = None
+    description: Optional[str] = None
+    user_id: Optional[UUID] = None
+    delivery_phone_number: Optional[str] = None
+    delivery_date: Optional[datetime] = None
+    delivery_fee: Optional[float] = 0.0
+    payment_method: Optional[str] = None
+    discount_amount: Optional[float] = 0.0
+    items_count: Optional[int] = 0
+    total_items_price: Optional[float] = 0.0
+    total_discounted_price: Optional[float] = 0.0
+    total_amount: Optional[float] = None
+    status: Optional[int] = 0  # Assuming status is an integer representing the order status
+    is_paid: Optional[bool] = False
+    is_delivered: Optional[bool] = False
+    created_at: Optional[datetime] = None
+    items: List[OrderFullItems] = []  # List of order items associated with the order
     loan_month_id: Optional[UUID] = None
     loan_month_percent: Optional[float] = 0.0
     loan_month_price: Optional[float] = 0.0

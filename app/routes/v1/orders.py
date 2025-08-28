@@ -16,6 +16,7 @@ from app.routes.depth import get_db, PermissionChecker
 from app.schemas.orders import (
     AddOrUpdateCartItem,
     CartItemsSelect,
+    OrdersFullGet,
     RemoveCartItem,
     ConfirmOrder,
     OrdersGet
@@ -225,7 +226,7 @@ async def get_orders(
     return orders
 
 
-@orders_router.get('/orders/{order_id}', response_model=OrdersGet)
+@orders_router.get('/orders/{order_id}', response_model=OrdersFullGet)
 async def get_order(
         order_id: UUID,
         db: Session = Depends(get_db),
@@ -241,7 +242,7 @@ async def get_order(
     return order
 
 
-@orders_router.get("/admin/orders", response_model=Page[OrdersGet])
+@orders_router.get("/admin/orders", response_model=Page[OrdersFullGet])
 async def get_all_orders(
         page: int = 1,
         size: int = 10,
@@ -257,7 +258,7 @@ async def get_all_orders(
 
 
 
-@orders_router.get('/admin/orders/{order_id}', response_model=OrdersGet)
+@orders_router.get('/admin/orders/{order_id}', response_model=OrdersFullGet)
 async def get_order_by_id(
         order_id: UUID,
         db: Session = Depends(get_db),

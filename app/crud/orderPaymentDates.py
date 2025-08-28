@@ -44,23 +44,14 @@ def create_order_payment_date(db: Session, order_id: UUID, months, amount):
 
 def get_payment_dates_by_order_id(db: Session, order_id: UUID):
     try:
-        return db.query(OrderPaymentDates).filter(OrderPaymentDates.order_id == order_id).all()
+        query =  db.query(OrderPaymentDates).filter(OrderPaymentDates.order_id == order_id)
+        query = query.order_by(OrderPaymentDates.payment_date.asc())
+        return query.all()
     except SQLAlchemyError as e:
         raise e
     
 
-def mark_payment_as_paid(db: Session, payment_id: UUID, data: OrderMonthlyPaymentUpdate):
-    try:
-        payment_date = db.query(OrderPaymentDates).filter(OrderPaymentDates.id == payment_id).first()
-        if payment_date:
-            payment_date.is_paid = True
-            db.commit()
-            db.refresh(payment_date)
-            return payment_date
-        return None
-    except SQLAlchemyError as e:
-        db.rollback()
-        raise e
+
 
 def mark_as_paid(db:Session,payment_id:UUID):
     try:

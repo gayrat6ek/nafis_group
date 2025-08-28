@@ -5,6 +5,7 @@ from uuid import UUID
 from pydantic import BaseModel, Field, ConfigDict
 from .colors import ColorGet
 from .measureUnits import getBasicMeasureUnits
+from app.schemas.reviews import ReviewGet
 
 
 class BaseConfig(BaseModel):
@@ -46,7 +47,18 @@ class ProductBasicGet(BaseConfig):
     description_en: Optional[str] = None
 
 
+
     
+
+class ProductWithReviewBasicGet(BaseConfig):
+    id: Optional[UUID] = None
+    name_uz: Optional[str] = None
+    name_ru: Optional[str] = None
+    name_en: Optional[str] = None
+    description_uz: Optional[str] = None        
+    description_ru: Optional[str] = None
+    description_en: Optional[str] = None
+    reviews: Optional[List[ReviewGet]] = None  # List of reviews for the product
 
 
 
@@ -142,6 +154,16 @@ class ProductDetailsBasicData(BaseConfig):
 class ProductDetailsInOrders(BaseConfig):
     id: UUID
     product: Optional[ProductBasicGet] = None  # Basic data of the product
+
+    images: Optional[list] = None
+    is_active: Optional[bool] = True
+    color:Optional[ColorGet] = None  # Assuming product details can have a color relationship
+    measure_unit: Optional[getBasicMeasureUnits] = None  # Assuming product details can have a measure unit relationship
+
+
+class ProductDetailsInOrdersFull(BaseConfig):
+    id: UUID
+    product: Optional[ProductWithReviewBasicGet] = None  # Basic data of the product
 
     images: Optional[list] = None
     is_active: Optional[bool] = True

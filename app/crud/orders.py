@@ -15,12 +15,14 @@ from sqlalchemy.sql import func
 from datetime import datetime,timedelta
 from sqlalchemy import or_, and_, Date, cast,String
 from uuid import UUID
+from app.models.ratings import Ratings
 from app.utils.utils import timezonetash
 from app.models.Orders import Orders
 from app.models.OrderItems import OrderItems
 from app.models.Products import Products
 from app.models.productDetails import ProductDetails
 from app.models.discountProducts import DiscountProducts
+from app.models.reviews import Reviews
 from app.models.discounts import Discounts
 from app.crud import productDetails as product_details_crud
 from app.schemas.orders import ConfirmOrder
@@ -278,32 +280,34 @@ def confirm_card(user_id: UUID, db: Session, data:ConfirmOrder):
 
 
 
-def get_orders(db: Session, user_id: Optional[UUID]=None, page: int = 1, size: int = 10,status: Optional[int]=None):
+def get_orders(db: Session, user_id: Optional[UUID]=None, page: int = 1, size: int = 10, status: Optional[int]=None):
     try:
-        query = db.query(Orders).filter(
-            Orders.status != 0  # Exclude carts
-        )
+        query = db.query(Orders)\
+            .join(Orders.items)\
+            .join(OrderItems.product_detail)\
+            .join(ProductDetails.product)\
+            .join(Products.reviews)\
+            .filter(Orders.status != 0)\
+            .filter(Orders.user_id == Reviews.user_id)
+        
         if user_id:
             query = query.filter(Orders.user_id == user_id)
         if status is not None:
             query = query.filter(Orders.status == status)
 
         total_count = query.count()
-        query = query.order_by(Orders.created_at.desc()) 
+        query = query.order_by(Orders.created_at.desc())
         orders = query.offset((page - 1) * size).limit(size).all()
-        
 
-        
         return {
             "items": orders,
             "total": total_count,
             "page": page,
             "size": size,
-            'pages': (total_count + size - 1) // size 
+            "pages": (total_count + size - 1) // size
         }
     except SQLAlchemyError as e:
         raise e
-    
 
 
 def get_order_by_id(db: Session, order_id: UUID) -> Optional[Orders]:
