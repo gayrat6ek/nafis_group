@@ -100,7 +100,8 @@ pages_and_permissions = {
         "view": "RV1",
         "update": "RV2",
         "create": "RV4",
-        "delete": "RV5"
+        "delete": "RV5",
+        "admin_review_view": "RV6"
     },
     "UserLocations": {
         "view": "UL1",

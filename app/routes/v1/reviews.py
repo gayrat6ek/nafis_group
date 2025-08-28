@@ -73,3 +73,15 @@ async def delete_review(
     if not deleted_review:
         raise HTTPException(status_code=404, detail="Review not found")
     return {"message": "Review deleted successfully"}   
+
+
+@reviews_router.get('/admin/reviews/view', response_model=Page[ReviewGet])
+async def admin_get_reviews_list(
+        order_id: UUID = None,
+        page: int = 1,
+        size: int = 10,
+        db: Session = Depends(get_db),
+        current_user: dict = Depends(PermissionChecker(required_permissions=pages_and_permissions['Reviews']['admin_review_view']))
+):
+    reviews = crud_reviews.admin_get_reviews(db=db, size=size, page=page, order_id=order_id)
+    return reviews

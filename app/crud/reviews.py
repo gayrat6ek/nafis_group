@@ -146,3 +146,26 @@ def get_reviews(db: Session, product_id:Optional[UUID]=None, is_active: Optional
     
     except SQLAlchemyError as e:
         raise e 
+    
+
+def admin_get_reviews(db: Session, order_id, page: int = 1, size: int = 10,):
+    try:
+        query = db.query(Reviews).order_by(Reviews.created_at.desc())
+        if order_id:
+            query = query.filter(Reviews.id == order_id)
+        
+        # Pagination
+        offset = (page - 1) * size
+        query = query.offset(offset).limit(size)
+        
+        return {
+            "items": query.all(),
+            "total": query.count(),
+            "page": page,
+            "size": size,
+            "pages": (query.count() + size - 1) // size  # Calculate total pages    
+        }
+    
+    except SQLAlchemyError as e:
+        raise e
+    
