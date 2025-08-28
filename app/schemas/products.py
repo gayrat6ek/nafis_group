@@ -84,7 +84,8 @@ class ProductGet(BaseConfig):
     materials: Optional[List[materialsGet]] = None  # Assuming products can have multiple materials
     reviews: Optional[List[ReviewGet]] = None  # Assuming products can have multiple reviews
     liked: Optional[bool] = False  # Indicates if the product is liked by the user
-    rating: Optional[float] = 0.0  # Average rating for the product
+    rating: Optional[float] = 5  # Average rating for the product
+
 
 
 class ProductList(BaseConfig):
@@ -103,7 +104,7 @@ class ProductList(BaseConfig):
     category_id: Optional[UUID] = None  # Assuming products are linked to categories
     brand_id: Optional[UUID] = None  # Assuming products are linked to brands
     created_at: Optional[datetime] = None
-    rating: Optional[float] = 0.0  # Average rating for the product
+    rating: Optional[float] = 5  # Average rating for the product
     # discounts: Optional[List[DiscountsProducts]] = None  # Assuming products can have multiple discounts
     details: Optional[List[ProductDetailsBasicData]] = None  # Assuming products can have details
     # materials: Optional[List[materialsGet]] = None  # Assuming products can have multiple materials
