@@ -254,7 +254,7 @@ def confirm_card(user_id: UUID, db: Session, data:ConfirmOrder):
 
         db.commit()
         if cart.loan_month_id:
-            create_order_payment_date(db=db,order_id=cart.id,months=loan_month.months,amount=cart.loan_month_price/loan_month.months)
+            create_order_payment_date(db=db,order_id=cart.id,months=loan_month.months,amount=cart.total_amount/loan_month.months)
 
         nextCard = get_cart_by_user_id(db, user_id)
         if not nextCard:
