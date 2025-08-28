@@ -302,7 +302,7 @@ def get_orders(db: Session, user_id: Optional[UUID] = None, page: int = 1, size:
             query = query.filter(Orders.status == status)
 
         total_count = query.count()
-        query = query.order_by(Orders.created_at.desc())
+        query = query.order_by(Orders.created_at.asc())
         orders = query.offset((page - 1) * size).limit(size).all()
 
         return {
