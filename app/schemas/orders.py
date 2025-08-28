@@ -6,6 +6,7 @@ from typing import Optional, List
 from uuid import UUID
 from pydantic import BaseModel, Field, ConfigDict
 from .productDetails import ProductDetailsInOrders,GetSize
+from app.schemas.users import GetUser
 
 
 
@@ -83,7 +84,7 @@ class OrdersGet(BaseConfig):
     loan_month_percent: Optional[float] = 0.0
     loan_month_price: Optional[float] = 0.0
     item_ids: Optional[List[UUID]] = None  # List of item IDs in the order
-
+    user: Optional[GetUser] = None  # Basic user information associated with the order
     
 
 

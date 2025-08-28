@@ -58,9 +58,10 @@ def check_perform_transaction(db:Session,raw_data):
 def create_transaction(db:Session,raw_data):
     order = getOrder(db=db, id=raw_data['params']['account']['order_id'])
     if not order:
+        print("there is not order Found")
         return generate_error_response(raw_data, -31099)
-    if order.total_amount != raw_data['params']['amount']:
-        return generate_error_response(raw_data, -31001)
+    # if order.total_amount != raw_data['params']['amount']:
+    #     return generate_error_response(raw_data, -31001)
 
 
     transaction = get_transaction_with_transaction_id(db=db, id=raw_data['params']['id'])
@@ -77,6 +78,7 @@ def create_transaction(db:Session,raw_data):
     order_transaction = get_transaction_with_order_id(db=db, id=raw_data['params']['account']['order_id'])
 
     if order_transaction:
+        print("order already has transaction")
         return generate_error_response(raw_data, -31099)
 
         # return generate_error_response(raw_data, -31050)
