@@ -31,7 +31,7 @@ import uuid
 
 class Transactions(Base):
     __tablename__ = 'transactions'
-    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    id = Column(BigInteger, primary_key=True, index=True, autoincrement=True)
     order_id = Column(UUID(as_uuid=True), ForeignKey('orders.id'))
     order = relationship('Orders', back_populates='transaction')
     amount = Column(DECIMAL,nullable=True)
