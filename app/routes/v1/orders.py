@@ -247,7 +247,7 @@ async def get_all_orders(
         size: int = 10,
         status: Optional[int] = None,
         db: Session = Depends(get_db),
-        current_user: dict = Depends(PermissionChecker(required_permissions=pages_and_permissions['Orders']['view']))
+        current_user: dict = Depends(PermissionChecker(required_permissions=pages_and_permissions['Orders']['admin_view']))
 ):
     """
     Get a paginated list of all orders (admin view).

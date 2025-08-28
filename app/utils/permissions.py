@@ -77,7 +77,10 @@ pages_and_permissions = {
         "update": "O2",
         "create": "O4",
         "delete": "O5",
-        "remove_from_cart": "O6"
+        "remove_from_cart": "O6",
+        'admin_update_order':"O7",
+        "admin_view": "O8",
+
     },
     "PickUpLocations": {
         "view": "PL1",
@@ -105,6 +108,7 @@ pages_and_permissions = {
         "create": "UL4",
         "delete": "UL5"
     }
+
 
 
 }

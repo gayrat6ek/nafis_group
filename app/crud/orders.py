@@ -30,7 +30,7 @@ from app.crud.loanMonths import get_loan_months_by_id
 from app.crud.regions import get_region_by_name
 from app.utils.utils import find_region
 from app.crud.userLocations import user_location as user_location_crud
-
+from app.crud.orderPaymentDates import create_order_payment_date
 
 def get_cart_by_user_id(db: Session, user_id: UUID):
     try:
@@ -173,7 +173,7 @@ def confirm_card(user_id: UUID, db: Session, data:ConfirmOrder):
                 raise HTTPException(status_code=400, detail="Loan month is not active")
             loan_month_percent = loan_month.percent
         else:
-            loan_month_percent = 1
+            loan_month_percent = 0
 
         if data.user_location_id:
             user_location = user_location_crud.get(db, id=data.user_location_id)
@@ -253,6 +253,9 @@ def confirm_card(user_id: UUID, db: Session, data:ConfirmOrder):
                 
 
         db.commit()
+        if cart.loan_month_id:
+            create_order_payment_date(db=db,order_id=cart.id,months=loan_month.months,amount=cart.loan_month_price/loan_month.months)
+
         nextCard = get_cart_by_user_id(db, user_id)
         if not nextCard:
             # If the cart was empty, create a new cart
@@ -265,7 +268,6 @@ def confirm_card(user_id: UUID, db: Session, data:ConfirmOrder):
                 order_id=nextCard.id,
                 size_id=nItem['size_id']
             )
-
         db.refresh(cart)
         return cart     
         
