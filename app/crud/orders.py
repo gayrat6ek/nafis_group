@@ -322,7 +322,6 @@ def get_order_by_id_admin(db: Session, order_id: UUID) -> Optional[Orders]:
 def getOrder(db: Session, id: UUID):
     try:
         order = db.query(Orders).filter(Orders.id == id).first()
-        
         return order
     
     except SQLAlchemyError as e:
