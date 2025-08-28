@@ -276,17 +276,21 @@ def confirm_card(user_id: UUID, db: Session, data:ConfirmOrder):
 
 
 
-def get_orders(db: Session, user_id: Optional[UUID]=None, page: int = 1, size: int = 10):
+def get_orders(db: Session, user_id: Optional[UUID]=None, page: int = 1, size: int = 10,status: Optional[int]=None):
     try:
         query = db.query(Orders).filter(
             Orders.status != 0  # Exclude carts
         )
         if user_id:
             query = query.filter(Orders.user_id == user_id)
+        if status is not None:
+            query = query.filter(Orders.status == status)
 
         total_count = query.count()
         query = query.order_by(Orders.created_at.desc()) 
         orders = query.offset((page - 1) * size).limit(size).all()
+        
+
         
         return {
             "items": orders,

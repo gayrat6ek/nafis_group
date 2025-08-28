@@ -245,13 +245,14 @@ async def get_order(
 async def get_all_orders(
         page: int = 1,
         size: int = 10,
+        status: Optional[int] = None,
         db: Session = Depends(get_db),
         current_user: dict = Depends(PermissionChecker(required_permissions=pages_and_permissions['Orders']['view']))
 ):
     """
     Get a paginated list of all orders (admin view).
     """
-    orders = crud_orders.get_orders(db=db, page=page, size=size)
+    orders = crud_orders.get_orders(db=db, page=page, size=size,status=status)
     return orders
 
 
