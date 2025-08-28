@@ -88,7 +88,7 @@ def create_transaction(db:Session,raw_data):
         order_id=raw_data['params']['account']['order_id'],
         amount=raw_data['params']['amount'],
         time=raw_data['params']['time'],
-        transaction_id=raw_data['params']['id'],
+        transaction_id=str(raw_data['params']['id']),
         )
 
 
