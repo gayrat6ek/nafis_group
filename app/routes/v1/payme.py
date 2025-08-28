@@ -209,7 +209,7 @@ def get_statement(db:Session,raw_data):
 def check_authorization(auth_header: Optional[str]) -> bool:
     # Example login & password. Replace with your actual credentials or logic.
     expected_username = "Paycom"
-    expected_password = "spGuq&TGjiWGoXQhY6PwNKt3iPZwA5uRanUp"
+    expected_password = "%FfiFIdxmFXRq?R&Rq5PNgSzVEVW#X6tuSOb"
 
     # 1. Check if header is provided
     if not auth_header:
