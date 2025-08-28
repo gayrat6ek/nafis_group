@@ -27,7 +27,7 @@ def create_order_payment_date(db: Session, order_id: UUID, months, amount):
     if checkIsalreadyCreated(db,order_id):
         return True
     try:
-        for i in range(months-1):
+        for i in range(months):
             payment_date = OrderPaymentDates(
                 order_id=order_id,
                 payment_date=datetime.now(tz=timezonetash) + timedelta(days=30 * (i + 1)),
