@@ -319,9 +319,9 @@ def get_order_by_id_admin(db: Session, order_id: UUID) -> Optional[Orders]:
         raise e
     
 
-def getOrder(db: Session, order_id: UUID):
+def getOrder(db: Session, id: UUID):
     try:
-        order = db.query(Orders).filter(Orders.id == order_id).first()
+        order = db.query(Orders).filter(Orders.id == id).first()
         
         return order
     
