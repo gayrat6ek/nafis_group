@@ -30,7 +30,7 @@ def create_order_payment_date(db: Session, order_id: UUID, months, amount):
         for i in range(months-1):
             payment_date = OrderPaymentDates(
                 order_id=order_id,
-                payment_date=timezonetash(datetime.now() + timedelta(days=30 * (i + 1))),
+                payment_date=datetime.now(tz=timezonetash) + timedelta(days=30 * (i + 1)),
                 amount=amount
             )
             db.add(payment_date)
