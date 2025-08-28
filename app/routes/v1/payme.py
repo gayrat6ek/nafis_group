@@ -27,6 +27,7 @@ from app.crud import orders as orders_crud
 from app.crud.transactions import create_transaction_crud,filter_transactions,get_transaction_crud,update_transaction,get_transaction_with_transaction_id,get_transaction_with_order_id
 
 import time
+from app.core.config import settings
 payme_route = APIRouter()
 
 
@@ -213,7 +214,7 @@ def get_statement(db:Session,raw_data):
 def check_authorization(auth_header: Optional[str]) -> bool:
     # Example login & password. Replace with your actual credentials or logic.
     expected_username = "Paycom"
-    expected_password = "%FfiFIdxmFXRq?R&Rq5PNgSzVEVW#X6tuSOb"
+    
 
     # 1. Check if header is provided
     if not auth_header:
@@ -242,7 +243,7 @@ def check_authorization(auth_header: Optional[str]) -> bool:
     username, password = decoded_str.split(":", 1)
 
     # 5. Compare with expected credentials
-    if username == expected_username and password == expected_password:
+    if username == expected_username and password == settings.payme_password:
         return True
 
     return False
