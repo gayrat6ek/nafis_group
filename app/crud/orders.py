@@ -280,18 +280,24 @@ def confirm_card(user_id: UUID, db: Session, data:ConfirmOrder):
 
 
 
-def get_orders(db: Session, user_id: Optional[UUID]=None, page: int = 1, size: int = 10, status: Optional[int]=None):
+def get_orders(db: Session, user_id: Optional[UUID] = None, page: int = 1, size: int = 10, status: Optional[int] = None):
     try:
-        query = db.query(Orders)\
-            .join(Orders.items)\
-            .join(OrderItems.product_detail)\
-            .join(ProductDetails.product)\
-            .join(Products.reviews)\
-            .filter(Orders.status != 0)\
-            .filter(Orders.user_id == Reviews.user_id)
-        
+        query = (
+            db.query(Orders)
+            .join(Orders.items)
+            .join(OrderItems.product_detail)
+            .join(ProductDetails.product)
+            .outerjoin(Products.reviews)   # <-- keep orders without reviews
+            .filter(Orders.status != 0)
+        )
+
         if user_id:
-            query = query.filter(Orders.user_id == user_id)
+            query = query.filter(
+                (Orders.user_id == user_id) |
+                (Reviews.user_id == None) |
+                (Reviews.user_id == user_id)
+            )
+
         if status is not None:
             query = query.filter(Orders.status == status)
 
@@ -304,11 +310,10 @@ def get_orders(db: Session, user_id: Optional[UUID]=None, page: int = 1, size: i
             "total": total_count,
             "page": page,
             "size": size,
-            "pages": (total_count + size - 1) // size
+            "pages": (total_count + size - 1) // size,
         }
     except SQLAlchemyError as e:
         raise e
-
 
 def get_order_by_id(db: Session, order_id: UUID) -> Optional[Orders]:
     try:
