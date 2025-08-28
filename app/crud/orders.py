@@ -248,6 +248,7 @@ def confirm_card(user_id: UUID, db: Session, data:ConfirmOrder):
         cart.loan_month_id = data.loan_month_id
         cart.loan_month_percent = loan_month_percent
         cart.user_location_id = data.user_location_id  # Set the user's location ID for delivery, if applicable
+        cart.created_at = datetime.now(timezonetash)
 
         # Update the cart status to 'confirmed' (assuming '1' is the status for confirmed orders)
         cart.status = 1
