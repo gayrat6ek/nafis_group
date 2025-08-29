@@ -217,7 +217,7 @@ async def confirm_order(
 @orders_router.get('/orders', response_model=Page[OrdersFullGet])
 async def get_orders(
         
-        filter: Optional[OrderFilter] = Depends(),
+        filter: OrderFilter = Depends(),
         db: Session = Depends(get_db),
         current_user: dict = Depends(PermissionChecker(required_permissions=pages_and_permissions['Orders']['view']))
 ):
