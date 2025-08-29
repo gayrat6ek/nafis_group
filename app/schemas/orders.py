@@ -137,7 +137,7 @@ class CartItemsSelect(BaseConfig):
 
 class OrderFilter(BaseConfig):
     is_paid: Optional[bool] = None  # Filter by payment status
-    filter: OrderStatus  # Filter by order status
+    filter: Optional[OrderStatus]=None  # Filter by order status
     status: Optional[int] = None  # Filter by specific order status code (if applicable)
     page: int = 1
     size: int = 10
@@ -154,4 +154,3 @@ class UpdateOrder(BaseConfig):
     delivery_address: Optional[str] = Field(None, max_length=255, description="Delivery address if applicable")
     delivery_phone_number: Optional[str] = Field(None, max_length=15, description="Phone number for delivery")
     delivery_receiver: Optional[str] = Field(None, max_length=100, description="Name of the person receiving the delivery")
-    
