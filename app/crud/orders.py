@@ -282,68 +282,55 @@ def confirm_card(user_id: UUID, db: Session, data:ConfirmOrder):
 
 
 
-from sqlalchemy.orm import joinedload, with_loader_criteria
-from sqlalchemy.exc import SQLAlchemyError
-
 def get_orders(db: Session, filter: OrderFilter, user_id: Optional[UUID] = None, page: int = 1, size: int = 10):
     try:
-        base_query = (
+        ReviewAlias = aliased(Reviews)
+        
+        query = (
             db.query(Orders)
-            .options(
-                joinedload(Orders.items)
-                    .joinedload(OrderItems.product_detail)
-                    .joinedload(ProductDetails.product)
-                    .joinedload(Products.reviews),
-                with_loader_criteria(
-                    Reviews,
-                    lambda cls: cls.user_id == user_id,
-                    include_aliases=True
+            .join(Orders.items)
+            .join(OrderItems.product_detail)
+            .join(ProductDetails.product)
+            .outerjoin(
+                ReviewAlias,
+                and_(
+                    Products.id == ReviewAlias.product_id,
+                    Orders.user_id == ReviewAlias.user_id  # reviews only from order owner
                 )
             )
             .filter(Orders.status != 0)
         )
 
-        # Filter by user_id if provided
+        # If user_id is provided, filter only that user's orders
         if user_id is not None:
-            base_query = base_query.filter(Orders.user_id == user_id)
+            query = query.filter(Orders.user_id == user_id)
 
         # Apply additional filters
         if filter.status is not None:
-            base_query = base_query.filter(Orders.status == filter.status)
+            query = query.filter(Orders.status == filter.status)
         if filter.is_paid is not None:
-            base_query = base_query.filter(Orders.is_paid == filter.is_paid)
+            query = query.filter(Orders.is_paid == filter.is_paid)
         if filter.filter == 'inactive':
-            base_query = base_query.filter(Orders.status.in_([3, 4]))
+            query = query.filter(Orders.status.in_([3, 4]))
         elif filter.filter == 'active':
-            base_query = base_query.filter(Orders.status.in_([1, 2]))
+            query = query.filter(Orders.status.in_([1, 2]))
         elif filter.filter == 'loan':
-            base_query = base_query.filter(Orders.loan_month_id.isnot(None))
+            query = query.filter(Orders.loan_month_id.isnot(None))
 
-        # Count total orders (distinct)
-        total_count = base_query.with_entities(Orders.id).distinct().count()
+        # Count before pagination
+        total_count = query.count()
 
-        # Fetch paginated results
-        orders = (
-            base_query
-            .order_by(Orders.created_at.desc())
-            .offset((page - 1) * size)
-            .limit(size)
-            .all()
-        )
-        from fastapi.encoders import jsonable_encoder
+        # Apply ordering and pagination
+        query = query.order_by(Orders.created_at.desc())
+        orders = query.offset((page - 1) * size).limit(size).all()
 
-
-        # At this point, each product.reviews only contains the owner’s review
-        # You can now serialize normally
         return {
-
-            "items": jsonable_encoder(orders),
+            "items": orders,
             "total": total_count,
             "page": page,
             "size": size,
             "pages": (total_count + size - 1) // size,
         }
-
     except SQLAlchemyError as e:
         raise e
 
