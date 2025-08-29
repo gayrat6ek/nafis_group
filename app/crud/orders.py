@@ -330,11 +330,14 @@ def get_orders(db: Session, filter: OrderFilter, user_id: Optional[UUID] = None,
             .limit(size)
             .all()
         )
+        from fastapi.encoders import jsonable_encoder
+
 
         # At this point, each product.reviews only contains the owner’s review
         # You can now serialize normally
         return {
-            "items": [o.to_dict() for o in orders],
+
+            "items": jsonable_encoder(orders),
             "total": total_count,
             "page": page,
             "size": size,
