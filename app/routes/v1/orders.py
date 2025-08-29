@@ -19,10 +19,12 @@ from app.schemas.orders import (
     OrdersFullGet,
     RemoveCartItem,
     ConfirmOrder,
-    OrdersGet
+    OrdersGet,
+    UpdateOrder
     )
 from app.schemas.products import (
     ProductList)
+from app.schemas.orders import OrderFilter
 
 from app.utils.permissions import pages_and_permissions
 from app.crud.loanMonths import get_loan_months
@@ -214,15 +216,15 @@ async def confirm_order(
 
 @orders_router.get('/orders', response_model=Page[OrdersFullGet])
 async def get_orders(
-        page: int = 1,
-        size: int = 10,
+        
+        filter: Optional[OrderFilter] = Depends(),
         db: Session = Depends(get_db),
         current_user: dict = Depends(PermissionChecker(required_permissions=pages_and_permissions['Orders']['view']))
 ):
     """
     Get a paginated list of orders for the user.
     """
-    orders = crud_orders.get_orders(db=db, user_id=current_user['id'], page=page, size=size)
+    orders = crud_orders.get_orders(db=db, user_id=current_user['id'], page=filter.page, size=filter.size,filter=filter)
     return orders
 
 
@@ -244,16 +246,14 @@ async def get_order(
 
 @orders_router.get("/admin/orders", response_model=Page[OrdersFullGet])
 async def get_all_orders(
-        page: int = 1,
-        size: int = 10,
-        status: Optional[int] = None,
+        filter: OrderFilter = Depends(),
         db: Session = Depends(get_db),
         current_user: dict = Depends(PermissionChecker(required_permissions=pages_and_permissions['Orders']['admin_view']))
 ):
     """
     Get a paginated list of all orders (admin view).
     """
-    orders = crud_orders.get_orders(db=db, page=page, size=size,status=status)
+    orders = crud_orders.get_orders(db=db, page=filter.page, size=filter.size, filter=filter)
     return orders
 
 
@@ -340,3 +340,25 @@ async def get_purchased_products(
 
     return products
 
+
+@orders_router.put('/admin/orders/{order_id}')
+async def update_order_status(
+        order_id: UUID,
+        data: UpdateOrder,
+        db: Session = Depends(get_db),
+        current_user: dict = Depends(PermissionChecker(required_permissions=pages_and_permissions['Orders']['admin_update_order']))
+):
+    """
+    Update the status of a specific order (admin only).
+    """
+    order = crud_orders.get_order_by_id_admin(db=db, order_id=order_id)
+    if not order:
+        raise HTTPException(status_code=404, detail="Order not found")
+    
+    updated_order = crud_orders.updateOrderCrud(
+        db=db,
+        order_id=order_id,
+        data=data
+    )
+    
+    return {"success": True, "message": "Order status updated successfully", "order": updated_order}

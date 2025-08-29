@@ -25,7 +25,7 @@ from app.models.discountProducts import DiscountProducts
 from app.models.reviews import Reviews
 from app.models.discounts import Discounts
 from app.crud import productDetails as product_details_crud
-from app.schemas.orders import ConfirmOrder
+from app.schemas.orders import ConfirmOrder,OrderFilter, UpdateOrder
 from app.crud.districts import get_district_by_id
 from app.crud.discounts import activeDisCountProd
 from app.crud.loanMonths import get_loan_months_by_id
@@ -281,7 +281,7 @@ def confirm_card(user_id: UUID, db: Session, data:ConfirmOrder):
 
 
 
-def get_orders(db: Session, user_id: Optional[UUID] = None, page: int = 1, size: int = 10, status: Optional[int] = None):
+def get_orders(db: Session, filter:OrderFilter,user_id: Optional[UUID] = None, page: int = 1, size: int = 10, ):
     try:
         query = (
             db.query(Orders)
@@ -299,8 +299,17 @@ def get_orders(db: Session, user_id: Optional[UUID] = None, page: int = 1, size:
                 (Reviews.user_id == user_id)
             )
 
-        if status is not None:
-            query = query.filter(Orders.status == status)
+        if filter.status is not None:
+            query = query.filter(Orders.status == filter.status)
+        if filter.is_paid is not None:
+            query = query.filter(Orders.is_paid == filter.is_paid)
+        if filter.filter == 'inactive':
+            query = query.filter(Orders.status.in_([3, 4]))
+        elif filter.filter == 'active':
+            query = query.filter(Orders.status.in_([1, 2]))
+        elif query.filter=='loan':
+            query = query.filter(Orders.loan_month_id.isnot(None))
+
 
         total_count = query.count()
         query = query.order_by(Orders.created_at.desc())
@@ -412,4 +421,34 @@ def get_purchased_product_list(db: Session, user_id: UUID, page: int = 1, size: 
 
 
     except SQLAlchemyError as e:
+        raise e
+    
+
+
+def updateOrderCrud(db:Session, order_id:UUID, data:UpdateOrder):
+    try:
+        order = db.query(Orders).filter(Orders.id==order_id).first()
+        if not order:
+            return None
+        if data.status is not None:
+            order.status = data.status
+        if data.is_paid is not None:
+            order.is_paid = data.is_paid
+        if data.is_delivered is not None:
+            order.is_delivered = data.is_delivered
+        if data.description is not None:
+            order.description = data.description
+        if data.delivery_address is not None:
+            order.delivery_address = data.delivery_address
+        if data.delivery_phone_number is not None:
+            order.delivery_phone_number = data.delivery_phone_number
+        if data.delivery_receiver is not None:
+            order.delivery_receiver = data.delivery_receiver
+        if data.payment_method is not None:
+            order.payment_method = data.payment_method
+        db.commit()
+        db.refresh(order)
+        return order
+    except SQLAlchemyError as e:
+        db.rollback()
         raise e

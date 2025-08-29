@@ -20,6 +20,11 @@ class PaymentMethod(str, Enum):
     CASH = 'cash'
     LOAN = 'loan'  # Assuming loan is a valid payment method
     PAYME = 'payme'  # Assuming payme is a valid payment method
+
+class OrderStatus(str, Enum):
+    FINISHED = 'inactive'
+    ACTIVE = 'active'
+    LOAN = 'loan'
     
 
 
@@ -129,3 +134,24 @@ class CartItemsSelect(BaseConfig):
 
 
 
+
+class OrderFilter(BaseConfig):
+    is_paid: Optional[bool] = None  # Filter by payment status
+    filter: OrderStatus  # Filter by order status
+    status: Optional[int] = None  # Filter by specific order status code (if applicable)
+    page: int = 1
+    size: int = 10
+
+
+
+
+class UpdateOrder(BaseConfig):
+    status: Optional[int] = Field(None, description="New status of the order")
+    is_paid: Optional[bool] = Field(None, description="Payment status of the order")
+    is_delivered: Optional[bool] = Field(None, description="Delivery status of the order")
+    description: Optional[str] = Field(None, max_length=500, description="Optional description for the order")
+    payment_method: Optional[PaymentMethod] = Field(None, description="Payment method used for the order")
+    delivery_address: Optional[str] = Field(None, max_length=255, description="Delivery address if applicable")
+    delivery_phone_number: Optional[str] = Field(None, max_length=15, description="Phone number for delivery")
+    delivery_receiver: Optional[str] = Field(None, max_length=100, description="Name of the person receiving the delivery")
+    
