@@ -292,7 +292,7 @@ def get_orders(db: Session, filter:OrderFilter,user_id: Optional[UUID] = None, p
             .filter(Orders.status != 0)
         )
 
-        if user_id:
+        if user_id is not None:
             query = query.filter(
                 (Orders.user_id == user_id) |
                 (Reviews.user_id == None) |
