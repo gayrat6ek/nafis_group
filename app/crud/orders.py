@@ -281,13 +281,14 @@ def confirm_card(user_id: UUID, db: Session, data:ConfirmOrder):
     
 
 
-
 def get_orders(db: Session, filter: OrderFilter, user_id: Optional[UUID] = None, page: int = 1, size: int = 10):
     try:
+        # Create alias for reviews so we can join them with an extra condition
         ReviewAlias = aliased(Reviews)
-        
+
+        # Build base query
         query = (
-            db.query(Orders)
+            db.query(Orders, ReviewAlias)
             .join(Orders.items)
             .join(OrderItems.product_detail)
             .join(ProductDetails.product)
@@ -295,7 +296,7 @@ def get_orders(db: Session, filter: OrderFilter, user_id: Optional[UUID] = None,
                 ReviewAlias,
                 and_(
                     Products.id == ReviewAlias.product_id,
-                    Orders.user_id == ReviewAlias.user_id  # reviews only from order owner
+                    Orders.user_id == ReviewAlias.user_id  # <-- only reviews from order owner
                 )
             )
             .filter(Orders.status != 0)
@@ -317,20 +318,31 @@ def get_orders(db: Session, filter: OrderFilter, user_id: Optional[UUID] = None,
         elif filter.filter == 'loan':
             query = query.filter(Orders.loan_month_id.isnot(None))
 
-        # Count before pagination
-        total_count = query.count()
+        # Count before pagination (need subquery or count on Orders only)
+        total_count = query.with_entities(Orders.id).distinct().count()
 
         # Apply ordering and pagination
         query = query.order_by(Orders.created_at.desc())
-        orders = query.offset((page - 1) * size).limit(size).all()
+        results = query.offset((page - 1) * size).limit(size).all()
+
+        # Transform into desired format
+        orders_out = []
+        for order, review in results:
+            order_dict = order.to_dict()  # or your schema serializer
+            if review:
+                order_dict["reviews"] = [review.to_dict()]  # single owner review
+            else:
+                order_dict["reviews"] = []
+            orders_out.append(order_dict)
 
         return {
-            "items": orders,
+            "items": orders_out,
             "total": total_count,
             "page": page,
             "size": size,
             "pages": (total_count + size - 1) // size,
         }
+
     except SQLAlchemyError as e:
         raise e
 
