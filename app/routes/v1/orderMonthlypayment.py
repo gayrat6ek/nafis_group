@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Optional
 from uuid import UUID
 from fastapi import APIRouter
 from fastapi import (
@@ -24,7 +24,7 @@ app_monthly_payment_router = APIRouter()
 
 @app_monthly_payment_router.get('/order_monthly_payments', response_model=List[OrderMonthlyPaymentGet])
 async def get_order_monthly_payment( 
-        order_id: UUID,
+        order_id: Optional[UUID] = None,
         is_paid: bool = None,
         db: Session = Depends(get_db),
         current_user: dict = Depends(PermissionChecker(required_permissions=pages_and_permissions['Orders']['view']))
