@@ -7,6 +7,7 @@ from sqlalchemy.orm import Session
 from typing import Optional
 import bcrypt
 
+from app.models.Orders import Orders
 import pytz
 from sqlalchemy.sql import func
 from datetime import datetime,timedelta
@@ -42,9 +43,15 @@ def create_order_payment_date(db: Session, order_id: UUID, months, amount):
 
 
 
-def get_payment_dates_by_order_id(db: Session, order_id: UUID):
+def get_payment_dates_by_order_id(db: Session, order_id: Optional[UUID] = None, user_id: Optional[UUID] = None,is_paid: Optional[bool] = None):
     try:
-        query =  db.query(OrderPaymentDates).filter(OrderPaymentDates.order_id == order_id)
+        query =  db.query(OrderPaymentDates).join(OrderPaymentDates.order)
+        if order_id is not None:
+            query = query.filter(OrderPaymentDates.order_id == order_id)
+        if user_id is not None:
+            query = query.filter(Orders.user_id == user_id)
+        if is_paid is not None:
+            query = query.filter(OrderPaymentDates.is_paid == is_paid)
         query = query.order_by(OrderPaymentDates.payment_date.asc())
         return query.all()
     except SQLAlchemyError as e:
