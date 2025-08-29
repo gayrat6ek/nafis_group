@@ -281,24 +281,30 @@ def confirm_card(user_id: UUID, db: Session, data:ConfirmOrder):
 
 
 
-def get_orders(db: Session, filter:OrderFilter,user_id: Optional[UUID] = None, page: int = 1, size: int = 10, ):
+def get_orders(db: Session, filter: OrderFilter, user_id: Optional[UUID] = None, page: int = 1, size: int = 10):
     try:
+        ReviewAlias = aliased(Reviews)
+        
         query = (
             db.query(Orders)
             .join(Orders.items)
             .join(OrderItems.product_detail)
             .join(ProductDetails.product)
-            .outerjoin(Products.reviews)   # <-- keep orders without reviews
+            .outerjoin(
+                ReviewAlias,
+                and_(
+                    Products.id == ReviewAlias.product_id,
+                    Orders.user_id == ReviewAlias.user_id  # reviews only from order owner
+                )
+            )
             .filter(Orders.status != 0)
         )
 
+        # If user_id is provided, filter only that user's orders
         if user_id is not None:
-            query = query.filter(
-                (Orders.user_id == user_id) |
-                (Reviews.user_id == None) |
-                (Reviews.user_id == user_id)
-            )
+            query = query.filter(Orders.user_id == user_id)
 
+        # Apply additional filters
         if filter.status is not None:
             query = query.filter(Orders.status == filter.status)
         if filter.is_paid is not None:
@@ -307,11 +313,13 @@ def get_orders(db: Session, filter:OrderFilter,user_id: Optional[UUID] = None, p
             query = query.filter(Orders.status.in_([3, 4]))
         elif filter.filter == 'active':
             query = query.filter(Orders.status.in_([1, 2]))
-        elif query.filter=='loan':
+        elif filter.filter == 'loan':
             query = query.filter(Orders.loan_month_id.isnot(None))
 
-
+        # Count before pagination
         total_count = query.count()
+
+        # Apply ordering and pagination
         query = query.order_by(Orders.created_at.desc())
         orders = query.offset((page - 1) * size).limit(size).all()
 
@@ -324,6 +332,7 @@ def get_orders(db: Session, filter:OrderFilter,user_id: Optional[UUID] = None, p
         }
     except SQLAlchemyError as e:
         raise e
+
 
 def get_order_by_id(db: Session, order_id: UUID) -> Optional[Orders]:
     try:
