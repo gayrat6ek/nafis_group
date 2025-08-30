@@ -61,6 +61,7 @@ class Orders(Base):
     created_at = Column(DateTime(timezone=True), default=func.now())
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())
     card_id = Column(UUID(as_uuid=True), ForeignKey('bank_cards.id'), nullable=True)  # ID of the bank card used for payment, if applicable
+    deny_reason = Column(String, nullable=True)  # Reason for order denial or cancellation
     card = relationship("BankCards", back_populates="orders")  # Assuming BankCards model has an orders relationship
     
     user = relationship("Users", back_populates="orders")
@@ -76,11 +77,13 @@ class Orders(Base):
 """
 statuses
 
-0 - new and in cart
-1 - confirmed and awaiting payment
-2 - delivery in progress
-3 - delivered or completed
-4 - cancelled
+0 - In cart
+1 - New
+2 - confirmed
+3 - prepared
+4 - delivering
+5 - delivered
+6 - cancelled
 """
 
 

@@ -311,9 +311,9 @@ def get_orders(db: Session, filter: OrderFilter, user_id: Optional[UUID] = None,
         if filter.is_paid is not None:
             query = query.filter(Orders.is_paid == filter.is_paid)
         if filter.filter == 'inactive':
-            query = query.filter(Orders.status.in_([3, 4]))
+            query = query.filter(Orders.status.in_([5, 6]))
         elif filter.filter == 'active':
-            query = query.filter(Orders.status.in_([1, 2]))
+            query = query.filter(Orders.status.in_([1, 2, 3, 4]))
         elif filter.filter == 'loan':
             query = query.filter(Orders.loan_month_id.isnot(None))
 
@@ -456,6 +456,8 @@ def updateOrderCrud(db:Session, order_id:UUID, data:UpdateOrder):
             order.delivery_receiver = data.delivery_receiver
         if data.payment_method is not None:
             order.payment_method = data.payment_method
+        if data.deny_reason is not None:
+            order.deny_reason = data.deny_reason
         db.commit()
         db.refresh(order)
         return order

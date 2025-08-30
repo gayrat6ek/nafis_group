@@ -98,6 +98,7 @@ class OrdersGet(BaseConfig):
     loan_month_price: Optional[float] = 0.0
     item_ids: Optional[List[UUID]] = None  # List of item IDs in the order
     user: Optional[GetUser] = None  # Basic user information associated with the order
+    deny_reason: Optional[str] = None  # Reason for order denial or cancellation
     
 
 
@@ -125,6 +126,7 @@ class OrdersFullGet(BaseConfig):
     loan_month_price: Optional[float] = 0.0
     item_ids: Optional[List[UUID]] = None  # List of item IDs in the order
     user: Optional[GetUser] = None  # Basic user information associated with the order
+    deny_reason: Optional[str] = None  # Reason for order denial or cancellation
     
 
 
@@ -154,3 +156,4 @@ class UpdateOrder(BaseConfig):
     delivery_address: Optional[str] = Field(None, max_length=255, description="Delivery address if applicable")
     delivery_phone_number: Optional[str] = Field(None, max_length=15, description="Phone number for delivery")
     delivery_receiver: Optional[str] = Field(None, max_length=100, description="Name of the person receiving the delivery")
+    deny_reason: Optional[str] = Field(None, max_length=500, description="Reason for order denial or cancellation")
