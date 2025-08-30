@@ -26,6 +26,7 @@ class Settings(BaseSettings):
     # Database settings
     database_url: str = os.getenv("DATABASE_URL", "sqlite:///./sql_app.db")
     payme_password: str = os.getenv("PAYME_PASSWORD")
+    payme_merchant_id: str = os.getenv("PAYME_MERCHANT_ID")
 
     # Security settings
 

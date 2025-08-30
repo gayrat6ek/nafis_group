@@ -1,3 +1,4 @@
+import base64
 from datetime import datetime, timedelta
 from typing import List, Optional, Union
 from uuid import UUID
@@ -16,12 +17,14 @@ from app.routes.depth import get_db, PermissionChecker
 from app.schemas.orders import (
     AddOrUpdateCartItem,
     CartItemsSelect,
+    OrderResponse,
     OrdersFullGet,
     RemoveCartItem,
     ConfirmOrder,
     OrdersGet,
     UpdateOrder
     )
+from app.core.config import settings
 from app.schemas.products import (
     ProductList)
 from app.schemas.orders import OrderFilter
@@ -187,7 +190,7 @@ async def get_my_cart(
 
 
 
-@orders_router.post('/orders/confirm', response_model=OrdersGet)
+@orders_router.post('/orders/confirm', response_model=OrderResponse)
 async def confirm_order(
         body: ConfirmOrder,
         db: Session = Depends(get_db),
@@ -207,9 +210,15 @@ async def confirm_order(
         user_id=current_user['id'],
         data=body,
     )
+
     
     if not order:
         raise HTTPException(status_code=400, detail="Order confirmation failed")
+    if order.payment_method =="payme":
+        total_price = order.total_amount*100
+        data = f"m={settings.payme_merchant_id};ac.order_id={order.id};a={total_price}"
+        base_64_data = base64.b64encode(data.encode('utf-8')).decode('utf-8')
+        order.payment_url = f"https://checkout.paycom.uz/{base_64_data}"
     return order
 
 

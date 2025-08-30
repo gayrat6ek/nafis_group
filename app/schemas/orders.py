@@ -99,6 +99,11 @@ class OrdersGet(BaseConfig):
     item_ids: Optional[List[UUID]] = None  # List of item IDs in the order
     user: Optional[GetUser] = None  # Basic user information associated with the order
     deny_reason: Optional[str] = None  # Reason for order denial or cancellation
+
+
+class OrderResponse(OrdersGet):
+    payment_url  : Optional[str] = None  # URL for payment processing, if applicable
+    
     
 
 
