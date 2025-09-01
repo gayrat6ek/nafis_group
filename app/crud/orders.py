@@ -347,6 +347,7 @@ def get_orders(db: Session, filter: OrderFilter, user_id: Optional[UUID] = None,
                 product = item.product_detail.product if item.product_detail else None
                 if product:
                     product.reviews = [r for r in (product.reviews or []) if str(r.user_id) == str(order.user_id)]
+                    print('current reviews',product.reviews)
 
 
         return {
