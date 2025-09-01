@@ -332,7 +332,7 @@ def get_orders(db: Session, filter: OrderFilter, user_id: Optional[UUID] = None,
         for order in orders:
             for item in order.items:
                 product = item.product_detail.product
-                product.reviews = [r for r in product.reviews if r.user_id == order.user_id]
+                product.reviews = [r for r in product.reviews if str(r.user_id) == str(order.user_id)]
 
         return {
             "items": orders,
