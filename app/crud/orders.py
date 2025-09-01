@@ -302,10 +302,10 @@ def get_orders(db: Session, filter: OrderFilter, user_id: Optional[UUID] = None,
         elif filter.filter == 'loan':
             base_query = base_query.filter(Orders.loan_month_id.isnot(None))
 
-        # Count first (no joins required)
-        total_count = base_query.count()
-        # Aliases
+        # Count without complex joins
+        total_count = base_query.with_entities(func.count(Orders.id)).scalar()
 
+        # Build the main query to fetch full orders + products + reviews
         query = (
             base_query
             .join(Orders.items)
@@ -320,9 +320,6 @@ def get_orders(db: Session, filter: OrderFilter, user_id: Optional[UUID] = None,
             .distinct()
         )
 
-        # Build main query
-        
-
         # Apply ordering and pagination
         orders = (
             query.order_by(Orders.created_at.desc())
@@ -331,10 +328,10 @@ def get_orders(db: Session, filter: OrderFilter, user_id: Optional[UUID] = None,
                  .all()
         )
 
+        # --- Filter reviews in Python ---
         for order in orders:
             for item in order.items:
                 product = item.product_detail.product
-                print(product.reviews)
                 product.reviews = [r for r in product.reviews if r.user_id == order.user_id]
 
         return {
@@ -347,6 +344,7 @@ def get_orders(db: Session, filter: OrderFilter, user_id: Optional[UUID] = None,
 
     except SQLAlchemyError as e:
         raise e
+
 
 
 
