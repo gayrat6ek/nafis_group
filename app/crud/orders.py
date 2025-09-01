@@ -443,7 +443,7 @@ def get_purchased_product_list(db: Session, user_id: UUID, page: int = 1, size: 
             .join(Orders, OrderItems.order_id == Orders.id)
             .filter(
                 Orders.user_id == user_id,
-                Orders.status.in_([1, 2, 3, 4])
+                Orders.status.in_([3, 4, 5, 6])  # Assuming these statuses indicate completed or past orders
             )
             .group_by(Products.id)
             .order_by(func.max(Orders.created_at).desc())

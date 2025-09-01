@@ -13,6 +13,7 @@ from uuid import UUID
 
 from app.models.discounts import Discounts
 from app.models.productDetails import ProductDetails
+from app.models.Products import Products
 from app.schemas.discounts import CreateDiscount, UpdateDiscount
 from app.models.discountProducts import DiscountProducts
 from app.models.Products import Products
@@ -99,16 +100,15 @@ def create_discount(db: Session, data: CreateDiscount) -> Discounts:
     
 def get_discounts(db: Session, is_active: Optional[bool] = None) -> list[Discounts]:
     try:
-        query = db.query(Discounts)
+        query = db.query(Discounts).join(Discounts.products).join(DiscountProducts.product)
         if is_active is not None:
-            query = query.filter(Discounts.is_active == is_active).filter(
-                
-                    and_(
-                        Discounts.active_from <= datetime.now(tz=time_zone),
-                        Discounts.active_to >= datetime.now(tz=time_zone)
-                    )
-                
-                 
+            now = datetime.now(tz=time_zone)
+            query = query.filter(
+                Discounts.is_active == is_active,
+                Discounts.active_from <= now,
+                Discounts.active_to >= now,
+                # Also filter active products
+                Products.is_active == True
             )
         query = query.order_by(Discounts.created_at.desc()).all()
         
