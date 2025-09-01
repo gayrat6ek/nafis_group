@@ -68,10 +68,11 @@ async def get_discount_list(
 @discounts_router.get('/discounts/{id}', response_model=DiscountGet)
 async def get_discount(
         id: UUID,
+        is_active: bool = None,
         db: Session = Depends(get_db),
         # current_user: dict = Depends(PermissionChecker(required_permissions=pages_and_permissions['Discounts']['view']))
 ):
-    discount = crud_discounts.get_discount_by_id(db=db, discount_id=id)
+    discount = crud_discounts.get_discount_by_id(db=db, discount_id=id, is_active=is_active)
     if not discount:
         raise HTTPException(status_code=404, detail="Discount not found")
     loan_months = get_loan_months(db=db,is_active=True,limit=1)  # Ensure loan months are loaded if needed

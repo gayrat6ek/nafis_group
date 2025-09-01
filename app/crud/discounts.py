@@ -118,9 +118,20 @@ def get_discounts(db: Session, is_active: Optional[bool] = None) -> list[Discoun
         raise e
     
 
-def get_discount_by_id(db: Session, discount_id: UUID) -> Optional[Discounts]:
+def get_discount_by_id(db: Session, discount_id: UUID, is_active:Optional[bool]=True) -> Optional[Discounts]:
     try:
-        return db.query(Discounts).filter(Discounts.id == discount_id).first()
+        query = db.query(Discounts).join(Discounts.products).join(DiscountProducts.product).filter(Discounts.id == discount_id)
+        if is_active:
+            query = query.filter(
+                Discounts.is_active == True,
+                Discounts.active_from <= datetime.now(tz=time_zone),
+                Discounts.active_to >= datetime.now(tz=time_zone),
+                
+                # Also filter active products
+                Products.is_active == True
+            )
+        return query.first()
+    
     except SQLAlchemyError as e:
         raise e
     
