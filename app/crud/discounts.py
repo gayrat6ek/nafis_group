@@ -3,6 +3,8 @@ from pickletools import read_unicodestringnl
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import Session
 from typing import Optional
+from sqlalchemy.orm import contains_eager
+
 import bcrypt
 
 import pytz
@@ -98,7 +100,6 @@ def create_discount(db: Session, data: CreateDiscount) -> Discounts:
         db.rollback()
         raise False
     
-from sqlalchemy.orm import contains_eager
 
 def get_discounts(db: Session, is_active: Optional[bool] = None) -> list[Discounts]:
     try:
@@ -132,15 +133,13 @@ def get_discounts(db: Session, is_active: Optional[bool] = None) -> list[Discoun
 def get_discount_by_id(db: Session, discount_id: UUID, is_active:Optional[bool]=True) -> Optional[Discounts]:
     try:
         query = db.query(Discounts).join(Discounts.products).join(DiscountProducts.product).filter(Discounts.id == discount_id)
-        if is_active:
+        if is_active is not None:
             query = query.filter(
-                Discounts.is_active == True,
-                Discounts.active_from <= datetime.now(tz=time_zone),
-                Discounts.active_to >= datetime.now(tz=time_zone),
-                
-                # Also filter active products
                 Products.is_active == True
             )
+
+        # Ensure only active products are populated
+        query = query.options(contains_eager(Discounts.products))
         return query.first()
     
     except SQLAlchemyError as e:
