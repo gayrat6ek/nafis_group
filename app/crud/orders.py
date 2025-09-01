@@ -280,10 +280,9 @@ def confirm_card(user_id: UUID, db: Session, data:ConfirmOrder):
     
 
 
-
 def get_orders(db: Session, filter: OrderFilter, user_id: Optional[UUID] = None, page: int = 1, size: int = 10):
     try:
-        # Base query for filtering and counting
+        # --- Step 1. Base query for filtering only ---
         base_query = db.query(Orders).filter(Orders.status != 0)
 
         # If user_id is provided, filter only that user's orders
@@ -302,25 +301,27 @@ def get_orders(db: Session, filter: OrderFilter, user_id: Optional[UUID] = None,
         elif filter.filter == 'loan':
             base_query = base_query.filter(Orders.loan_month_id.isnot(None))
 
-        # Count without complex joins
-        total_count = base_query.with_entities(func.count(Orders.id)).scalar()
+        # --- Step 2. Count distinct orders ---
+        total_count = db.query(func.count(func.distinct(Orders.id))).select_from(
+            base_query.subquery()
+        ).scalar()
 
-        # Build the main query to fetch full orders + products + reviews
+        # --- Step 3. Build main query using OUTER JOINs to avoid dropping orders ---
         query = (
             base_query
-            .join(Orders.items)
-            .join(OrderItems.product_detail)
-            .join(ProductDetails.product)
+            .outerjoin(Orders.items)
+            .outerjoin(OrderItems.product_detail)
+            .outerjoin(ProductDetails.product)
             .options(
                 contains_eager(Orders.items)
                 .contains_eager(OrderItems.product_detail)
                 .contains_eager(ProductDetails.product)
-                .contains_eager(Products.reviews)  # load all reviews
+                .contains_eager(Products.reviews)   # load ALL reviews
             )
             .distinct()
         )
 
-        # Apply ordering and pagination
+        # --- Step 4. Apply ordering + pagination ---
         orders = (
             query.order_by(Orders.created_at.desc())
                  .offset((page - 1) * size)
@@ -328,26 +329,24 @@ def get_orders(db: Session, filter: OrderFilter, user_id: Optional[UUID] = None,
                  .all()
         )
 
-        # --- Filter reviews in Python ---
+        # --- Step 5. Prune reviews outside query ---
         for order in orders:
-            for item in order.items:
-                product = item.product_detail.product
-                product.reviews = [r for r in product.reviews if str(r.user_id) == str(order.user_id)]
+            for item in order.items or []:
+                product = item.product_detail.product if item.product_detail else None
+                if product:
+                    product.reviews = [r for r in (product.reviews or []) if r.user_id == order.user_id]
 
+        # --- Step 6. Return response ---
         return {
             "items": orders,
             "total": total_count,
             "page": page,
-            "size": len(orders),
+            "size": size,
             "pages": (total_count + size - 1) // size if size > 0 else 0,
         }
 
     except SQLAlchemyError as e:
         raise e
-
-
-
-
 
 def get_order_by_id(db: Session, order_id: UUID) -> Optional[Orders]:
     try:
