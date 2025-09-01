@@ -174,9 +174,7 @@ def confirm_card(user_id: UUID, db: Session, data:ConfirmOrder):
                 raise HTTPException(status_code=404, detail="Loan month not found")
             if not loan_month.is_active:
                 raise HTTPException(status_code=400, detail="Loan month is not active")
-            loan_month_percent = loan_month.percent
-        else:
-            loan_month_percent = 0
+      
 
         if data.user_location_id:
             user_location = user_location_crud.get(db, id=data.user_location_id)
@@ -234,8 +232,9 @@ def confirm_card(user_id: UUID, db: Session, data:ConfirmOrder):
         cart.items_count = item_count
         cart.total_items_price = total_items_price
         cart.total_discounted_price = total_discounted_price
-        cart.loan_month_price = (total_price+ delivery_cost)*loan_month_percent/100
+        cart.loan_month_price = (total_price+ delivery_cost)*loan_month.percent/100 if data.loan_month_id else 0.0
         cart.total_amount = (total_price+ delivery_cost)+cart.loan_month_price
+        cart.loan_month_price = cart.total_amount/loan_month.months if data.loan_month_id else 0.0
         
         cart.payment_method = data.payment_method
         cart.description = data.description
@@ -247,7 +246,7 @@ def confirm_card(user_id: UUID, db: Session, data:ConfirmOrder):
         cart.delivery_fee = delivery_cost
         cart.pick_up_location_id = data.pick_up_location_id
         cart.loan_month_id = data.loan_month_id
-        cart.loan_month_percent = loan_month_percent
+        cart.loan_month_percent = loan_month.percent if data.loan_month_id else 0.0
         cart.user_location_id = data.user_location_id  # Set the user's location ID for delivery, if applicable
         cart.created_at = datetime.now(timezonetash)
 

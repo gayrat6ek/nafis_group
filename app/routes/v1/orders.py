@@ -32,6 +32,9 @@ from app.schemas.orders import OrderFilter
 from app.utils.permissions import pages_and_permissions
 from app.crud.loanMonths import get_loan_months
 from app.utils.utils import timezonetash
+from app.crud.userLocations import user_location as user_location_crud
+from app.crud.regions import get_region_by_name
+from app.utils.utils import find_region
 
 orders_router = APIRouter()
 @orders_router.post('/orders/cart/add', response_model=None)
@@ -298,10 +301,26 @@ async def select_cart_items(
         raise HTTPException(status_code=404, detail="Cart not found")
     loan_month = 0
     if body.loan_month_id:
-        loan_month_data = crud_loanMonths.get_loan_months_by_id(db=db, loan_months_id=body.loan_month_id)
-        if not loan_month_data:
+        loan_month = crud_loanMonths.get_loan_months_by_id(db=db, loan_months_id=body.loan_month_id)
+        if not loan_month:
             raise HTTPException(status_code=404, detail="Loan month not found")
-        loan_month = loan_month_data.percent
+    if body.user_location_id:
+        user_location = user_location_crud.get(db, id=body.user_location_id)
+        if not user_location:
+            raise HTTPException(status_code=404, detail="User location not found")
+        region = find_region(lat=user_location.latitude, lon=user_location.longitude)
+        if not region:
+            raise HTTPException(status_code=404, detail="Region not found for the given location")
+        region_data = get_region_by_name(db=db, name=region['NAME_1'])
+        if not region_data or not region_data.is_active:
+            raise HTTPException(status_code=404, detail="Region is not active or not found")
+        cart.delivery_fee = region_data.delivery_cost
+        cart.delivery_date = (
+                datetime.now(timezonetash) + timedelta(days=region_data.delivery_days)
+                if region_data and region_data.delivery_days is not None else None
+            )
+    else:
+        cart.delivery_fee = 0.0
 
     
     cart = crud_orders.update_cart_items_selection(
@@ -320,13 +339,16 @@ async def select_cart_items(
         total_discounted_price += (cart_item.size.price - cart_item.price) * cart_item.quantity
         total_price += cart_item.price * cart_item.quantity
         item_count += 1
-
+    
+    cart.loan_month_price = (total_price+ cart.delivery_fee)*loan_month.percent/100 if body.loan_month_id else 0.0
+    cart.total_amount = (total_price+ cart.delivery_fee)+cart.loan_month_price
+    cart.loan_month_price = cart.total_amount/loan_month.months if body.loan_month_id else 0.0
 
     cart.items_count = item_count
     cart.total_items_price = total_items_price
     cart.total_discounted_price = total_discounted_price
-    cart.total_amount = total_price+(total_price/100*loan_month)
     cart.loan_month_id = body.loan_month_id
+
     db.commit()
     
     if not cart:

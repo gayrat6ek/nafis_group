@@ -138,6 +138,7 @@ class OrdersFullGet(BaseConfig):
 class CartItemsSelect(BaseConfig):
     item_ids: List[UUID]  # List of product detail IDs to select in the cart
     loan_month_id: Optional[UUID] = None  # ID of the loan month used for payment, if applicable
+    user_location_id: Optional[UUID] = None  # ID of the user's location for delivery, if applicable
 
 
 
