@@ -319,13 +319,7 @@ def get_orders(db: Session, filter: OrderFilter, user_id: Optional[UUID] = None,
             .join(ProductDetails.product)
             # This outerjoin is critical. It finds reviews ONLY if the user_id matches.
             # If no match is found, the review columns will be NULL.
-            .outerjoin(
-                ReviewAlias,
-                and_(
-                    Products.id == ReviewAlias.product_id,
-                    Orders.user_id == ReviewAlias.user_id 
-                )
-            )
+            
             # This tells SQLAlchemy to build the .reviews list from our specific outerjoin.
             # If the review columns were NULL, it will correctly create an empty list.
             .options(
