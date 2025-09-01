@@ -98,24 +98,35 @@ def create_discount(db: Session, data: CreateDiscount) -> Discounts:
         db.rollback()
         raise False
     
+from sqlalchemy.orm import contains_eager
+
 def get_discounts(db: Session, is_active: Optional[bool] = None) -> list[Discounts]:
     try:
-        query = db.query(Discounts).join(Discounts.products).join(DiscountProducts.product)
+        now = datetime.now(tz=time_zone)
+        
+        query = (
+            db.query(Discounts)
+            .join(Discounts.products)
+            .join(DiscountProducts.product)
+        )
+
         if is_active is not None:
-            now = datetime.now(tz=time_zone)
             query = query.filter(
                 Discounts.is_active == is_active,
                 Discounts.active_from <= now,
                 Discounts.active_to >= now,
-                # Also filter active products
                 Products.is_active == True
             )
-        query = query.order_by(Discounts.created_at.desc()).all()
-        
-        return query
-        
+
+        # Ensure only active products are populated
+        query = query.options(contains_eager(Discounts.products)).order_by(Discounts.created_at.desc())
+        discounts = query.all()
+
+        return discounts
+
     except SQLAlchemyError as e:
         raise e
+
     
 
 def get_discount_by_id(db: Session, discount_id: UUID, is_active:Optional[bool]=True) -> Optional[Discounts]:
