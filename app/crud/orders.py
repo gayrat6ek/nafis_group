@@ -290,6 +290,7 @@ def get_orders(db: Session, filter: OrderFilter, user_id: Optional[UUID] = None,
             .join(Orders.items)
             .join(OrderItems.product_detail)
             .join(ProductDetails.product)
+            .join(Products.reviews)
             .outerjoin(
                 ReviewAlias,
                 and_(
