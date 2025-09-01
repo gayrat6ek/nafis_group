@@ -343,6 +343,7 @@ async def select_cart_items(
     cart.loan_month_price = (total_price+ cart.delivery_fee)*loan_month.percent/100 if body.loan_month_id else 0.0
     cart.total_amount = (total_price+ cart.delivery_fee)+cart.loan_month_price
     cart.loan_month_price = cart.total_amount/loan_month.months if body.loan_month_id else 0.0
+    cart.loan_month_percent = loan_month.percent if body.loan_month_id else 0.0
 
     cart.items_count = item_count
     cart.total_items_price = total_items_price
