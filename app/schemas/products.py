@@ -82,7 +82,7 @@ class ProductGet(BaseConfig):
     # discounts: Optional[List[DiscountsProducts]] = None  # Assuming products can have multiple discounts
     details: Optional[List[ProductDetailsBasicData]] = None  # Assuming products can have details
     materials: Optional[List[materialsGet]] = None  # Assuming products can have multiple materials
-    reviews: Optional[List[ReviewGet]] = None  # Assuming products can have multiple reviews
+    reviews: Optional[List[ReviewGet]] = None 
     liked: Optional[bool] = False  # Indicates if the product is liked by the user
     rating: Optional[float] = 5  # Average rating for the product
 

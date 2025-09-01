@@ -37,7 +37,7 @@ async def get_order_monthly_payment(
 
 @app_monthly_payment_router.get('/admin/order_monthly_payments', response_model=List[OrderMonthlyPaymentGet])
 async def get_order_monthly_payment( 
-        order_id: UUID,
+        order_id: Optional[UUID] = None,
         user_id: UUID = None,
         is_paid: bool = None,
         db: Session = Depends(get_db),
@@ -47,7 +47,7 @@ async def get_order_monthly_payment(
     return order_monthly_payment
 
 
-@app_monthly_payment_router.put('/mark_as_paid/{payment_id}',)
+@app_monthly_payment_router.put('/admin/mark_as_paid/{payment_id}',)
 async def update_order_monthly_payment(  
         payment_id: UUID,
         db: Session = Depends(get_db),
