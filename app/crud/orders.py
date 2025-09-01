@@ -14,7 +14,7 @@ from sqlalchemy.orm import aliased
 import pytz
 from sqlalchemy.sql import func
 from datetime import datetime,timedelta
-from sqlalchemy import or_, and_, Date, cast,String
+from sqlalchemy import or_, and_, Date, cast,String,tuple_
 from uuid import UUID
 from app.models.ratings import Ratings
 from app.utils.utils import timezonetash
@@ -33,6 +33,7 @@ from app.crud.loanMonths import get_loan_months_by_id
 from app.crud.regions import get_region_by_name
 from app.utils.utils import find_region
 from app.crud.userLocations import user_location as user_location_crud
+from sqlalchemy.orm import Session, aliased, noload, subqueryload
 from app.crud.orderPaymentDates import create_order_payment_date
 
 def get_cart_by_user_id(db: Session, user_id: UUID):
@@ -281,65 +282,91 @@ def confirm_card(user_id: UUID, db: Session, data:ConfirmOrder):
 
 
 
-def get_orders(db: Session, filter: OrderFilter, user_id: Optional[UUID] = None, page: int = 1, size: int = 10):
+def get_orders(
+    db: Session,
+    filter: OrderFilter, # Replace with your actual filter schema
+    user_id: Optional[UUID] = None,
+    page: int = 1,
+    size: int = 10
+):
+    """
+    Fetches a paginated list of orders, ensuring that for each product in an order,
+    only the reviews written by that specific order's owner are included.
+    """
     try:
-        # Base query for filtering and counting
+        # === STEP 1: Build the base query with all filters ===
+
         base_query = db.query(Orders).filter(Orders.status != 0)
 
-        # If user_id is provided, filter only that user's orders
         if user_id is not None:
             base_query = base_query.filter(Orders.user_id == user_id)
 
-        # Apply additional filters
+        # Apply additional filters from the filter object
         if filter.status is not None:
             base_query = base_query.filter(Orders.status == filter.status)
         if filter.is_paid is not None:
             base_query = base_query.filter(Orders.is_paid == filter.is_paid)
         if filter.filter == 'inactive':
-            # Need to join to apply this filter if it's based on related tables
             base_query = base_query.filter(Orders.status.in_([5, 6]))
         elif filter.filter == 'active':
             base_query = base_query.filter(Orders.status.in_([1, 2, 3, 4]))
         elif filter.filter == 'loan':
             base_query = base_query.filter(Orders.loan_month_id.isnot(None))
 
-        # --- Correctly count before adding complex joins for data fetching ---
-        # The count query should only have joins necessary for the filters.
-        # In this case, no extra joins are needed for the count.
+        # First, get the total count for pagination using the filtered query
         total_count = base_query.with_entities(func.count(Orders.id)).scalar()
 
-        # --- Now build the main query to fetch data ---
-        ReviewAlias = aliased(Reviews)
-        
-        
-        query = (
-            base_query
-            .join(Orders.items)
-            .join(OrderItems.product_detail)
-            .join(ProductDetails.product)
-            # This outerjoin is critical. It finds reviews ONLY if the user_id matches.
-            # If no match is found, the review columns will be NULL.
-            .outerjoin(
-                ReviewAlias,
-                and_(
-                    Products.id == ReviewAlias.product_id,
-                    Orders.user_id == ReviewAlias.user_id 
-                )
+        if total_count == 0:
+            return {"items": [], "total": 0, "page": page, "size": size, "pages": 0}
+
+        # === STEP 2: Fetch the orders, but explicitly DO NOT load reviews ===
+
+        orders = (
+            base_query.options(
+                # Use subqueryload for efficient loading of related collections
+                subqueryload(Orders.items)
+                .subqueryload(OrderItems.product_detail)
+                .subqueryload(ProductDetails.product)
+                .noload(Products.reviews)  # <-- Explicitly disable default review loading
             )
-            # This tells SQLAlchemy to build the .reviews list from our specific outerjoin.
-            # If the review columns were NULL, it will correctly create an empty list.
-            .options(
-                contains_eager(Orders.items)
-                .contains_eager(OrderItems.product_detail)
-                .contains_eager(ProductDetails.product)
-                .contains_eager(Products.reviews, alias=ReviewAlias)
-            )
-            .distinct() # Add distinct to ensure each order is returned only once
+            .order_by(Orders.created_at.desc())
+            .offset((page - 1) * size)
+            .limit(size)
+            .all()
         )
 
+        # === STEP 3: Gather keys to fetch the correct reviews separately ===
 
-        # Apply ordering and pagination
-        orders = query.order_by(Orders.created_at.desc()).offset((page - 1) * size).limit(size).all()
+        # This set will store unique (product_id, user_id) pairs
+        review_keys = set()
+        # This map will help us easily find product objects to attach reviews to
+        product_map = {}
+
+        for order in orders:
+            for item in order.items:
+                product = item.product_detail.product
+                # Store the key for our next query
+                review_keys.add((product.id, order.user_id))
+                # Store the product object for easy access
+                product_map[product.id] = product
+                # IMPORTANT: Initialize reviews as an empty list on each product
+                # This ensures the field exists and is empty if no reviews are found.
+                product.reviews = []
+
+        # === STEP 4: Fetch only the reviews that match our keys ===
+
+        if review_keys:
+            matching_reviews = (
+                db.query(Reviews)
+                .filter(tuple_(Reviews.product_id, Reviews.user_id).in_(review_keys))
+                .all()
+            )
+
+            # === STEP 5: Stitch the reviews back onto the correct products ===
+            for review in matching_reviews:
+                # Find the product object and append the review
+                if review.product_id in product_map:
+                    product_map[review.product_id].reviews.append(review)
 
         return {
             "items": orders,
@@ -349,12 +376,10 @@ def get_orders(db: Session, filter: OrderFilter, user_id: Optional[UUID] = None,
             "pages": (total_count + size - 1) // size if size > 0 else 0,
         }
     except SQLAlchemyError as e:
-        # It's good practice to log the error here
+        # In a real application, you should log the error
         # import logging
-        # logging.exception("Error fetching orders")
+        # logging.exception("An error occurred while fetching orders.")
         raise e
-
-
 
 def get_order_by_id(db: Session, order_id: UUID) -> Optional[Orders]:
     try:
