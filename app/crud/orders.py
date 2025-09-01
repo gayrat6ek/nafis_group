@@ -342,6 +342,13 @@ def get_orders(db: Session, filter: OrderFilter, user_id: Optional[UUID] = None,
         # Apply ordering and pagination
         orders = query.order_by(Orders.created_at.desc()).offset((page - 1) * size).limit(size).all()
 
+        for order in orders:
+            for item in order.items or []:
+                product = item.product_detail.product if item.product_detail else None
+                if product:
+                    product.reviews = [r for r in (product.reviews or []) if r.user_id == order.user_id]
+
+
         return {
             "items": orders,
             "total": total_count,
