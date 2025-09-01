@@ -311,28 +311,32 @@ def get_orders(db: Session, filter: OrderFilter, user_id: Optional[UUID] = None,
         # --- Now build the main query to fetch data ---
         ReviewAlias = aliased(Reviews)
         
+        
         query = (
-            base_query # Start from the already filtered query
+            base_query
             .join(Orders.items)
             .join(OrderItems.product_detail)
             .join(ProductDetails.product)
-            # Use an OUTER JOIN to ensure orders are returned even if the user hasn't reviewed the product yet
+            # This outerjoin is critical. It finds reviews ONLY if the user_id matches.
+            # If no match is found, the review columns will be NULL.
             .outerjoin(
                 ReviewAlias,
                 and_(
                     Products.id == ReviewAlias.product_id,
-                    Orders.user_id == ReviewAlias.user_id  # <<< Your correct filtering condition
+                    Orders.user_id == ReviewAlias.user_id 
                 )
             )
-            # --- This is the key part ---
-            # Tell SQLAlchemy to use the aliased join to populate the reviews
+            # This tells SQLAlchemy to build the .reviews list from our specific outerjoin.
+            # If the review columns were NULL, it will correctly create an empty list.
             .options(
                 contains_eager(Orders.items)
                 .contains_eager(OrderItems.product_detail)
                 .contains_eager(ProductDetails.product)
-                .contains_eager(Products.reviews, alias=ReviewAlias) # <<< Use the alias here
+                .contains_eager(Products.reviews, alias=ReviewAlias)
             )
+            .distinct() # Add distinct to ensure each order is returned only once
         )
+
 
         # Apply ordering and pagination
         orders = query.order_by(Orders.created_at.desc()).offset((page - 1) * size).limit(size).all()
