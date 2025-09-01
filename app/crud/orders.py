@@ -302,37 +302,20 @@ def get_orders(db: Session, filter: OrderFilter, user_id: Optional[UUID] = None,
         elif filter.filter == 'loan':
             base_query = base_query.filter(Orders.loan_month_id.isnot(None))
 
-        # Count without complex joins
-        total_count = base_query.with_entities(func.count(Orders.id)).scalar()
+        # Count first (no joins required)
+        total_count = base_query.count()
+        # Aliases
 
-        # Build the main query to fetch full orders + products + reviews
-        query = (
-            base_query
-            .join(Orders.items)
-            .join(OrderItems.product_detail)
-            .join(ProductDetails.product)
-            .options(
-                contains_eager(Orders.items)
-                .contains_eager(OrderItems.product_detail)
-                .contains_eager(ProductDetails.product)
-                .contains_eager(Products.reviews)  # load all reviews
-            )
-            .distinct()
-        )
+        # Build main query
+        
 
         # Apply ordering and pagination
         orders = (
-            query.order_by(Orders.created_at.desc())
+            base_query.order_by(Orders.created_at.desc())
                  .offset((page - 1) * size)
                  .limit(size)
                  .all()
         )
-
-        # --- Filter reviews in Python ---
-        for order in orders:
-            for item in order.items:
-                product = item.product_detail.product
-                product.reviews = [r for r in product.reviews if r.user_id == order.user_id]
 
         return {
             "items": orders,
