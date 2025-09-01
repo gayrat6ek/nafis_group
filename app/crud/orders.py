@@ -313,22 +313,20 @@ def get_orders(db: Session, filter: OrderFilter, user_id: Optional[UUID] = None,
         
         
         query = (
-            base_query
-            .join(Orders.items)
-            .join(OrderItems.product_detail)
-            .join(ProductDetails.product)
-            .outerjoin(
-                Products.reviews.of_type(ReviewAlias), 
-                ReviewAlias.user_id == Orders.user_id
-            )
-            .options(
-                contains_eager(Orders.items)
-                .contains_eager(OrderItems.product_detail)
-                .contains_eager(ProductDetails.product)
-                .contains_eager(Products.reviews.of_type(ReviewAlias))
-            )
-            .distinct()
-        )
+    base_query
+    .join(Orders.items)
+    .join(OrderItems.product_detail)
+    .join(ProductDetails.product)
+    .outerjoin(Products.reviews.of_type(ReviewAlias))  # no ON clause here
+    .filter(ReviewAlias.user_id == Orders.user_id)     # filter separately
+    .options(
+        contains_eager(Orders.items)
+        .contains_eager(OrderItems.product_detail)
+        .contains_eager(ProductDetails.product)
+        .contains_eager(Products.reviews.of_type(ReviewAlias))
+    )
+    .distinct()
+)
 
 
         # Apply ordering and pagination
