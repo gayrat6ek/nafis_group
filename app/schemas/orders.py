@@ -8,6 +8,9 @@ from pydantic import BaseModel, Field, ConfigDict
 from .productDetails import ProductDetailsInOrders,GetSize, ProductDetailsInOrdersFull
 from app.schemas.users import GetUser
 from app.schemas.loanMonths import LoanMonthsGet
+from app.schemas.userLocations import UserLocation
+from app.schemas.pickUpLocations import PickUpLocationGet
+
 
 
 
@@ -101,6 +104,8 @@ class OrdersGet(BaseConfig):
     user: Optional[GetUser] = None  # Basic user information associated with the order
     deny_reason: Optional[str] = None  # Reason for order denial or cancellation
     loan_month: Optional[LoanMonthsGet] = None  # Loan month details if applicable
+    pick_up_location: Optional[PickUpLocationGet] = None  # Pick-up location details if applicable
+    user_location: Optional[UserLocation] = None  # User location details if applicable
 
 
 class OrderResponse(OrdersGet):
@@ -135,6 +140,8 @@ class OrdersFullGet(BaseConfig):
     user: Optional[GetUser] = None  # Basic user information associated with the order
     deny_reason: Optional[str] = None  # Reason for order denial or cancellation
     loan_month: Optional[LoanMonthsGet] = None  # Loan month details if applicable
+    pick_up_location: Optional[PickUpLocationGet] = None  # Pick-up location details if applicable
+    user_location: Optional[UserLocation] = None  # User location details if applicable
     
 
 
