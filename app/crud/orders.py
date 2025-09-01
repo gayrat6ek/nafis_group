@@ -355,7 +355,7 @@ def get_orders(db: Session, filter: OrderFilter, user_id: Optional[UUID] = None,
             "items": orders,
             "total": total_count,
             "page": page,
-            "size": size,
+            "size": len(orders),
             "pages": (total_count + size - 1) // size if size > 0 else 0,
         }
     except SQLAlchemyError as e:
