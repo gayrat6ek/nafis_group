@@ -2,7 +2,7 @@
 
 from pickletools import read_unicodestringnl
 from re import L
-
+from sqlalchemy.orm import contains_eager, aliased
 from fastapi import HTTPException
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import Session
@@ -283,56 +283,73 @@ def confirm_card(user_id: UUID, db: Session, data:ConfirmOrder):
 
 def get_orders(db: Session, filter: OrderFilter, user_id: Optional[UUID] = None, page: int = 1, size: int = 10):
     try:
+        # Base query for filtering and counting
+        base_query = db.query(Orders).filter(Orders.status != 0)
+
+        # If user_id is provided, filter only that user's orders
+        if user_id is not None:
+            base_query = base_query.filter(Orders.user_id == user_id)
+
+        # Apply additional filters
+        if filter.status is not None:
+            base_query = base_query.filter(Orders.status == filter.status)
+        if filter.is_paid is not None:
+            base_query = base_query.filter(Orders.is_paid == filter.is_paid)
+        if filter.filter == 'inactive':
+            # Need to join to apply this filter if it's based on related tables
+            base_query = base_query.filter(Orders.status.in_([5, 6]))
+        elif filter.filter == 'active':
+            base_query = base_query.filter(Orders.status.in_([1, 2, 3, 4]))
+        elif filter.filter == 'loan':
+            base_query = base_query.filter(Orders.loan_month_id.isnot(None))
+
+        # --- Correctly count before adding complex joins for data fetching ---
+        # The count query should only have joins necessary for the filters.
+        # In this case, no extra joins are needed for the count.
+        total_count = base_query.with_entities(func.count(Orders.id)).scalar()
+
+        # --- Now build the main query to fetch data ---
         ReviewAlias = aliased(Reviews)
         
         query = (
-            db.query(Orders)
+            base_query # Start from the already filtered query
             .join(Orders.items)
             .join(OrderItems.product_detail)
             .join(ProductDetails.product)
-            .join(Products.reviews)
+            # Use an OUTER JOIN to ensure orders are returned even if the user hasn't reviewed the product yet
             .outerjoin(
                 ReviewAlias,
                 and_(
                     Products.id == ReviewAlias.product_id,
-                    Orders.user_id == ReviewAlias.user_id  # reviews only from order owner
+                    Orders.user_id == ReviewAlias.user_id  # <<< Your correct filtering condition
                 )
             )
-            .filter(Orders.status != 0)
+            # --- This is the key part ---
+            # Tell SQLAlchemy to use the aliased join to populate the reviews
+            .options(
+                contains_eager(Orders.items)
+                .contains_eager(OrderItems.product_detail)
+                .contains_eager(ProductDetails.product)
+                .contains_eager(Products.reviews, alias=ReviewAlias) # <<< Use the alias here
+            )
         )
 
-        # If user_id is provided, filter only that user's orders
-        if user_id is not None:
-            query = query.filter(Orders.user_id == user_id)
-
-        # Apply additional filters
-        if filter.status is not None:
-            query = query.filter(Orders.status == filter.status)
-        if filter.is_paid is not None:
-            query = query.filter(Orders.is_paid == filter.is_paid)
-        if filter.filter == 'inactive':
-            query = query.filter(Orders.status.in_([5, 6]))
-        elif filter.filter == 'active':
-            query = query.filter(Orders.status.in_([1, 2, 3, 4]))
-        elif filter.filter == 'loan':
-            query = query.filter(Orders.loan_month_id.isnot(None))
-
-        # Count before pagination
-        total_count = query.count()
-
         # Apply ordering and pagination
-        query = query.order_by(Orders.created_at.desc())
-        orders = query.offset((page - 1) * size).limit(size).all()
+        orders = query.order_by(Orders.created_at.desc()).offset((page - 1) * size).limit(size).all()
 
         return {
             "items": orders,
             "total": total_count,
             "page": page,
             "size": size,
-            "pages": (total_count + size - 1) // size,
+            "pages": (total_count + size - 1) // size if size > 0 else 0,
         }
     except SQLAlchemyError as e:
+        # It's good practice to log the error here
+        # import logging
+        # logging.exception("Error fetching orders")
         raise e
+
 
 
 def get_order_by_id(db: Session, order_id: UUID) -> Optional[Orders]:
