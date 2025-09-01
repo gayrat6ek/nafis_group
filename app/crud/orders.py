@@ -346,7 +346,8 @@ def get_orders(db: Session, filter: OrderFilter, user_id: Optional[UUID] = None,
             for item in order.items or []:
                 product = item.product_detail.product if item.product_detail else None
                 if product:
-                    print('all reviews',product.reviews)
+                    for r in product.reviews or []:
+                        print('all reviews',r.user_id, order.user_id)
                     product.reviews = [r for r in (product.reviews or []) if r.user_id == order.user_id]
                     
 
