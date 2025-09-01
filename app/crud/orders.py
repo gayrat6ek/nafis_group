@@ -317,13 +317,13 @@ def get_orders(db: Session, filter: OrderFilter, user_id: Optional[UUID] = None,
     .join(Orders.items)
     .join(OrderItems.product_detail)
     .join(ProductDetails.product)
-    .outerjoin(Products.reviews.of_type(ReviewAlias))  # no ON clause here
-    .filter(ReviewAlias.user_id == Orders.user_id)     # filter separately
+    .outerjoin(Products.reviews.of_type(ReviewAlias))
     .options(
         contains_eager(Orders.items)
         .contains_eager(OrderItems.product_detail)
         .contains_eager(ProductDetails.product)
-        .contains_eager(Products.reviews.of_type(ReviewAlias))
+        .contains_eager(Products.reviews.of_type(ReviewAlias)),
+        with_loader_criteria(Reviews, lambda cls: cls.user_id == Orders.user_id)
     )
     .distinct()
 )
