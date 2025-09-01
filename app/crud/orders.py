@@ -309,7 +309,6 @@ def get_orders(db: Session, filter: OrderFilter, user_id: Optional[UUID] = None,
         total_count = base_query.with_entities(func.count(Orders.id)).scalar()
 
         # --- Now build the main query to fetch data ---
-        ReviewAlias = aliased(Reviews)
         
         ReviewAlias = aliased(Reviews)
         
