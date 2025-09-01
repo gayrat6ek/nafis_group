@@ -296,41 +296,47 @@ def get_orders(db: Session, filter: OrderFilter, user_id: Optional[UUID] = None,
         if filter.is_paid is not None:
             base_query = base_query.filter(Orders.is_paid == filter.is_paid)
         if filter.filter == 'inactive':
-            # Need to join to apply this filter if it's based on related tables
             base_query = base_query.filter(Orders.status.in_([5, 6]))
         elif filter.filter == 'active':
             base_query = base_query.filter(Orders.status.in_([1, 2, 3, 4]))
         elif filter.filter == 'loan':
             base_query = base_query.filter(Orders.loan_month_id.isnot(None))
 
-        # --- Correctly count before adding complex joins for data fetching ---
-        # The count query should only have joins necessary for the filters.
-        # In this case, no extra joins are needed for the count.
+        # Count first (no joins required)
         total_count = base_query.with_entities(func.count(Orders.id)).scalar()
 
-        # --- Now build the main query to fetch data ---
+        # Aliases
         ReviewAlias = aliased(Reviews)
-        
-        
-        query = (
-    base_query
-    .join(Orders.items)
-    .join(OrderItems.product_detail)
-    .join(ProductDetails.product)
-    .outerjoin(Products.reviews.of_type(ReviewAlias))
-    .options(
-        contains_eager(Orders.items)
-        .contains_eager(OrderItems.product_detail)
-        .contains_eager(ProductDetails.product)
-        .contains_eager(Products.reviews.of_type(ReviewAlias)),
-        with_loader_criteria(Reviews, lambda cls: cls.user_id == Orders.user_id)
-    )
-    .distinct()
-)
 
+        # Build main query
+        query = (
+            base_query
+            .join(Orders.items)
+            .join(OrderItems.product_detail)
+            .join(ProductDetails.product)
+            .outerjoin(
+                ReviewAlias,
+                and_(
+                    Products.id == ReviewAlias.product_id,
+                    Orders.user_id == ReviewAlias.user_id
+                )
+            )
+            .options(
+                contains_eager(Orders.items)
+                .contains_eager(OrderItems.product_detail)
+                .contains_eager(ProductDetails.product)
+                .contains_eager(Products.reviews, alias=ReviewAlias)
+            )
+            .distinct()
+        )
 
         # Apply ordering and pagination
-        orders = query.order_by(Orders.created_at.desc()).offset((page - 1) * size).limit(size).all()
+        orders = (
+            query.order_by(Orders.created_at.desc())
+                 .offset((page - 1) * size)
+                 .limit(size)
+                 .all()
+        )
 
         return {
             "items": orders,
@@ -339,11 +345,10 @@ def get_orders(db: Session, filter: OrderFilter, user_id: Optional[UUID] = None,
             "size": size,
             "pages": (total_count + size - 1) // size if size > 0 else 0,
         }
+
     except SQLAlchemyError as e:
-        # It's good practice to log the error here
-        # import logging
-        # logging.exception("Error fetching orders")
         raise e
+
 
 
 
