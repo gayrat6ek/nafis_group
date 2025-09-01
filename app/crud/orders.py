@@ -317,6 +317,11 @@ def get_orders(db: Session, filter: OrderFilter, user_id: Optional[UUID] = None,
                  .all()
         )
 
+        for order in orders:
+            for item in order.items:
+                product = item.product_detail.product
+                product.reviews = [r for r in product.reviews if r.user_id == order.user_id]
+
         return {
             "items": orders,
             "total": total_count,
