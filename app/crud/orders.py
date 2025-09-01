@@ -306,12 +306,26 @@ def get_orders(db: Session, filter: OrderFilter, user_id: Optional[UUID] = None,
         total_count = base_query.count()
         # Aliases
 
+        query = (
+            base_query
+            .join(Orders.items)
+            .join(OrderItems.product_detail)
+            .join(ProductDetails.product)
+            .options(
+                contains_eager(Orders.items)
+                .contains_eager(OrderItems.product_detail)
+                .contains_eager(ProductDetails.product)
+                .contains_eager(Products.reviews)  # load all reviews
+            )
+            .distinct()
+        )
+
         # Build main query
         
 
         # Apply ordering and pagination
         orders = (
-            base_query.order_by(Orders.created_at.desc())
+            query.order_by(Orders.created_at.desc())
                  .offset((page - 1) * size)
                  .limit(size)
                  .all()
