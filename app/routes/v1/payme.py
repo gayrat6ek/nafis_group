@@ -31,13 +31,13 @@ from app.core.config import settings
 payme_route = APIRouter()
 
 
-def generate_error_response(raw_body,code):
+def generate_error_response(raw_body, from_error,code):
     return {
           "jsonrpc": "2.0",
           "id": raw_body['id'],
           "error": {
             "code": code,#-32504,
-            "message": "We cannot perform such action"
+            "message": f"We cannot perform such action - {from_error}"
           }
         }
 
@@ -45,9 +45,10 @@ def generate_error_response(raw_body,code):
 def check_perform_transaction(db:Session,raw_data):
     order = getOrder(db=db,id = raw_data['params']['account']['order_id'])
     if not order:
-        return generate_error_response(raw_data, -31099)
+        return generate_error_response(raw_data, "Order not found", -31099)
     if order.total_amount!=raw_data['params']['amount']:
-        return generate_error_response(raw_data, -31001)
+        error_res= f"Amount does not match {raw_data['params']['amount']}"
+        return generate_error_response(raw_data,error_res, -31001)
 
     return {
     "result" : {
@@ -60,7 +61,7 @@ def create_transaction(db:Session,raw_data):
     order = getOrder(db=db, id=raw_data['params']['account']['order_id'])
     if not order:
         print("there is not order Found")
-        return generate_error_response(raw_data, -31099)
+        return generate_error_response(raw_data,"Order not found with this id", -31099)
     # if order.total_amount != raw_data['params']['amount']:
     #     return generate_error_response(raw_data, -31001)
 
@@ -80,7 +81,7 @@ def create_transaction(db:Session,raw_data):
 
     if order_transaction:
         print("order already has transaction")
-        return generate_error_response(raw_data, -31099)
+        return generate_error_response(raw_data, "This order already has transaction" -31099)
 
         # return generate_error_response(raw_data, -31050)
 
@@ -178,6 +179,7 @@ def check_transaction(db:Session,raw_data):
 
     return generate_error_response(
         raw_data,
+        "no transaction found"
         -31003
     )
 
@@ -260,7 +262,7 @@ async def order_statuses(
     auth_header = request.headers.get("Authorization")
     checking_authorization = check_authorization(auth_header)
     if not checking_authorization:
-        return generate_error_response(raw_body=raw_body,code=-32504)
+        return generate_error_response(raw_body=raw_body, from_error="Cannot authenticate",code=-32504)
 
 
     if raw_body['method']=='CheckPerformTransaction':
@@ -283,7 +285,7 @@ async def order_statuses(
         return  get_statement(db=db,raw_data=raw_body)
 
     else:
-        return  generate_error_response(raw_body=raw_body,code='-32504')
+        return  generate_error_response(raw_body=raw_body, from_error='perform action not found',code='-32504')
 
 
 
