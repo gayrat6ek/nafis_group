@@ -175,12 +175,10 @@ async def get_my_cart(
             })
         item.size.loan_months = loan_month_prise
 
-   
-
     item_count = len(cart.items)
-    total_items_price = sum(item.size.price * item.quantity for item in cart.items)
-    total_discounted_price = total_items_price - sum(item.price for item in cart.items)
-    total_price = sum(item.price * item.quantity for item in cart.items)
+    total_items_price = sum(item.size.price * item.quantity for item in cart.items)  # original total
+    total_price = sum(item.price * item.quantity for item in cart.items)  # discounted total
+    total_discounted_price = total_items_price - total_price
 
     cart.items_count = item_count
     cart.total_items_price = total_items_price
@@ -336,7 +334,7 @@ async def select_cart_items(
     item_count = 0
     for cart_item in cart.items:
         total_items_price += cart_item.size.price * cart_item.quantity
-        total_discounted_price += (cart_item.size.price - cart_item.price) * cart_item.quantity
+        total_discounted_price += (cart_item.size.price - cart_item.price)
         total_price += cart_item.price * cart_item.quantity
         item_count += 1
     
