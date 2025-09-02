@@ -216,7 +216,7 @@ async def confirm_order(
     if not order:
         raise HTTPException(status_code=400, detail="Order confirmation failed")
     if order.payment_method =="payme":
-        total_price = order.total_amount
+        total_price = order.total_amount *100
         data = f"m={settings.payme_merchant_id};ac.order_id={order.id};a={total_price};c=https://nafis-home.uz/home/user/orders/active;ct=20"
         base_64_data = base64.b64encode(data.encode('utf-8')).decode('utf-8')
         order.payment_url = f"https://checkout.paycom.uz/{base_64_data}"

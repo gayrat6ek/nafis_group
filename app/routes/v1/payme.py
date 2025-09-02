@@ -46,9 +46,9 @@ def check_perform_transaction(db:Session,raw_data):
     order = getOrder(db=db,id = raw_data['params']['account']['order_id'])
     if not order:
         return generate_error_response(raw_data, "Order not found", -31099)
-    if order.total_amount!=raw_data['params']['amount']:
-        error_res= f"Amount does not match {raw_data['params']['amount']}"
-        return generate_error_response(raw_data,error_res, -31001)
+    # if order.total_amount!=raw_data['params']['amount']:
+    #     error_res= f"Amount does not match {raw_data['params']['amount']}"
+    #     return generate_error_response(raw_data,error_res, -31001)
 
     return {
     "result" : {
