@@ -23,7 +23,7 @@ regions_router = APIRouter()
 @regions_router.get('/regions')
 async def get_region_list(
         page: int = 1,
-        size: int = 10,
+        size: int = 30,
         is_active: bool = None,
         db: Session = Depends(get_db),
         # current_user: dict = Depends(PermissionChecker(required_permissions=pages_and_permissions['Regions']['view']))
