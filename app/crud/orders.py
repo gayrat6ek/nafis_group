@@ -223,7 +223,7 @@ def confirm_card(user_id: UUID, db: Session, data:ConfirmOrder):
         
         item_count = len(cart.items)
         total_items_price = sum(item.size.price * item.quantity for item in cart.items)
-        total_discounted_price = total_items_price - sum(item.price for item in cart.items)
+        total_discounted_price = total_items_price - sum(item.price for item in cart.items) +delivery_cost
         total_price = sum(item.price * item.quantity for item in cart.items) 
         
 
@@ -341,13 +341,13 @@ def get_orders(db: Session, filter: OrderFilter, user_id: Optional[UUID] = None,
         # Apply ordering and pagination
         orders = query.order_by(Orders.created_at.desc()).offset((page - 1) * size).limit(size).all()
 
-        for order in orders:
-            for item in order.items or []:
-                product = item.product_detail.product if item.product_detail else None
-                if product:
-                    for r in product.reviews or []:
-                        print('all reviews',r.user_id, order.user_id)
-                    product.reviews = [r for r in (product.reviews or []) if r.user_id == order.user_id]
+        # for order in orders:
+        #     for item in order.items or []:
+        #         product = item.product_detail.product if item.product_detail else None
+        #         if product:
+        #             for r in product.reviews or []:
+        #                 print('all reviews',r.user_id, order.user_id)
+        #             product.reviews = [r for r in (product.reviews or []) if r.user_id == order.user_id]
                     
 
 

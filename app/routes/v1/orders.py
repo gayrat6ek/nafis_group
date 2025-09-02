@@ -69,7 +69,7 @@ async def add_to_cart(
 
     item_count = len(cart.items)
     total_items_price = sum(item.size.price * item.quantity for item in cart.items)
-    total_discounted_price = total_items_price - sum(item.price for item in cart.items)
+    total_discounted_price = total_items_price - sum(item.price for item in cart.items) 
     total_price = sum(item.price * item.quantity for item in cart.items)
 
 
@@ -112,7 +112,7 @@ async def remove_from_cart(
     cart = crud_orders.get_cart_by_user_id(db=db, user_id=current_user['id'])
     item_count = len(cart.items)
     total_items_price = sum(item.size.price * item.quantity for item in cart.items)
-    total_discounted_price = total_items_price - sum(item.price for item in cart.items)
+    total_discounted_price = total_items_price - sum(item.price for item in cart.items) 
     total_price = sum(item.price * item.quantity for item in cart.items)
     cart.items_count = item_count
     cart.total_items_price = total_items_price
@@ -178,7 +178,7 @@ async def get_my_cart(
     item_count = len(cart.items)
     total_items_price = sum(item.size.price * item.quantity for item in cart.items)  # original total
     total_price = sum(item.price * item.quantity for item in cart.items)  # discounted total
-    total_discounted_price = total_items_price - total_price
+    total_discounted_price = total_items_price - total_price+cart.delivery_fee if cart.delivery_fee is None else total_items_price - total_price
 
     cart.items_count = item_count
     cart.total_items_price = total_items_price
@@ -334,7 +334,7 @@ async def select_cart_items(
     item_count = 0
     for cart_item in cart.items:
         total_items_price += cart_item.size.price * cart_item.quantity
-        total_discounted_price += (cart_item.size.price - cart_item.price)
+        total_discounted_price += (cart_item.size.price - cart_item.price) +cart.delivery_fee
         total_price += cart_item.price * cart_item.quantity
         item_count += 1
     
