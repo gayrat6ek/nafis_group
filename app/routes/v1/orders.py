@@ -395,3 +395,24 @@ async def update_order_status(
     )
     
     return {"success": True, "message": "Order status updated successfully", "order": updated_order}
+
+
+
+@orders_router.get('/orders/statistics')
+async def get_order_statistics(
+        from_date:datetime,
+        to_date:datetime,
+        db: Session = Depends(get_db),
+        current_user: dict = Depends(PermissionChecker(required_permissions=pages_and_permissions['Orders']['statistics']))
+):
+    """
+    Get order statistics (admin only).
+    """
+    ravenue_stats= crud_orders.get_order_stats(db=db, from_date=from_date, to_date=to_date)
+    order_status_breakdown= crud_orders.get_order_status_breakdown(db=db, from_date=from_date, to_date=to_date)
+    by_region = crud_orders.get_region_stats(db=db, from_date=from_date, to_date=to_date)
+    return {
+        "ravenue_stats": ravenue_stats,
+        "order_status_breakdown": order_status_breakdown,
+        "by_region": by_region
+    }

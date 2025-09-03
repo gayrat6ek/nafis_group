@@ -80,6 +80,7 @@ pages_and_permissions = {
         "remove_from_cart": "O6",
         'admin_update_order':"O7",
         "admin_view": "O8",
+        "statistics": "O9"
 
     },
     "PickUpLocations": {
