@@ -131,6 +131,8 @@ class OrdersFullGet(BaseConfig):
     status: Optional[int] = 0  # Assuming status is an integer representing the order status
     is_paid: Optional[bool] = False
     is_delivered: Optional[bool] = False
+    region: Optional[str] = None
+    district: Optional[str] = None
     created_at: Optional[datetime] = None
     items: List[OrderFullItems] = []  # List of order items associated with the order
     loan_month_id: Optional[UUID] = None
