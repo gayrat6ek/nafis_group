@@ -398,7 +398,7 @@ async def update_order_status(
 
 
 
-@orders_router.get('/orders/statistics')
+@orders_router.get('/admin/statistics')
 async def get_order_statistics(
         from_date:datetime,
         to_date:datetime,
