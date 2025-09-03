@@ -181,7 +181,7 @@ def confirm_card(user_id: UUID, db: Session, data:ConfirmOrder):
         if data.user_location_id:
             user_location = user_location_crud.get(db, id=data.user_location_id)
             region_find = find_region(lat=user_location.latitude, lon=user_location.longitude)
-            if not region:
+            if not region_find:
                 raise HTTPException(status_code=404, detail="Region not found for the provided location")
 
             region = get_region_by_name(db, region_find['NAME_1'])
