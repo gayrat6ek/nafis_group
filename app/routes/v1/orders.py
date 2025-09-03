@@ -412,7 +412,8 @@ async def get_order_statistics(
     order_status_breakdown= crud_orders.get_order_status_breakdown(db=db, from_date=from_date, to_date=to_date)
     by_region = crud_orders.get_region_stats(db=db, from_date=from_date, to_date=to_date)
     return {
-        "ravenue_stats": ravenue_stats,
-        "order_status_breakdown": order_status_breakdown,
-        "by_region": by_region
+        # ._mapping works on SQLAlchemy Row objects >=1.4
+        "ravenue_stats": dict(ravenue_stats._mapping) if ravenue_stats else {},
+        "order_status_breakdown": [dict(r._mapping) for r in order_status_breakdown],
+        "by_region": [dict(r._mapping) for r in by_region],
     }
