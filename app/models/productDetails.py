@@ -45,3 +45,4 @@ class ProductDetails(Base):
     order_items = relationship("OrderItems", back_populates="product_detail")  # Assuming OrderItems model has a product_detail relationship
     measure_unit = relationship("MeasureUnits", back_populates="product_details")  # Assuming MeasureUnits model has a product_details relationship
     size = relationship("Sizes", back_populates="product_details")  # Assuming Sizes model has a product_details relationship
+    reviews = relationship("Reviews", back_populates="product_detail")  # Assuming Reviews model has a product_details relationship

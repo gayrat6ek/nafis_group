@@ -5,6 +5,8 @@ from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import Session
 from typing import Optional
 import bcrypt
+from sqlalchemy.orm import joinedload
+
 
 import pytz
 from sqlalchemy.sql import func
@@ -55,7 +57,8 @@ def create_review(db: Session, data: CreateReview,user_id) -> Reviews:
             rating=data.rating,
             comment=data.comment,
             is_active=True, 
-            images=data.images  # Assuming images is a list of URLs or paths
+            images=data.images,  # Assuming images is a list of URLs or paths
+            product_detail_id=data.product_detail_id
         )
         db.add(review)
         db.commit()
@@ -153,17 +156,31 @@ def admin_get_reviews(db: Session, order_id, page: int = 1, size: int = 10,):
         query = db.query(Reviews).order_by(Reviews.created_at.desc())
         if order_id:
             query = query.filter(Reviews.id == order_id)
+        query = query.options(
+            joinedload(Reviews.product),
+            joinedload(Reviews.product_detail)  # for direct detail
+        )
         
         # Pagination
         offset = (page - 1) * size
         query = query.offset(offset).limit(size)
+        count = query.count()
+        all_reviews = query.all()
+        for review in all_reviews:
+            
+
+            # decide which details to include
+            if review.product_detail_id:
+                # only the specific detail
+                review.product.details = [review.product_detail]
+               
         
         return {
-            "items": query.all(),
-            "total": query.count(),
+            "items": all_reviews,
+            "total": count,
             "page": page,
             "size": size,
-            "pages": (query.count() + size - 1) // size  # Calculate total pages    
+            "pages": (count + size - 1) // size  # Calculate total pages    
         }
     
     except SQLAlchemyError as e:

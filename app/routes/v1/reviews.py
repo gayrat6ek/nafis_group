@@ -7,7 +7,7 @@ from sqlalchemy.orm import Session
 
 from app.crud import reviews as crud_reviews
 from app.routes.depth import get_db, PermissionChecker
-from app.schemas.reviews import CreateReview,ReviewGet,UpdateReview
+from app.schemas.reviews import CreateReview,ReviewGet,UpdateReview,ReviewAdminGet
 
 
 
@@ -75,7 +75,7 @@ async def delete_review(
     return {"message": "Review deleted successfully"}   
 
 
-@reviews_router.get('/admin/reviews/view', response_model=Page[ReviewGet])
+@reviews_router.get('/admin/reviews/view', response_model=Page[ReviewAdminGet])
 async def admin_get_reviews_list(
         order_id: UUID = None,
         page: int = 1,
