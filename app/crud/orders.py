@@ -35,6 +35,7 @@ from app.utils.utils import find_region
 from app.crud.userLocations import user_location as user_location_crud
 from app.crud.orderPaymentDates import create_order_payment_date
 from app.models.Users import Users
+from app.crud.pickUpLocations import getUpLocationById
 
 def get_cart_by_user_id(db: Session, user_id: UUID):
     try:
@@ -179,11 +180,11 @@ def confirm_card(user_id: UUID, db: Session, data:ConfirmOrder):
 
         if data.user_location_id:
             user_location = user_location_crud.get(db, id=data.user_location_id)
-            region = find_region(lat=user_location.latitude, lon=user_location.longitude)
+            region_find = find_region(lat=user_location.latitude, lon=user_location.longitude)
             if not region:
                 raise HTTPException(status_code=404, detail="Region not found for the provided location")
 
-            region = get_region_by_name(db, region['NAME_1'])
+            region = get_region_by_name(db, region_find['NAME_1'])
             if not region:
                 raise HTTPException(status_code=404, detail="Region not found in the database")
             # delivery_cost = region.delivery_cost if region else 0.0
@@ -192,11 +193,20 @@ def confirm_card(user_id: UUID, db: Session, data:ConfirmOrder):
                 datetime.now(timezonetash) + timedelta(days=region.delivery_days)
                 if region and region.delivery_days is not None else None
             )
+            cart.region = region_find['NAME_1'] if region_find and 'NAME_1' in region_find else None
+            cart.district = region_find['NAME_2'] if region_find and 'NAME_2' in region_find else None
+
             
         else:
             delivery_cost = 0.0
             delivery_date = None
+            if data.pick_up_location_id is None:
+                raise HTTPException(status_code=400, detail="Either user_location_id or pick_up_location_id must be provided for delivery.")
+            pick_up_location = getUpLocationById(db, data.pick_up_location_id)
 
+            cart.region = "ToshkentShahri"
+            cart.district = pick_up_location.name_uz
+            
         # new_cart = get_cart_by_user_id(db, user_id)
 
         # if not new_cart:

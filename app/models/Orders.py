@@ -40,6 +40,8 @@ class Orders(Base):
     delivery_receiver = Column(String, nullable=True)  # Name of the person receiving the delivery
     delivery_date = Column(DateTime(timezone=True), nullable=True)
     delivery_fee = Column(Float, nullable=False, default=0.0)
+    region = Column(String, nullable=True)  # Region for delivery
+    district = Column(String, nullable=True)  # District for delivery
 
     payment_method = Column(String, nullable=True)  # e.g., 'credit_card', 'cash', etc.
     discount_amount = Column(Float, nullable=True, default=0.0)  # Amount of discount applied to the order

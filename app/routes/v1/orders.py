@@ -310,6 +310,7 @@ async def select_cart_items(
         if not region:
             raise HTTPException(status_code=404, detail="Region not found for the given location")
         region_data = get_region_by_name(db=db, name=region['NAME_1'])
+
         if not region_data or not region_data.is_active:
             raise HTTPException(status_code=404, detail="Region is not active or not found")
         cart.delivery_fee = region_data.delivery_cost if region_data and region_data.delivery_cost is not None else 0.0
@@ -317,6 +318,8 @@ async def select_cart_items(
                 datetime.now(timezonetash) + timedelta(days=region_data.delivery_days)
                 if region_data and region_data.delivery_days is not None else None
             )
+            
+        
     else:
         cart.delivery_fee = 0.0
 
