@@ -1,5 +1,5 @@
 
-from datetime import datetime
+from datetime import date, datetime
 from enum import Enum
 from symtable import Class
 from typing import Optional, List
@@ -157,6 +157,10 @@ class OrderFilter(BaseConfig):
     is_paid: Optional[bool] = None  # Filter by payment status
     filter: Optional[OrderStatus]=None  # Filter by order status
     status: Optional[int] = None  # Filter by specific order status code (if applicable)
+    paymenttype: Optional[PaymentMethod] = None  # Filter by payment method
+    username: Optional[str] = None  # Filter by user's name
+    created_at: Optional[date] = None  # Filter by creation date
+    is_loan: Optional[bool] = None  # Filter by loan status
     page: int = 1
     size: int = 10
 

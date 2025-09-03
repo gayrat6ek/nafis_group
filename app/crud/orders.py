@@ -34,6 +34,7 @@ from app.crud.regions import get_region_by_name
 from app.utils.utils import find_region
 from app.crud.userLocations import user_location as user_location_crud
 from app.crud.orderPaymentDates import create_order_payment_date
+from app.models.Users import Users
 
 def get_cart_by_user_id(db: Session, user_id: UUID):
     try:
@@ -302,6 +303,20 @@ def get_orders(db: Session, filter: OrderFilter, user_id: Optional[UUID] = None,
             base_query = base_query.filter(Orders.status.in_([1, 2, 3, 4]))
         elif filter.filter == 'loan':
             base_query = base_query.filter(Orders.loan_month_id.isnot(None))
+        if filter.paymenttype is not None:
+            base_query = base_query.filter(Orders.payment_method == filter.paymenttype.value)
+        if filter.username:
+            base_query = base_query.join(Users).filter(Users.full_name.ilike(f"%{filter.username}%"))
+        if filter.created_at:
+            base_query = base_query.filter(
+                cast(Orders.created_at, Date) == filter.created_at
+            )
+        if filter.is_loan is not None:
+            if filter.is_loan:
+                base_query = base_query.filter(Orders.loan_month_id.isnot(None))
+            else:
+                base_query = base_query.filter(Orders.loan_month_id.is_(None))
+        
 
         # --- Correctly count before adding complex joins for data fetching ---
         # The count query should only have joins necessary for the filters.
@@ -436,17 +451,28 @@ def update_cart_items_selection(
 
 def get_purchased_product_list(db: Session, user_id: UUID, page: int = 1, size: int = 10):
     try:
-        products = (
-            db.query(Products)
-            .join(ProductDetails, Products.id == ProductDetails.product_id)
+        purchased_product_details = (
+            db.query(ProductDetails.id)
             .join(OrderItems, ProductDetails.id == OrderItems.product_detail_id)
             .join(Orders, OrderItems.order_id == Orders.id)
             .filter(
                 Orders.user_id == user_id,
-                Orders.status.in_([3, 4, 5, 6])  # Assuming these statuses indicate completed or past orders
-            )
+                Orders.status.in_([1,2,3, 4, 5, 6])
+                    )
+                    .subquery()
+                )
+
+        products = (
+            db.query(Products)
+            .join(ProductDetails, Products.id == ProductDetails.product_id)
+            .filter(ProductDetails.id.in_(purchased_product_details))
             .group_by(Products.id)
             .order_by(func.max(Orders.created_at).desc())
+            .options(
+                joinedload(Products.details.and_(
+                    ProductDetails.id.in_(purchased_product_details)
+                ))
+            )
             .offset((page - 1) * size)
             .limit(size)
             .all()
