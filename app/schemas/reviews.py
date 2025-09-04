@@ -27,10 +27,22 @@ class GetSize(BaseConfig):
 
 
 
+
+class ProductBasicGet(BaseConfig):
+    id: Optional[UUID] = None
+    name_uz: Optional[str] = None
+    name_ru: Optional[str] = None
+    name_en: Optional[str] = None
+    description_uz: Optional[str] = None        
+    description_ru: Optional[str] = None
+    description_en: Optional[str] = None
+
 class ProductDetailsGet(BaseConfig):
     id: Optional[UUID] = None
 
     video_info: Optional[list] = None
+    product: Optional[ProductBasicGet] = None  # Assuming product details are linked to a basic product
+    
 
     images: Optional[list] = None
     is_active: Optional[bool] = True
@@ -41,17 +53,6 @@ class ProductDetailsGet(BaseConfig):
     color:Optional[ColorGet] = None  # Assuming product details can have a color relationship
     measure_unit: Optional[getBasicMeasureUnits] = None  # Assuming product details can have a measure unit relationship
     size: Optional[List[GetSize]] = None  # Assuming product details can have multiple sizes
-
-class ProductBasicGet(BaseConfig):
-    id: Optional[UUID] = None
-    name_uz: Optional[str] = None
-    name_ru: Optional[str] = None
-    name_en: Optional[str] = None
-    description_uz: Optional[str] = None        
-    description_ru: Optional[str] = None
-    description_en: Optional[str] = None
-    details:Optional[List[ProductDetailsGet]]=None
-
 
 
 
@@ -93,5 +94,6 @@ class ReviewAdminGet(BaseConfig):
     is_active: Optional[bool] = True
     created_at: Optional[datetime] = None
     product:Optional[ProductBasicGet]=None
+    product_detail:Optional[ProductDetailsGet]=None
     images: Optional[List[str]] = Field(None, description="List of image URLs or paths associated with the review")
     user: Optional[GetUser] = None  # Assuming reviews are linked to users

@@ -350,6 +350,8 @@ async def select_cart_items(
     cart.total_items_price = total_items_price
     cart.total_discounted_price = total_discounted_price
     cart.loan_month_id = body.loan_month_id
+    cart.pick_up_location_id = body.pick_up_location_id
+    cart.user_location_id = body.user_location_id
 
     db.commit()
     

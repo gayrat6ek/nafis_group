@@ -11,6 +11,7 @@ from app.models.Categories import Categories
 from app.models.Brands import Brands
 from app.models.likes import Likes
 from app.models.productDetails import ProductDetails
+from app.models.reviews import Reviews
 from app.models.sizes import Sizes
 from sqlalchemy.orm import selectinload, with_loader_criteria
 from app.crud.categories import get_category_with_children
@@ -168,6 +169,7 @@ def get_product_by_id(db: Session, product_id: UUID) -> Optional[Products]:
     try:
         now = datetime.now(timezonetash)
 
+        # Load product with discounts, details, etc.
         product = (
             db.query(Products)
             .options(
@@ -178,12 +180,12 @@ def get_product_by_id(db: Session, product_id: UUID) -> Optional[Products]:
                     DiscountProducts,
                     lambda dp: dp.discount.has(
                         and_(
-                            Discounts.is_active == True,
+                            Discounts.is_active.is_(True),
                             Discounts.active_from <= now,
-                            Discounts.active_to >= now
+                            Discounts.active_to >= now,
                         )
                     ),
-                    include_aliases=True
+                    include_aliases=True,
                 ),
 
                 joinedload(Products.details)
@@ -191,23 +193,37 @@ def get_product_by_id(db: Session, product_id: UUID) -> Optional[Products]:
 
                 with_loader_criteria(
                     Sizes,
-                    lambda s: s.is_deleted == False,
-                    include_aliases=True
-                )
+                    lambda s: s.is_deleted.is_(False),
+                    include_aliases=True,
+                ),
             )
             .filter(Products.id == product_id)
             .first()
         )
-        if product and not product.views:
-            product.views = 1  # Initialize views if not set
+
+        if not product:
+            return None
+
+        # Increment views
+        if not product.views:
+            product.views = 1
         else:
             product.views += 1
-        db.commit()  # Commit the view increment    
-        db.refresh(product)  # Refresh to get the updated views count
+        db.commit()
+        db.refresh(product)
 
+        # Load the latest 6 reviews from DB
+        latest_reviews = (
+            db.query(Reviews)
+            .filter(Reviews.product_id == product_id)
+            .order_by(Reviews.created_at.desc())
+            .limit(6)
+            .all()
+        )
+        product.reviews = latest_reviews
 
-        product.reviews = product.reviews[:6]
         return product
+
     except SQLAlchemyError as e:
         raise e
     
