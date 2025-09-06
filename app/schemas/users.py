@@ -87,6 +87,28 @@ class GetUserFullData(BaseModel):
     )
 
 
+class GetUserFullDataInOrder(BaseModel):
+    id: UUID
+    full_name: Optional[str] = None
+    username: Optional[str] = None
+    is_client: Optional[bool] = True
+    passport_front_image: Optional[str] = None
+    passport_back_image: Optional[str] = None
+    person_passport_image: Optional[str] = None
+    passport_series: Optional[str] = None
+    extra_phone_number: Optional[str] = None
+    birth_date: Optional[datetime] = None
+    is_verified: Optional[bool] = False
+    is_active: Optional[bool] = True
+    marriage_status: Optional[str] = None
+    job: Optional[str] = None
+    salary: Optional[str] = None
+    exerience: Optional[float] = None
+
+    model_config = ConfigDict(
+        from_attributes=True
+    )
+
 
 class LoginClient(BaseModel):
     username: str = Field(..., min_length=12, max_length=12, pattern=r'^\d{12}$', description="Phone number in format 998901234567")
