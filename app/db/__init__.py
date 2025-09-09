@@ -33,3 +33,4 @@ from app.models import measureUnits
 from app.models import reviews
 from app.models import userLocations
 from app.models import transactions
+from app.models import sitevisits

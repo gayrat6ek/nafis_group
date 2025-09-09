@@ -9,6 +9,7 @@ from fastapi_pagination import add_pagination
 
 from app.core.config import settings
 from app.db.base import Base
+from sqlalchemy.orm import Session
 from app.db.session import engine
 from app.routes.v1.life_span import combined_lifespan
 from app.routes.v1.roles import roles_router
@@ -33,7 +34,8 @@ from app.routes.v1.reviews import reviews_router
 from app.routes.v1.userLocations import router as user_locations_router
 from app.routes.v1.payme import payme_route
 from app.routes.v1.orderMonthlypayment import app_monthly_payment_router
-
+from app.crud.sitevisits import add_today_visit
+from app.routes.depth import get_db
 
 from app.utils.utils import get_current_user_for_docs
 
@@ -102,6 +104,30 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"]
 )
+
+
+
+def get_client_ip(request: Request) -> str:
+    """Extract client IP (works behind proxies if forwarded-for is set)."""
+    x_forwarded_for = request.headers.get("x-forwarded-for")
+    if x_forwarded_for:
+        ip = x_forwarded_for.split(",")[0]
+    else:
+        ip = request.client.host
+    return ip
+
+
+@app.middleware("http")
+async def count_unique_ips(request: Request, call_next,db: Session = Depends(get_db)):
+    db: Session = next(get_db())
+    try:
+        ip = get_client_ip(request)
+        add_today_visit(db=db, ip_address=ip)
+        response = await call_next(request)
+        return response
+    finally:
+        db.close()  # Always close session     
+
 
 
 

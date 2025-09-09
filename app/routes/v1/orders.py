@@ -35,7 +35,7 @@ from app.utils.utils import timezonetash
 from app.crud.userLocations import user_location as user_location_crud
 from app.crud.regions import get_region_by_name
 from app.utils.utils import find_region
-
+from app.crud.sitevisits import stats_visits
 orders_router = APIRouter()
 @orders_router.post('/orders/cart/add', response_model=None)
 async def add_to_cart(
@@ -413,9 +413,11 @@ async def get_order_statistics(
     ravenue_stats= crud_orders.get_order_stats(db=db, from_date=from_date, to_date=to_date)
     order_status_breakdown= crud_orders.get_order_status_breakdown(db=db, from_date=from_date, to_date=to_date)
     by_region = crud_orders.get_region_stats(db=db, from_date=from_date, to_date=to_date)
+    daily_visits = stats_visits(db=db, from_date=from_date,to_date=to_date)
     return {
         # ._mapping works on SQLAlchemy Row objects >=1.4
         "ravenue_stats": dict(ravenue_stats._mapping) if ravenue_stats else {},
         "order_status_breakdown": [dict(r._mapping) for r in order_status_breakdown],
         "by_region": [dict(r._mapping) for r in by_region],
+        "daily_visits":[{"day": str(row.day), "visits": row.visits} for row in daily_visits]
     }
