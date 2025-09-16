@@ -125,9 +125,10 @@ def send_sms(phone_number, otp):
 
     response = requests.post(
         url,
-        json=message,             # send JSON payload
+        json=message,
         auth=(settings.playmobile_login, settings.playmobile_password) # Basic Auth
     )
+    print(response.text)
 
     return response
     
