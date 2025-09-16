@@ -106,20 +106,22 @@ def find_region(lat, lon, geojson_path="app/utils/geo.json"):
 def send_sms(phone_number, otp):
     text = f"Kod dlya vhoda v prilozheniyu Nafis Home: {otp}. Ne soobshayte danniy kod nikomu!!!"
 
-    message = [
-        {
-        "recipient":phone_number,
-        "message-id":"abc000000001",
+    message = {
+    "messages":[
+            {
+            "recipient":phone_number,
+            "message-id":"abc000000001",
 
-            "sms":{
+                "sms":{
 
-            "originator": "3700",
-            "content": {
-            "text": text
-            }
-            }
+                "originator": "3700",
+                "content": {
+                "text": text
+                    }
                 }
-    ]
+            }
+        ]
+    }
     url = "https://send.smsxabar.uz/broker-api/send"  # replace with real endpoint
   
 
