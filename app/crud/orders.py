@@ -546,6 +546,7 @@ def get_order_stats(db, from_date, to_date):
             func.sum(Orders.discount_amount).label("total_discounts"),
         )
         .filter(Orders.created_at.between(from_date, to_date))
+        .filter(Orders.status!=0)
     )
     return q.one()
 
@@ -558,6 +559,7 @@ def get_order_status_breakdown(db, from_date, to_date):
             func.sum(Orders.total_amount).label("revenue")
         )
         .filter(Orders.created_at.between(from_date, to_date))
+        .filter(Orders.status!=0)
         .group_by(Orders.status)
     )
     return q.all()  # list of (status, count, revenue)
@@ -573,6 +575,7 @@ def get_region_stats(db, from_date, to_date):
             func.sum(Orders.items_count).label("items")
         )
         .filter(Orders.created_at.between(from_date, to_date))
+        .filter(Orders.status!=0)
         .group_by(Orders.region)
     )
     return q.all()  # list of (region, count, revenue, items)

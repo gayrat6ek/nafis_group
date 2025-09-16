@@ -27,6 +27,10 @@ class Settings(BaseSettings):
     database_url: str = os.getenv("DATABASE_URL", "sqlite:///./sql_app.db")
     payme_password: str = os.getenv("PAYME_PASSWORD")
     payme_merchant_id: str = os.getenv("PAYME_MERCHANT_ID")
+    playmobile_login: str = os.getenv('PLAYMOBILE_LOGIN')
+    playmobile_password: str = os.getenv("PLAYMOBILE_PASSWORD")
+
+
 
     # Security settings
 

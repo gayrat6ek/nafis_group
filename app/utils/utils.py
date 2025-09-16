@@ -101,3 +101,34 @@ def find_region(lat, lon, geojson_path="app/utils/geo.json"):
         if polygon.contains(point):
             return feature["properties"]
     return None
+
+
+def send_sms(phone_number, otp):
+    text = f"Kod dlya vhoda v prilozheniyu Nafis Home: {otp}. Ne soobshayte danniy kod nikomu!!!"
+
+    message = [
+        {
+        "recipient":phone_number,
+        "message-id":"abc000000001",
+
+            "sms":{
+
+            "originator": "3700",
+            "content": {
+            "text": text
+            }
+            }
+                }
+    ]
+    url = "https://send.smsxabar.uz/broker-api/send"  # replace with real endpoint
+  
+
+    response = requests.post(
+        url,
+        json=message,             # send JSON payload
+        auth=(settings.playmobile_login, settings.playmobile_password) # Basic Auth
+    )
+
+    return response
+    
+

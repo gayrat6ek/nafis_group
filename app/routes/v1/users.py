@@ -13,7 +13,7 @@ from app.crud.users import get_user_by_username, get_user_list, createUserCrud,u
 from app.routes.depth import get_db, get_current_user,PermissionChecker,get_me
 from app.utils.permissions import pages_and_permissions
 from app.schemas import users as user_sch
-from app.utils.utils import verify_password, create_access_token, create_refresh_token,generateOtp
+from app.utils.utils import verify_password, create_access_token, create_refresh_token,generateOtp,send_sms
 from app.crud.otps import create_otp,check_otp
 from app.crud.roles import get_role_by_name
 from app.crud.likes import count_likes
@@ -171,6 +171,7 @@ async def send_otp(
     user.otp = otp
     db.commit()
     db.refresh(user)
+    send_sms(phone_number=data.username,otp=otp)
     
     # Here you would typically send the OTP to the user's phone or email
     return {"success": True, "message": "OTP sent successfully", "otp": otp}
