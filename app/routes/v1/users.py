@@ -166,6 +166,7 @@ async def send_otp(
     
     if not user:
         create_otp(db=db, phone_number=data.username, otp_code=otp)
+        send_sms(phone_number=data.username,otp=otp)
         return {"success": True, "message": "OTP sent successfully", "otp": otp}
     
     user.otp = otp
