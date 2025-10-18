@@ -17,6 +17,10 @@ from app.utils.utils import verify_password, create_access_token, create_refresh
 from app.crud.otps import create_otp,check_otp
 from app.crud.roles import get_role_by_name
 from app.crud.likes import count_likes
+from app.crud.limit import get_limit
+from app.crud.orders import get_user_order_sum
+from app.crud.orders import has_unpaid_order
+
 
 user_router = APIRouter()
 
@@ -88,8 +92,14 @@ async def get_me(
         current_user: user_sch.GetUserFullData = Depends(get_me)
 ):
     likes = count_likes(db=db, user_id=current_user.id)
+    limit = get_limit(db=db)
+    orders_total = get_user_order_sum(db=db, user_id=current_user.id)
+    limit_left = limit.limit - orders_total
+    # min left limit is 0
     
+    current_user.limit_total = limit.limit
     current_user.like_count = int(likes)
+    current_user.limit_left = max(0, limit_left)
     return current_user
 
 
@@ -124,7 +134,7 @@ async def get_user(
 async def create_user(
         user_data: user_sch.createUser,
         db: Session = Depends(get_db),
-        # current_user: dict = Depends(PermissionChecker(required_permissions=pages_and_permissions['Users']['create'])),
+        current_user: dict = Depends(PermissionChecker(required_permissions=pages_and_permissions['Users']['create'])),
 ):
     if get_user_by_username(db=db, username=user_data.username):
         raise HTTPException(status_code=400, detail="Username already exists")
@@ -143,16 +153,16 @@ async def update_user_data(
         user_id: str,
         user_data: user_sch.UpdateUser,
         db: Session = Depends(get_db),
-        # current_user: dict = Depends(PermissionChecker(required_permissions=pages_and_permissions['Users']['update'])),
+        current_user: dict = Depends(PermissionChecker(required_permissions=pages_and_permissions['Users']['update'])),
 ):
     user_id = UUID(user_id)
-    updated_user = update_user(db=db, user_id=user_id, user_data=user_data)
-    
-    if not updated_user:
+    current_user_data = get_one_user(db=db, user_id=user_id)
+    if not current_user_data:
         raise HTTPException(status_code=404, detail="User not found")
-    
-    return updated_user
+    if current_user_data.role.name != "Admin" and has_unpaid_order(db=db, user_id=current_user_data.id):
+        raise HTTPException(status_code=400, detail="You have unpaid orders, you can't update your profile")
 
+    return update_user(db=db, user_id=user_id, user_data=user_data)
 
 
 @user_router.post("/users/otp",)

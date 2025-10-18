@@ -34,6 +34,7 @@ from app.routes.v1.reviews import reviews_router
 from app.routes.v1.userLocations import router as user_locations_router
 from app.routes.v1.payme import payme_route
 from app.routes.v1.orderMonthlypayment import app_monthly_payment_router
+from app.routes.v1.limit import limit_router
 from app.crud.sitevisits import add_today_visit
 from app.routes.depth import get_db
 
@@ -75,7 +76,7 @@ app.include_router(reviews_router, prefix="/api/v1", tags=["Reviews"])
 app.include_router(user_locations_router, prefix="/api/v1/user-locations", tags=["User Locations"])
 app.include_router(payme_route, prefix="/api/v1/payme", tags=["Payme"])
 app.include_router(app_monthly_payment_router, prefix="/api/v1/monthly-payment", tags=["Order Monthly Payment"])
-
+app.include_router(limit_router, prefix="/api/v1", tags=["Limit"])
 
 
 @app.get("/docs", include_in_schema=False)

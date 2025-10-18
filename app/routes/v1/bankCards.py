@@ -18,6 +18,7 @@ from app.schemas.bankCards import (
     BankCardGet,
 )
 from app.utils.permissions import pages_and_permissions
+from app.crud.orders import has_unpaid_order
 
 bank_cards_router = APIRouter()
 
@@ -64,6 +65,8 @@ async def update_bank_card(
         db: Session = Depends(get_db),
         current_user: dict = Depends(PermissionChecker(required_permissions=pages_and_permissions['BankCards']['update']))
 ):
+    if has_unpaid_order(db=db, user_id=current_user['id']):
+        raise HTTPException(status_code=400, detail="You have unpaid orders, you can't update your bank card")
     updated_bank_card = crud_bank_cards.update_bank_card(db=db, card_id=id, data=body)
     if not updated_bank_card:
         raise HTTPException(status_code=404, detail="Bank card not found")

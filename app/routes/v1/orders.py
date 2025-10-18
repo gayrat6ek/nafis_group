@@ -36,6 +36,10 @@ from app.crud.userLocations import user_location as user_location_crud
 from app.crud.regions import get_region_by_name
 from app.utils.utils import find_region
 from app.crud.sitevisits import stats_visits
+from app.crud import productDetails as product_details_crud
+from app.crud.limit import get_limit
+
+
 orders_router = APIRouter()
 @orders_router.post('/orders/cart/add', response_model=None)
 async def add_to_cart(
@@ -49,6 +53,18 @@ async def add_to_cart(
     cart = crud_orders.get_cart_by_user_id(db=db, user_id=current_user['id'])
     if not cart:
         cart = crud_orders.create_cart(db=db, user_id=current_user['id'])
+
+    product_detail = product_details_crud.get_product_details_by_id(db=db, product_detail_id=body.product_detail_id)
+    if not product_detail:
+        raise HTTPException(status_code=404, detail="Product detail not found")
+    
+    size = product_detail.size.price * body.quantity
+
+    
+    limit = get_limit(db=db)
+    cart_total = crud_orders.get_user_cart_sum(db=db, user_id=current_user['id'])
+    if cart_total + size > limit.limit:
+        raise HTTPException(status_code=400, detail="You have reached your limit")
     
     orderItem = crud_orders.add_or_update_item_cart(
         db=db,

@@ -579,3 +579,41 @@ def get_region_stats(db, from_date, to_date):
         .group_by(Orders.region)
     )
     return q.all()  # list of (region, count, revenue, items)
+
+
+
+def get_user_order_sum(db: Session, user_id: UUID):
+    # This get all unclosed or unfinished and not paid orders and sum the total amount
+    try:
+        orders = db.query(Orders).filter(
+            Orders.user_id == user_id,
+            Orders.status.in_([1, 2, 3, 4, 5]),
+            Orders.is_paid == False
+        ).all()
+        return sum(order.total_amount for order in orders)
+    except SQLAlchemyError as e:
+        raise e
+
+
+def get_user_cart_sum(db: Session, user_id: UUID):
+    try:
+        orders = db.query(Orders).filter(
+            Orders.user_id == user_id,
+            Orders.status.in_([0,1, 2, 3, 4, 5]),
+            Orders.is_paid == False
+        ).all()
+        return sum(order.total_amount for order in orders)
+    except SQLAlchemyError as e:
+        raise e
+
+
+def has_unpaid_order(db: Session, user_id: UUID):
+    try:
+        order = db.query(Orders).filter(
+            Orders.user_id == user_id,
+            Orders.status.in_([1, 2, 3, 4, 5]),
+            Orders.is_paid == False
+        ).first()
+        return order is not None
+    except SQLAlchemyError as e:
+        raise e

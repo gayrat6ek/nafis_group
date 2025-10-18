@@ -109,6 +109,11 @@ pages_and_permissions = {
         "update": "UL2",
         "create": "UL4",
         "delete": "UL5"
+    },
+    "Limits": {
+        "view": "L1",
+        "update": "L2",
+        "create": "L4"
     }
 
 
