@@ -97,7 +97,7 @@ async def get_me(
         limit = get_user.limit_total
     else:
         limit = get_limit(db=db)
-        get_user.limit_total = limit.limit.limit
+        get_user.limit_total = limit.limit
     likes = count_likes(db=db, user_id=current_user.id)
     orders_total = get_user_order_sum(db=db, user_id=current_user.id)
     limit_left = limit - orders_total
