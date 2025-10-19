@@ -103,7 +103,6 @@ async def get_me(
     limit_left = current_user.limit_total - orders_total
     # min left limit is 0
     
-    current_user.limit_total = limit.limit
     current_user.like_count = int(likes)
     current_user.limit_left = max(0, limit_left)
     return current_user
