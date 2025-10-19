@@ -69,7 +69,7 @@ async def add_to_cart(
         limit = get_limit(db=db)
         get_user.limit_total = limit.limit
     cart_total = crud_orders.get_user_cart_sum(db=db, user_id=current_user['id'])
-    if cart_total + size > limit.limit:
+    if cart_total + size > get_user.limit_total:
         raise HTTPException(status_code=400, detail="You have reached your limit")
     
     orderItem = crud_orders.add_or_update_item_cart(
