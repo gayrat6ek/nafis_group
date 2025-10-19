@@ -93,14 +93,14 @@ async def get_me(
         current_user: user_sch.GetUserFullData = Depends(get_me)
 ):
     get_user = get_one_user(db=db, user_id=current_user.id)
-    if not get_user.limit_total:
-        get_user.limit_total = get_user.limit_total
+    if get_user.limit_total is not None:
+        limit = get_user.limit_total
     else:
         limit = get_limit(db=db)
-        get_user.limit_total = limit.limit
+        get_user.limit_total = limit.limit.limit
     likes = count_likes(db=db, user_id=current_user.id)
     orders_total = get_user_order_sum(db=db, user_id=current_user.id)
-    limit_left = get_user.limit_total - orders_total
+    limit_left = limit - orders_total
     # min left limit is 0
     
     current_user.limit_total = limit.limit
