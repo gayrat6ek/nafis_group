@@ -55,15 +55,15 @@ async def add_to_cart(
     if not cart:
         cart = crud_orders.create_cart(db=db, user_id=current_user['id'])
 
-    product_detail = product_details_crud.get_product_details_by_id(db=db, product_detail_id=body.product_detail_id)
-    if not product_detail:
+    product_size = product_details_crud.get_size_by_id(db=db, size_id=body.size_id)
+    if not product_size:
         raise HTTPException(status_code=404, detail="Product detail not found")
     
-    size = product_detail.size.price * body.quantity
+    size = product_size.price * body.quantity
 
     
     get_user = get_one_user(db=db, user_id=current_user['id'])
-    if not get_user.limit_total:
+    if get_user.limit_total:
         get_user.limit_total = get_user.limit_total
     else:
         limit = get_limit(db=db)
