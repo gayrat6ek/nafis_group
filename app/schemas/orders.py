@@ -157,6 +157,7 @@ class CartItemsSelect(BaseConfig):
 
 
 class OrderFilter(BaseConfig):
+    order_number: Optional[int] = None  # Filter by order number
     is_paid: Optional[bool] = None  # Filter by payment status
     filter: Optional[OrderStatus]=None  # Filter by order status
     status: Optional[int] = None  # Filter by specific order status code (if applicable)

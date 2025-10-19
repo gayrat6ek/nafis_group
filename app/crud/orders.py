@@ -304,6 +304,8 @@ def get_orders(db: Session, filter: OrderFilter, user_id: Optional[UUID] = None,
         # Apply additional filters
         if filter.status is not None:
             base_query = base_query.filter(Orders.status == filter.status)
+        if filter.order_number is not None:
+            base_query = base_query.filter(Orders.order_number.ilike(f"%{filter.order_number}%"))
         if filter.is_paid is not None:
             base_query = base_query.filter(Orders.is_paid == filter.is_paid)
         if filter.filter == 'inactive':
