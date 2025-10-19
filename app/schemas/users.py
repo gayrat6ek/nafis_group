@@ -56,6 +56,7 @@ class UpdateUser(BaseModel):
     job: Optional[str] = Field(None, description="Job of the user")
     salary: Optional[str] = Field(None, description="Salary of the user")
     exerience: Optional[float] = Field(None, description="Work experience of the user in years")
+    limit_total: Optional[float] = Field(None, description="Limit total of the user")
 
 
 class GetUserFullData(BaseModel):

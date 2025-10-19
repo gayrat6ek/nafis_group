@@ -1,3 +1,4 @@
+from typing import Optional
 from uuid import UUID
 from fastapi import APIRouter
 from fastapi_pagination import paginate, Page
@@ -91,10 +92,15 @@ async def get_me(
         db: Session = Depends(get_db),
         current_user: user_sch.GetUserFullData = Depends(get_me)
 ):
+    get_user = get_one_user(db=db, user_id=current_user.id)
+    if not get_user.limit_total:
+        get_user.limit_total = get_user.limit_total
+    else:
+        limit = get_limit(db=db)
+        get_user.limit_total = limit.limit
     likes = count_likes(db=db, user_id=current_user.id)
-    limit = get_limit(db=db)
     orders_total = get_user_order_sum(db=db, user_id=current_user.id)
-    limit_left = limit.limit - orders_total
+    limit_left = get_user.limit_total - orders_total
     # min left limit is 0
     
     current_user.limit_total = limit.limit
@@ -107,10 +113,12 @@ async def get_me(
 async def get_users(
         page: int = 1,
         size: int = 10,
+        username: Optional[str]=None,
+        full_name:Optional[str]=None,
         db: Session = Depends(get_db),
         current_user: dict= Depends(PermissionChecker(required_permissions=pages_and_permissions['Users']['view'])),
 ):
-    return get_user_list(db=db, page=page, size=size)
+    return get_user_list(db=db, page=page, size=size,username=username,full_name=full_name)
 
 
 
@@ -161,6 +169,9 @@ async def update_user_data(
         raise HTTPException(status_code=404, detail="User not found")
     if current_user_data.role.name != "Admin" and has_unpaid_order(db=db, user_id=current_user_data.id):
         raise HTTPException(status_code=400, detail="You have unpaid orders, you can't update your profile")
+    
+    if user_id == current_user['id'] and user_data.limit_total is not None:
+        raise HTTPException(status_code=400, detail="You can't update your limit total")
 
     return update_user(db=db, user_id=user_id, user_data=user_data)
 

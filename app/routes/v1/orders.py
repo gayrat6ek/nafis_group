@@ -13,6 +13,7 @@ from fastapi_pagination import Page
 from sqlalchemy.orm import Session
 from app.crud import orders as crud_orders
 from app.crud import loanMonths as crud_loanMonths
+from app.crud.users import get_one_user
 from app.routes.depth import get_db, PermissionChecker
 from app.schemas.orders import (
     AddOrUpdateCartItem,
@@ -61,7 +62,12 @@ async def add_to_cart(
     size = product_detail.size.price * body.quantity
 
     
-    limit = get_limit(db=db)
+    get_user = get_one_user(db=db, user_id=current_user['id'])
+    if not get_user.limit_total:
+        get_user.limit_total = get_user.limit_total
+    else:
+        limit = get_limit(db=db)
+        get_user.limit_total = limit.limit
     cart_total = crud_orders.get_user_cart_sum(db=db, user_id=current_user['id'])
     if cart_total + size > limit.limit:
         raise HTTPException(status_code=400, detail="You have reached your limit")

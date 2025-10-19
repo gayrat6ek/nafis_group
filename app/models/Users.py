@@ -59,6 +59,7 @@ class Users(Base):
     salary = Column(String, nullable=True)  # Assuming salary is a string
     exerience = Column(Float, nullable=True)  # Assuming work experience is a string
     work_place = Column(String, nullable=True)  # Assuming workplace is a string
+    limit_total = Column(Float, nullable=True)  # Assuming limit total is a float
 
     bank_cards = relationship("BankCards", back_populates="user")  # Assuming BankCards model has a user relationship
     orders = relationship("Orders", back_populates="user")  # Assuming Orders model has

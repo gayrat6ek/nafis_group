@@ -1,4 +1,5 @@
 
+from curses import noecho
 from app.utils.utils import hash_password
 from app.models.Users import Users
 from sqlalchemy.orm import Session
@@ -31,9 +32,14 @@ def get_user_by_username(db:Session,username):
     return query
 
 
-def get_user_list(db:Session, page: int = 1, size: int = 10):
+def get_user_list(db:Session,username:Optional[str]=None,full_name:Optional[str]=None, page: int = 1, size: int = 10,):
     query = db.query(Users)
+    if username is not None:
+        query = query.filter(Users.username.ilike(f"%{username}%"))
+    if full_name is not None:
+        query = query.filter(Users.full_name.ilike(f"%{full_name}%"))
     total_count = query.count()
+    
     users = query.offset((page - 1) * size).limit(size).all()
     
     return {
