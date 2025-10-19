@@ -164,7 +164,7 @@ async def update_user_data(
         current_user: dict = Depends(PermissionChecker(required_permissions=pages_and_permissions['Users']['update'])),
 ):
     user_id = UUID(user_id)
-    current_user_data = get_one_user(db=db, user_id=user_id)
+    current_user_data = get_one_user(db=db, user_id=current_user['id'])
     if not current_user_data:
         raise HTTPException(status_code=404, detail="User not found")
     if current_user_data.role.name != "Admin" and has_unpaid_order(db=db, user_id=current_user_data.id):
