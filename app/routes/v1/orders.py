@@ -208,10 +208,6 @@ async def confirm_order(
     """
     Confirm the user's order.
     """
-
-    product_size = product_details_crud.get_size_by_id(db=db, size_id=body.size_id)
-    if not product_size:
-        raise HTTPException(status_code=404, detail="Product detail not found")
     
     
 
