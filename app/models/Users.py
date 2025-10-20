@@ -60,6 +60,8 @@ class Users(Base):
     exerience = Column(Float, nullable=True)  # Assuming work experience is a string
     work_place = Column(String, nullable=True)  # Assuming workplace is a string
     limit_total = Column(Float, nullable=True)  # Assuming limit total is a float
+    black_list = Column(Boolean, default=False)  # Assuming black list is a boolean
+    black_list_reason = Column(String, nullable=True)  # Assuming black list reason is a string
 
     bank_cards = relationship("BankCards", back_populates="user")  # Assuming BankCards model has a user relationship
     orders = relationship("Orders", back_populates="user")  # Assuming Orders model has

@@ -57,6 +57,8 @@ class UpdateUser(BaseModel):
     salary: Optional[str] = Field(None, description="Salary of the user")
     exerience: Optional[float] = Field(None, description="Work experience of the user in years")
     limit_total: Optional[float] = Field(None, description="Limit total of the user")
+    black_list: Optional[bool] = Field(False, description="Indicates if the user is black listed")
+    black_list_reason: Optional[str] = Field(None, description="Reason for black listing the user")
 
 
 class GetUserFullData(BaseModel):
@@ -84,6 +86,8 @@ class GetUserFullData(BaseModel):
     like_count: Optional[int] = 0  # Assuming this is the count of likes for the user
     limit_total: Optional[float] = 0
     limit_left: Optional[float]= 0
+    black_list: Optional[bool] = False
+    black_list_reason: Optional[str] = None
 
     model_config = ConfigDict(
         from_attributes=True

@@ -208,11 +208,12 @@ async def confirm_order(
     """
     Confirm the user's order.
     """
-    
+    get_user = get_one_user(db=db, user_id=current_user['id'])
+    if get_user.black_list:
+        raise HTTPException(status_code=400, detail=f"You are black listed: {get_user.black_list_reason}")
     
 
     if body.loan_month_id:
-        get_user = get_one_user(db=db, user_id=current_user['id'])
         if get_user.limit_total:
             get_user.limit_total = get_user.limit_total
         else:
