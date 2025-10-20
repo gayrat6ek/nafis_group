@@ -166,7 +166,7 @@ async def update_user_data(
     current_user_data = get_one_user(db=db, user_id=current_user['id'])
     if not current_user_data:
         raise HTTPException(status_code=404, detail="User not found")
-    if current_user_data.role.name != "Admin" and has_unpaid_order(db=db, user_id=current_user_data.id):
+    if current_user_data.role.name != "Admin" and has_unpaid_order(db=db, user_id=current_user_data.id) and ( current_user_data.passport_series and current_user_data.person_passport_image):
         raise HTTPException(status_code=400, detail="You have unpaid orders, you can't update your profile")
     
     if user_id == current_user['id'] and user_data.limit_total is not None:
