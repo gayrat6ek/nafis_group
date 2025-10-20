@@ -212,6 +212,7 @@ def confirm_card(user_id: UUID, db: Session, data:ConfirmOrder):
         # if not new_cart:
         #     new_cart = create_cart(db, user_id)
         new_cart = []
+        print('data.item_ids',data.item_ids)
         for item in cart.items:
             if item.id not in data.item_ids:
                 new_cart.append({

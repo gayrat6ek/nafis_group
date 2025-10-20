@@ -424,18 +424,15 @@ async def update_order_status(
     if not order:
         raise HTTPException(status_code=404, detail="Order not found")
     
-    if data.status and data.status == 7 and order.status != 7:
-        send_sms(phone_number=order.user.username,text=f"Vash zakaz {order.order_number} v punkte vidachi {order.pick_up_location.name}. Dlya polucheniya nazovite nomer zakaza")
-    
-    if data.status and data.status == 5 and order.status != 5:
-        send_sms(phone_number=order.user.username,text=f"Vash zakaz {order.order_number} dostavlen")
-
-    if data.status and data.status == 6 and order.status != 6:
-        send_sms(phone_number=order.user.username,text=f"Vash zakaz {order.order_number} otmenen po prichine {data.deny_reason}")
-    
-    if data.status and data.status == 2 and order.status != 2:
-        send_sms(phone_number=order.user.username,text=f"Vash zakaz {order.order_number} prinyat")
-
+    if data.status:
+        if  data.status == 7 and order.status != 7:
+            send_sms(phone_number=order.user.username,text=f"Vash zakaz {order.order_number} v punkte vidachi {order.pick_up_location.name}. Dlya polucheniya nazovite nomer zakaza")
+        if data.status == 5 and order.status != 5:
+            send_sms(phone_number=order.user.username,text=f"Vash zakaz {order.order_number} dostavlen")
+        if data.status == 6 and order.status != 6:
+            send_sms(phone_number=order.user.username,text=f"Vash zakaz {order.order_number} otmenen po prichine {data.deny_reason}")
+        if data.status == 2 and order.status != 2:
+            send_sms(phone_number=order.user.username,text=f"Vash zakaz {order.order_number} prinyat")
 
 
     
