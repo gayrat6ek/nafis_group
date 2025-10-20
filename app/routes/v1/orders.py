@@ -55,25 +55,8 @@ async def add_to_cart(
     if not cart:
         cart = crud_orders.create_cart(db=db, user_id=current_user['id'])
 
-    product_size = product_details_crud.get_size_by_id(db=db, size_id=body.size_id)
-    if not product_size:
-        raise HTTPException(status_code=404, detail="Product detail not found")
     
-    size = product_size.price * body.quantity
 
-    
-    get_user = get_one_user(db=db, user_id=current_user['id'])
-    if get_user.limit_total:
-        get_user.limit_total = get_user.limit_total
-    else:
-        limit = get_limit(db=db)
-        get_user.limit_total = limit.limit
-    cart_total = crud_orders.get_user_cart_sum(db=db, user_id=current_user['id'])
-    if cart_total + size > get_user.limit_total:
-        print('user limit total: ', get_user.limit_total)
-        print('cart total: ', cart_total)
-        print('size: ', size)
-        raise HTTPException(status_code=400, detail="You have reached your limit")
     
     orderItem = crud_orders.add_or_update_item_cart(
         db=db,
@@ -225,6 +208,23 @@ async def confirm_order(
     """
     Confirm the user's order.
     """
+
+    product_size = product_details_crud.get_size_by_id(db=db, size_id=body.size_id)
+    if not product_size:
+        raise HTTPException(status_code=404, detail="Product detail not found")
+    
+    size = product_size.price * body.quantity
+
+    if body.loan_month_id:
+        get_user = get_one_user(db=db, user_id=current_user['id'])
+        if get_user.limit_total:
+            get_user.limit_total = get_user.limit_total
+        else:
+            limit = get_limit(db=db)
+            get_user.limit_total = limit.limit
+        cart_total = crud_orders.get_user_cart_sum(db=db, user_id=current_user['id'])
+        if cart_total + size > get_user.limit_total:
+            raise HTTPException(status_code=400, detail="You have reached your limit")
 
         
     cart = crud_orders.get_cart_by_user_id(db=db, user_id=current_user['id'])
