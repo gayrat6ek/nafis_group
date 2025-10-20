@@ -433,7 +433,7 @@ async def update_order_status(
     if data.status and data.status == 6 and order.status != 6:
         send_sms(phone_number=order.user.username,text=f"Vash zakaz {order.order_number} otmenen po prichine {data.deny_reason}")
     
-    if data.status and data.status == 4 and order.status != 4:
+    if data.status and data.status == 2 and order.status != 2:
         send_sms(phone_number=order.user.username,text=f"Vash zakaz {order.order_number} prinyat")
 
 
