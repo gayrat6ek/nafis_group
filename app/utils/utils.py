@@ -103,8 +103,7 @@ def find_region(lat, lon, geojson_path="app/utils/geo.json"):
     return None
 
 
-def send_sms(phone_number, otp):
-    text = f"Kod dlya vhoda v prilozheniyu Nafis Home: {otp}. Ne soobshayte danniy kod nikomu!!!"
+def send_sms(phone_number, text):
 
     message = {
     "messages":[

@@ -56,6 +56,7 @@ class ConfirmOrder(BaseConfig):
     item_ids: Optional[List[UUID]] = None  # List of product detail IDs to confirm in the order
     loan_month_id: Optional[UUID] = None  # ID of the loan month used for payment, if applicable
     user_location_id: Optional[UUID] = None  # ID of the user's location for delivery, if applicable
+    confirm_number: Optional[int] = None  # Confirm number of the order
 
 
 

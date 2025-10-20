@@ -183,16 +183,18 @@ async def send_otp(
 ):
     user = get_user_by_id(db=db, username=data.username)
     otp = generateOtp(6)
+    text = f"Kod dlya vhoda v prilozheniyu Nafis Home: {otp}. Ne soobshayte danniy kod nikomu!!!"
+
     
     if not user:
         create_otp(db=db, phone_number=data.username, otp_code=otp)
-        send_sms(phone_number=data.username,otp=otp)
+        send_sms(phone_number=data.username,text=text)
         return {"success": True, "message": "OTP sent successfully"}
     
     user.otp = otp
     db.commit()
     db.refresh(user)
-    send_sms(phone_number=data.username,otp=otp)
+    send_sms(phone_number=data.username,text=text)
     
     # Here you would typically send the OTP to the user's phone or email
     return {"success": True, "message": "OTP sent successfully"}

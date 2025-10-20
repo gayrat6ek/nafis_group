@@ -1,5 +1,6 @@
 import base64
 from datetime import datetime, timedelta
+import random
 from typing import List, Optional, Union
 from uuid import UUID
 from fastapi import APIRouter
@@ -32,7 +33,7 @@ from app.schemas.orders import OrderFilter
 
 from app.utils.permissions import pages_and_permissions
 from app.crud.loanMonths import get_loan_months
-from app.utils.utils import timezonetash
+from app.utils.utils import send_sms, timezonetash, generateOtp
 from app.crud.userLocations import user_location as user_location_crud
 from app.crud.regions import get_region_by_name
 from app.utils.utils import find_region
@@ -199,7 +200,7 @@ async def get_my_cart(
 
 
 
-@orders_router.post('/orders/confirm', response_model=OrderResponse)
+@orders_router.post('/orders/confirm')
 async def confirm_order(
         body: ConfirmOrder,
         db: Session = Depends(get_db),
@@ -227,6 +228,17 @@ async def confirm_order(
     cart = crud_orders.get_cart_by_user_id(db=db, user_id=current_user['id'])
     if not cart:
         raise HTTPException(status_code=404, detail="Cart not found")
+    if not cart.confirm_number and (body.loan_month_id or cart.loan_month_id):
+        confirm_number = generateOtp(6)
+        cart.confirm_number = confirm_number
+        db.commit()
+        send_sms(phone_number=current_user['username'],text=f"Kod dlya sozdaniya zakaza na rassrochku ot Nafis Home: {confirm_number}. Ne soobshayte danniy kod nikomu!!!")
+        return {"message": "Confirmation code sent to your phone", "confirm_number": confirm_number}
+
+    if cart.confirm_number and cart.confirm_number != body.confirm_number:
+        raise HTTPException(status_code=400, detail="Invalid confirmation code")
+
+    
     
     order = crud_orders.confirm_card(
         db=db, 
@@ -411,6 +423,21 @@ async def update_order_status(
     order = crud_orders.get_order_by_id_admin(db=db, order_id=order_id)
     if not order:
         raise HTTPException(status_code=404, detail="Order not found")
+    
+    if data.status and data.status == 7 and order.status != 7:
+        send_sms(phone_number=order.user.username,text=f"Vash zakaz {order.order_number} v punkte vidachi {order.pick_up_location.name}. Dlya polucheniya nazovite nomer zakaza")
+    
+    if data.status and data.status == 5 and order.status != 5:
+        send_sms(phone_number=order.user.username,text=f"Vash zakaz {order.order_number} dostavlen")
+
+    if data.status and data.status == 6 and order.status != 6:
+        send_sms(phone_number=order.user.username,text=f"Vash zakaz {order.order_number} otmenen po prichine {data.deny_reason}")
+    
+    if data.status and data.status == 4 and order.status != 4:
+        send_sms(phone_number=order.user.username,text=f"Vash zakaz {order.order_number} prinyat")
+
+
+
     
     updated_order = crud_orders.updateOrderCrud(
         db=db,
