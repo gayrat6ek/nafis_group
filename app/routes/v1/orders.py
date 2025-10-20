@@ -213,7 +213,7 @@ async def confirm_order(
     if not product_size:
         raise HTTPException(status_code=404, detail="Product detail not found")
     
-    size = product_size.price * body.quantity
+    
 
     if body.loan_month_id:
         get_user = get_one_user(db=db, user_id=current_user['id'])
@@ -223,7 +223,7 @@ async def confirm_order(
             limit = get_limit(db=db)
             get_user.limit_total = limit.limit
         cart_total = crud_orders.get_user_cart_sum(db=db, user_id=current_user['id'])
-        if cart_total + size > get_user.limit_total:
+        if cart_total  > get_user.limit_total:
             raise HTTPException(status_code=400, detail="You have reached your limit")
 
         
