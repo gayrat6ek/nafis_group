@@ -59,6 +59,7 @@ class UpdateUser(BaseModel):
     limit_total: Optional[float] = Field(None, description="Limit total of the user")
     black_list: Optional[bool] = Field(False, description="Indicates if the user is black listed")
     black_list_reason: Optional[str] = Field(None, description="Reason for black listing the user")
+    black_list_days: Optional[int] = Field(None, description="Days for black listing the user")
 
 
 class GetUserFullData(BaseModel):
@@ -88,7 +89,7 @@ class GetUserFullData(BaseModel):
     limit_left: Optional[float]= 0
     black_list: Optional[bool] = False
     black_list_reason: Optional[str] = None
-
+    black_list_date: Optional[datetime] = None
     model_config = ConfigDict(
         from_attributes=True
     )

@@ -1,6 +1,6 @@
 
 from curses import noecho
-from app.utils.utils import hash_password
+from app.utils.utils import hash_password, timezonetash
 from app.models.Users import Users
 from sqlalchemy.orm import Session
 from typing import Optional
@@ -67,9 +67,47 @@ def update_user(db:Session, user_id: UUID, user_data: UpdateUser):
     if not query:
         return None
     
-    for key, value in user_data.dict(exclude_unset=True).items():
-        setattr(query, key, value)
-    
+    if user_data.birth_date is not None:
+        query.birth_date = user_data.birth_date
+    if user_data.full_name is not None:
+        query.full_name = user_data.full_name
+    if user_data.username is not None:
+        query.username = user_data.username
+    if user_data.role_id is not None:
+        query.role_id = user_data.role_id
+    if user_data.is_client is not None:
+        query.is_client = user_data.is_client
+    if user_data.passport_front_image is not None:
+        query.passport_front_image = user_data.passport_front_image
+    if user_data.passport_back_image is not None:
+        query.passport_back_image = user_data.passport_back_image
+    if user_data.person_passport_image is not None:
+        query.person_passport_image = user_data.person_passport_image
+    if user_data.passport_series is not None:
+        query.passport_series = user_data.passport_series
+    if user_data.extra_phone_number is not None:
+        query.extra_phone_number = user_data.extra_phone_number
+    if user_data.email is not None:
+        query.email = user_data.email
+    if user_data.is_verified is not None:
+        query.is_verified = user_data.is_verified
+    if user_data.is_active is not None:
+        query.is_active = user_data.is_active
+    if user_data.marriage_status is not None:
+        query.marriage_status = user_data.marriage_status
+    if user_data.job is not None:
+        query.job = user_data.job
+    if user_data.salary is not None:
+        query.salary = user_data.salary
+    if user_data.exerience is not None:
+        query.exerience = user_data.exerience
+    if user_data.limit_total is not None:
+        query.limit_total = user_data.limit_total
+    if user_data.black_list_reason is not None:
+        query.black_list_reason = user_data.black_list_reason
+    if user_data.black_list_days is not None:
+        query.black_list_date = datetime.now(tz=timezonetash) + timedelta(days=int(user_data.black_list_days))
+
     db.commit()
     db.refresh(query)
     return query

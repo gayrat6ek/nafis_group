@@ -210,8 +210,8 @@ async def confirm_order(
     Confirm the user's order.
     """
     get_user = get_one_user(db=db, user_id=current_user['id'])
-    if get_user.black_list:
-        raise HTTPException(status_code=400, detail=f"You are black listed: {get_user.black_list_reason}")
+    if get_user.black_list_date and get_user.black_list_date > datetime.now(tz=timezonetash):
+        raise HTTPException(status_code=400, detail=f"Вы в черном списке: {get_user.black_list_reason}")
     
 
     if body.loan_month_id:
@@ -222,7 +222,7 @@ async def confirm_order(
             get_user.limit_total = limit.limit
         cart_total = crud_orders.get_user_cart_sum(db=db, user_id=current_user['id'])
         if cart_total  > get_user.limit_total:
-            raise HTTPException(status_code=400, detail="You have reached your limit")
+            raise HTTPException(status_code=400, detail="Вы использовали ваш лимит")
 
         
     cart = crud_orders.get_cart_by_user_id(db=db, user_id=current_user['id'])
@@ -235,8 +235,8 @@ async def confirm_order(
         send_sms(phone_number=current_user['username'],text=f"Kod dlya sozdaniya zakaza na rassrochku ot Nafis Home: {confirm_number}. Ne soobshayte danniy kod nikomu!!!")
         return {"message": "Confirmation code sent to your phone", "confirm_number": confirm_number}
 
-    if cart.confirm_number and cart.confirm_number != body.confirm_number:
-        raise HTTPException(status_code=400, detail="Invalid confirmation code")
+    if cart.confirm_number and cart.confirm_number != body.confirm_number and cart.client_confirmed_date is None:
+        raise HTTPException(status_code=400, detail="Неверный код подтверждения")
 
     
     

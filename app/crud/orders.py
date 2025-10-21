@@ -212,7 +212,6 @@ def confirm_card(user_id: UUID, db: Session, data:ConfirmOrder):
         # if not new_cart:
         #     new_cart = create_cart(db, user_id)
         new_cart = []
-        print('data.item_ids',data.item_ids)
         for item in cart.items:
             if item.id not in data.item_ids:
                 new_cart.append({
@@ -591,7 +590,8 @@ def get_user_order_sum(db: Session, user_id: UUID):
         orders = db.query(Orders).filter(
             Orders.user_id == user_id,
             Orders.status.in_([1, 2, 3, 4, 5]),
-            Orders.is_paid == False
+            Orders.is_paid == False,
+            Orders.loan_month_id.is_(None)
         ).all()
         return sum(order.total_amount for order in orders)
     except SQLAlchemyError as e:
@@ -603,7 +603,8 @@ def get_user_cart_sum(db: Session, user_id: UUID):
         orders = db.query(Orders).filter(
             Orders.user_id == user_id,
             Orders.status.in_([0,1, 2, 3, 4, 5]),
-            Orders.is_paid == False
+            Orders.is_paid == False,
+            Orders.loan_month_id.is_(None)
         ).all()
         return sum(order.total_amount for order in orders)
     except SQLAlchemyError as e:

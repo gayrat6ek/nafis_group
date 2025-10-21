@@ -66,6 +66,7 @@ class Orders(Base):
     deny_reason = Column(String, nullable=True)  # Reason for order denial or cancellation
     card = relationship("BankCards", back_populates="orders")  # Assuming BankCards model has an orders relationship
     confirm_number = Column(Integer, nullable=True)  # Confirm number of the order
+    client_confirmed_date = Column(DateTime(timezone=True), nullable=True)  # Indicates if the client has confirmed the order
     
     user = relationship("Users", back_populates="orders")
     payment_dates = relationship("OrderPaymentDates", back_populates="order")
@@ -75,6 +76,7 @@ class Orders(Base):
     user_location = relationship("UserLocations", back_populates="orders")
     loan_month = relationship("LoanMonths", back_populates="orders")
     transaction = relationship("Transactions", back_populates="order")  # Assuming Transactions model has an order relationship
+    
 
 
 """
