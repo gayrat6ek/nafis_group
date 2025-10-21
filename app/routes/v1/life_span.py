@@ -13,30 +13,35 @@ from app.utils.permissions import pages_and_permissions
 timezonetash = pytz.timezone('Asia/Tashkent')
 
 
-
-#---------------------- CREATE ROLE AND USERS FOR DEFAULT ADMIN USER --------------------------
 @asynccontextmanager
 async def create_role_lifespan():
-    db: Session = next(get_db())
-    role_permissions = []
-    for key, value in pages_and_permissions.items():
-        for name, link in value.items():
-            role_permissions.append(link)
+    yield
 
-    role = get_role_by_name(db=db, name=settings.admin_role)
-    if not role:
-        role = create_role(db=db, name=settings.admin_role, description='Admin',permissions=role_permissions)
-    else:
-        role = update_role(db=db, id=role.id,data=UpdateRole(**{
-    'name': settings.admin_role,
-    'description': 'Admin',
-    'permissions': role_permissions
-}))
 
-    user = get_user_by_username(db=db, username=settings.admin_role)
-    if not user:
-        create_user(db=db, username=settings.admin_role, password=settings.admin_password, role_id=role.id,
-                    fullname='Admin user')
+
+#---------------------- CREATE ROLE AND USERS FOR DEFAULT ADMIN USER --------------------------
+# @asynccontextmanager
+# async def create_role_lifespan():
+#     db: Session = next(get_db())
+#     role_permissions = []
+#     for key, value in pages_and_permissions.items():
+#         for name, link in value.items():
+#             role_permissions.append(link)
+
+#     role = get_role_by_name(db=db, name=settings.admin_role)
+#     if not role:
+#         role = create_role(db=db, name=settings.admin_role, description='Admin',permissions=role_permissions)
+#     else:
+#         role = update_role(db=db, id=role.id,data=UpdateRole(**{
+#     'name': settings.admin_role,
+#     'description': 'Admin',
+#     'permissions': role_permissions
+# }))
+
+#     user = get_user_by_username(db=db, username=settings.admin_role)
+#     if not user:
+#         create_user(db=db, username=settings.admin_role, password=settings.admin_password, role_id=role.id,
+#                     fullname='Admin user')
 
     # role_permissions = []
     # for i in role.access:
@@ -49,7 +54,7 @@ async def create_role_lifespan():
 
     #             create_accesses(db=db, role_id=role.id, permission_id=permission.id)
 
-    yield  #--------------  HERE YOU CAN WRITE LOG ON CLOSING AFTER YIELD ------------
+    # yield  #--------------  HERE YOU CAN WRITE LOG ON CLOSING AFTER YIELD ------------
 
 
 # async def daily_run():
