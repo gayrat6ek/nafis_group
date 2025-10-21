@@ -237,6 +237,12 @@ async def confirm_order(
 
     if cart.confirm_number and cart.confirm_number != body.confirm_number and cart.client_confirmed_date is None:
         raise HTTPException(status_code=400, detail="Неверный код подтверждения")
+    elif cart.confirm_number and cart.confirm_number == body.confirm_number and cart.client_confirmed_date is None:
+        cart.client_confirmed_date = datetime.now(tz=timezonetash)
+        db.commit()
+    else:
+        raise HTTPException(status_code=400, detail="Неверный код подтверждения")
+    
 
     
     
@@ -332,6 +338,7 @@ async def select_cart_items(
     if not cart:
         raise HTTPException(status_code=404, detail="Cart not found")
     
+    loan_month = None
     if body.loan_month_id:
         loan_month = crud_loanMonths.get_loan_months_by_id(db=db, loan_months_id=body.loan_month_id)
         if not loan_month:
@@ -371,14 +378,20 @@ async def select_cart_items(
     item_count = 0
     for cart_item in cart.items:
         total_items_price += cart_item.size.price * cart_item.quantity
-        total_discounted_price += (cart_item.size.price - cart_item.price) +cart.delivery_fee
+        total_discounted_price += (cart_item.size.price - cart_item.price)
         total_price += cart_item.price * cart_item.quantity
         item_count += 1
     
-    cart.loan_month_price = (total_price+ cart.delivery_fee)*loan_month.percent/100 if body.loan_month_id else 0.0
-    cart.total_amount = (total_price+ cart.delivery_fee)+cart.loan_month_price
-    cart.loan_month_price = cart.total_amount/loan_month.months if body.loan_month_id else 0.0
-    cart.loan_month_percent = loan_month.percent if body.loan_month_id else 0.0
+    # Calculate loan interest and monthly payment
+    if body.loan_month_id and loan_month:
+        loan_interest = (total_price + cart.delivery_fee) * loan_month.percent / 100
+        cart.total_amount = (total_price + cart.delivery_fee) + loan_interest
+        cart.loan_month_price = cart.total_amount / loan_month.months
+        cart.loan_month_percent = loan_month.percent
+    else:
+        cart.total_amount = total_price + cart.delivery_fee
+        cart.loan_month_price = 0.0
+        cart.loan_month_percent = 0.0
 
     cart.items_count = item_count
     cart.total_items_price = total_items_price
