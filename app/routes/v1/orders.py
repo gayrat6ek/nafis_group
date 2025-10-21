@@ -373,27 +373,37 @@ async def select_cart_items(
     cart = crud_orders.get_cart_by_user_id(db=db, user_id=current_user['id'])
     
     # Apply delivery fee and date to cart
-    cart.delivery_fee = delivery_fee
+    cart.delivery_fee = delivery_fee if delivery_fee is not None else 0.0
     cart.delivery_date = delivery_date
+    
+    # Filter only selected items based on cart.item_ids
+    selected_items = []
+    if cart.item_ids:
+        selected_item_ids = set(cart.item_ids)  # Convert to set for faster lookup
+        selected_items = [item for item in cart.items if str(item.id) in selected_item_ids]
+    else:
+        selected_items = cart.items  # If no selection, use all items
     
     total_items_price = 0
     total_discounted_price = 0
     total_price = 0
     item_count = 0
-    for cart_item in cart.items:
+    for cart_item in selected_items:
         total_items_price += cart_item.size.price * cart_item.quantity
-        total_discounted_price += (cart_item.size.price - cart_item.price)
+        total_discounted_price += (cart_item.size.price - cart_item.price) * cart_item.quantity
         total_price += cart_item.price * cart_item.quantity
         item_count += 1
     
     # Calculate loan interest and monthly payment
+    delivery_fee_safe = cart.delivery_fee if cart.delivery_fee is not None else 0.0
+    
     if body.loan_month_id and loan_month:
-        loan_interest = (total_price + cart.delivery_fee) * loan_month.percent / 100
-        cart.total_amount = (total_price + cart.delivery_fee) + loan_interest
+        loan_interest = (total_price + delivery_fee_safe) * loan_month.percent / 100
+        cart.total_amount = (total_price + delivery_fee_safe) + loan_interest
         cart.loan_month_price = cart.total_amount / loan_month.months
         cart.loan_month_percent = loan_month.percent
     else:
-        cart.total_amount = total_price + cart.delivery_fee
+        cart.total_amount = total_price + delivery_fee_safe
         cart.loan_month_price = 0.0
         cart.loan_month_percent = 0.0
 
