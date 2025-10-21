@@ -187,14 +187,21 @@ async def get_my_cart(
     item_count = len(cart.items)
     total_items_price = sum(item.size.price * item.quantity for item in cart.items)  # original total
     total_price = sum(item.price * item.quantity for item in cart.items)  # discounted total
-    total_discounted_price = total_items_price - total_price+cart.delivery_fee if cart.delivery_fee is None else total_items_price - total_price
+    total_discounted_price = total_items_price - total_price
+
+    # Ensure delivery fee is not None
+    delivery_fee_safe = cart.delivery_fee if cart.delivery_fee is not None else 0.0
+    
+    # Calculate total amount with delivery fee and loan interest
+    if cart.loan_month_id and cart.loan_month_percent:
+        loan_interest = (total_price + delivery_fee_safe) * cart.loan_month_percent / 100
+        cart.total_amount = (total_price + delivery_fee_safe) + loan_interest
+    else:
+        cart.total_amount = total_price + delivery_fee_safe
 
     cart.items_count = item_count
     cart.total_items_price = total_items_price
     cart.total_discounted_price = total_discounted_price
-    cart.total_amount = total_price
-
-
 
     return cart
 
