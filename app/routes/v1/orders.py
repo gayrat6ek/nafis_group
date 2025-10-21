@@ -343,6 +343,10 @@ async def select_cart_items(
         loan_month = crud_loanMonths.get_loan_months_by_id(db=db, loan_months_id=body.loan_month_id)
         if not loan_month:
             raise HTTPException(status_code=404, detail="Loan month not found")
+    
+    # Calculate delivery fee based on user location
+    delivery_fee = 0.0
+    delivery_date = None
     if body.user_location_id:
         user_location = user_location_crud.get(db, id=body.user_location_id)
         if not user_location:
@@ -354,15 +358,11 @@ async def select_cart_items(
 
         if not region_data or not region_data.is_active:
             raise HTTPException(status_code=404, detail="Region is not active or not found")
-        cart.delivery_fee = region_data.delivery_cost if region_data and region_data.delivery_cost is not None else 0.0
-        cart.delivery_date = (
+        delivery_fee = region_data.delivery_cost if region_data and region_data.delivery_cost is not None else 0.0
+        delivery_date = (
                 datetime.now(timezonetash) + timedelta(days=region_data.delivery_days)
                 if region_data and region_data.delivery_days is not None else None
             )
-            
-        
-    else:
-        cart.delivery_fee = 0.0
 
     
     cart = crud_orders.update_cart_items_selection(
@@ -371,6 +371,10 @@ async def select_cart_items(
         item_ids=body.item_ids,
     )
     cart = crud_orders.get_cart_by_user_id(db=db, user_id=current_user['id'])
+    
+    # Apply delivery fee and date to cart
+    cart.delivery_fee = delivery_fee
+    cart.delivery_date = delivery_date
     
     total_items_price = 0
     total_discounted_price = 0
