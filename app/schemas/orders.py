@@ -107,6 +107,7 @@ class OrdersGet(BaseConfig):
     loan_month: Optional[LoanMonthsGet] = None  # Loan month details if applicable
     pick_up_location: Optional[PickUpLocationGet] = None  # Pick-up location details if applicable
     user_location: Optional[UserLocation] = None  # User location details if applicable
+    
 
 
 class OrderResponse(OrdersGet):
@@ -145,6 +146,7 @@ class OrdersFullGet(BaseConfig):
     loan_month: Optional[LoanMonthsGet] = None  # Loan month details if applicable
     pick_up_location: Optional[PickUpLocationGet] = None  # Pick-up location details if applicable
     user_location: Optional[UserLocation] = None  # User location details if applicable
+    confirm_status: Optional[str] = None  # Confirm status of the order
     
 
 
