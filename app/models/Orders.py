@@ -67,7 +67,13 @@ class Orders(Base):
     card = relationship("BankCards", back_populates="orders")  # Assuming BankCards model has an orders relationship
     confirm_number = Column(Integer, nullable=True)  # Confirm number of the order
     client_confirmed_date = Column(DateTime(timezone=True), nullable=True)  # Indicates if the client has confirmed the order
-    
+    confirm_status = Column(String, nullable=True)
+    """
+    confirm_status:
+    - confirming
+    - confirmed
+    - null "this means this order is not for loan"
+    """
     user = relationship("Users", back_populates="orders")
     payment_dates = relationship("OrderPaymentDates", back_populates="order")
     items = relationship("OrderItems", back_populates="order")

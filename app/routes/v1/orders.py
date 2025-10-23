@@ -238,14 +238,16 @@ async def confirm_order(
     if not cart.confirm_number and (body.loan_month_id or cart.loan_month_id):
         confirm_number = generateOtp(6)
         cart.confirm_number = confirm_number
+        cart.confirm_status = "confirming"
         db.commit()
         send_sms(phone_number=current_user['username'],text=f"Kod dlya sozdaniya zakaza na rassrochku ot Nafis Home: {confirm_number}. Ne soobshayte danniy kod nikomu!!!")
-        return {"message": "Confirmation code sent to your phone", "confirm_number": confirm_number}
+        return {"message": "Confirmation code sent to your phone", "confirm_number": confirm_number, "confirm_status": cart.confirm_status}
 
     if cart.confirm_number and cart.confirm_number != body.confirm_number and cart.client_confirmed_date is None:
         raise HTTPException(status_code=400, detail="Неверный код подтверждения")
     elif cart.confirm_number and cart.confirm_number == body.confirm_number and cart.client_confirmed_date is None:
         cart.client_confirmed_date = datetime.now(tz=timezonetash)
+        cart.confirm_status = "confirmed"
         db.commit()
     else:
         raise HTTPException(status_code=400, detail="Неверный код подтверждения")
@@ -413,6 +415,7 @@ async def select_cart_items(
         cart.total_amount = total_price + delivery_fee_safe
         cart.loan_month_price = 0.0
         cart.loan_month_percent = 0.0
+    
 
     cart.items_count = item_count
     cart.total_items_price = total_items_price
@@ -420,6 +423,9 @@ async def select_cart_items(
     cart.loan_month_id = body.loan_month_id
     cart.pick_up_location_id = body.pick_up_location_id
     cart.user_location_id = body.user_location_id
+    cart.confirm_number = None
+    cart.client_confirmed_date = None
+    cart.confirm_status = None
 
     db.commit()
     
