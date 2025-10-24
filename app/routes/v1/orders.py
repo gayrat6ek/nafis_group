@@ -252,9 +252,6 @@ async def confirm_order(
         cart.client_confirmed_date = datetime.now(tz=timezonetash)
         cart.confirm_status = "confirmed"
         db.commit()
-    else:
-        raise HTTPException(status_code=400, detail="Неверный код подтверждения")
-    
 
     
     
