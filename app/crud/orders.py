@@ -591,7 +591,7 @@ def get_user_order_sum(db: Session, user_id: UUID):
             Orders.user_id == user_id,
             Orders.status.in_([1, 2, 3, 4, 5]),
             Orders.is_paid == False,
-            Orders.loan_month_id.is_(None)
+            Orders.loan_month_id.isnot(None)
         ).all()
         return sum(order.total_amount for order in orders)
     except SQLAlchemyError as e:
