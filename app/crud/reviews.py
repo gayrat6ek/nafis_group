@@ -124,7 +124,7 @@ def delete_review(db: Session, review_id: UUID) -> Optional[Reviews]:
 
 
 
-def get_reviews(db: Session, product_id:Optional[UUID]=None, is_active: Optional[bool] = None,page: int = 1, size: int = 10) -> list[Reviews]:
+def get_reviews(db: Session, product_id:Optional[UUID]=None, user_id:Optional[UUID]=None, is_active: Optional[bool] = None,page: int = 1, size: int = 10) -> list[Reviews]:
     try:
         query = db.query(Reviews)
         
@@ -132,7 +132,8 @@ def get_reviews(db: Session, product_id:Optional[UUID]=None, is_active: Optional
             query = query.filter(Reviews.is_active == is_active)
         if product_id:
             query = query.filter(Reviews.product_id == product_id)
-        
+        if user_id:
+            query = query.filter(Reviews.user_id == user_id)
         query = query.order_by(Reviews.created_at.desc())
         
         # Pagination

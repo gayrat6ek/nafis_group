@@ -56,10 +56,11 @@ async def update_review(
 @reviews_router.get('/reviews', response_model=Page[ReviewGet])
 async def get_reviews_list(
         product_id: UUID = None,
+        user_id: UUID = None,
         db: Session = Depends(get_db),
         # current_user: dict = Depends(PermissionChecker(required_permissions=pages_and_permissions['Reviews']['view']))
 ):
-    reviews = crud_reviews.get_reviews(db=db, product_id=product_id)
+    reviews = crud_reviews.get_reviews(db=db, product_id=product_id, user_id=user_id)
     return reviews
 
 
