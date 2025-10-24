@@ -86,6 +86,9 @@ async def add_to_cart(
     cart.total_items_price = total_items_price
     cart.total_discounted_price = total_discounted_price
     cart.total_amount = total_price
+    cart.confirm_status = None
+    cart.confirm_number = None
+    cart.client_confirmed_date = None
     cart.item_ids = []
     db.commit()
 
